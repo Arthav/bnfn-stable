@@ -53,6 +53,7 @@ const AIChatPage = () => {
       handleSendMessage();
     }
   };
+  // add test comment
 
   return (
     <div>
