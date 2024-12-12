@@ -164,7 +164,7 @@ const showcaseSection = (
             A brief description of the project, highlighting what it does and the technologies used.
           </p>
           <a
-            href="#"
+            href="/"
             className="mt-4 inline-block text-blue-500 hover:text-blue-700 transition-colors"
           >
             View Project
@@ -184,7 +184,7 @@ const showcaseSection = (
             A brief description of the project, highlighting what it does and the technologies used.
           </p>
           <a
-            href="#"
+            href="/"
             className="mt-4 inline-block text-blue-500 hover:text-blue-700 transition-colors"
           >
             View Project
@@ -204,7 +204,7 @@ const showcaseSection = (
             A brief description of the project, highlighting what it does and the technologies used.
           </p>
           <a
-            href="#"
+            href="/"
             className="mt-4 inline-block text-blue-500 hover:text-blue-700 transition-colors"
           >
             View Project
