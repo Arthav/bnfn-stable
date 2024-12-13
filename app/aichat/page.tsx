@@ -1,45 +1,48 @@
 "use client";
 
-import React, { useState } from 'react';
-import { title } from '@/components/primitives';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { Stream } from 'stream';
+import React, { useState } from "react";
+import { title } from "@/components/primitives";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Stream } from "stream";
+import clsx from "clsx";
 
 const AIChatPage = () => {
-  const [messages, setMessages] = useState<{ user: string; text: string }[]>([]);
-  const [inputValue, setInputValue] = useState<string>('');
+  const [messages, setMessages] = useState<{ user: string; text: string }[]>(
+    []
+  );
+  const [inputValue, setInputValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSendMessage = async () => {
-    if (inputValue.trim() === '') return;
+    if (inputValue.trim() === "") return;
 
-    const userMessage = { user: 'User', text: inputValue };
+    const userMessage = { user: "User", text: inputValue };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setInputValue('');
+    setInputValue("");
     setLoading(true);
 
     try {
       const geminiKey = process.env.NEXT_PUBLIC_GEMINI_KEY;
 
       if (!geminiKey) {
-        throw new Error('Missing API Key');
+        throw new Error("Missing API Key");
       }
 
       const genAI = new GoogleGenerativeAI(geminiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent(inputValue);
 
       const aiMessage = {
-        user: 'AI',
-        text: result.response.text() || 'No response received from AI.',
+        user: "AI",
+        text: result.response.text() || "No response received from AI.",
       };
-      
+
       setMessages((prevMessages) => [...prevMessages, aiMessage]);
     } catch (error) {
-      console.error('Error fetching AI response:', error);
+      console.error("Error fetching AI response:", error);
       const errorMessage = {
-        user: 'AI',
-        text: 'Error loading AI response. Please try again later.',
+        user: "AI",
+        text: "Error loading AI response. Please try again later.",
       };
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } finally {
@@ -57,20 +60,33 @@ const AIChatPage = () => {
 
   return (
     <div>
-      <h1 className={title()}>AI Chat</h1>
-      <div className="chat-window">
+      <div
+        className="max-w-3xl min-w-3xl mx-auto p-4 md:p-6 rounded-lg bg-gray-100 dark:bg-gray-800 shadow-md overflow-y-scroll"
+        style={{ maxHeight: "80vh", minHeight: "80vh" }}
+      >
+        {messages.length === 0 && (
+          <p className="text-center h-full flex items-center justify-center">
+            Start messaging by typing a message in the chatbox below.
+          </p>
+        )}
+
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`chat-message ${
-              message.user === 'User' ? 'user-message' : 'ai-message'
-            }`}
+            className={clsx(
+              "chat-message",
+              "rounded-lg",
+              "border",
+              message.user === "User"
+                ? "border-blue-500 flex justify-end text-right"
+                : "border-gray-500 flex justify-start text-left"
+            )}
           >
-            <strong>{message.user}:</strong> {message.text}
+            {message.text}
           </div>
         ))}
       </div>
-      <div className="input-container">
+      <div className="flex items-center justify-center gap-4 py-4">
         <input
           type="text"
           value={inputValue}
@@ -81,10 +97,10 @@ const AIChatPage = () => {
         />
         <button
           onClick={handleSendMessage}
-          disabled={loading || inputValue.trim() === ''}
+          disabled={loading || inputValue.trim() === ""}
           aria-label="Send your message"
         >
-          {loading ? 'Sending...' : 'Send'}
+          {loading ? "Sending..." : "Send"}
         </button>
       </div>
     </div>
