@@ -106,7 +106,7 @@ const heroSection = (
       <button className="hover:scale-105 text-2xl bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-4 px-8 rounded-lg shadow-md hover:opacity-90 transition duration-300 ease-in-out">
         Let&apos;s Connect
       </button>
-      <button className="border-2 border-gradient-to-r from-blue-500 to-purple-500 text-2xl text-blue-500 font-semibold py-4 px-8 rounded-lg hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 hover:text-white transition duration-300 ease-in-out">
+      <button className="border-2 border-gradient-to-r from-blue-500 to-purple-500 text-2xl text-white font-semibold py-4 px-8 rounded-lg hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 transition duration-300 ease-in-out">
         View Portfolio
       </button>
     </div>

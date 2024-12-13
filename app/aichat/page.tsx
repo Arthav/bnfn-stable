@@ -78,8 +78,8 @@ const AIChatPage = () => {
               "rounded-lg",
               "border",
               message.user === "User"
-                ? "border-blue-500 flex justify-end text-right"
-                : "border-gray-500 flex justify-start text-left"
+                ? "bg-blue-500 text-white flex justify-end text-right"
+                : "flex justify-start text-left"
             )}
           >
             {message.text}
