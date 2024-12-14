@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import clsx from "clsx";
 
-import {data} from "./data";
+// import {data} from "./data";
 
 const AIChatPage = () => {
   const [messages, setMessages] = useState<{ user: string; text: string }[]>(
