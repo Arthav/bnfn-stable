@@ -4,12 +4,10 @@ import React, { useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import clsx from "clsx";
 
-// import {data} from "./data";
+import {data} from "@/components/constant/data";
 
 const AIChatPage = () => {
-  const [messages, setMessages] = useState<{ user: string; text: string }[]>(
-    []
-  );
+  const [messages, setMessages] = useState<{ user: string; text: string }[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -43,7 +41,7 @@ const AIChatPage = () => {
         },
         required: ["customerId", "issueDescription"],
       },
-    },
+    }
   ]
 
   const systempersonality = data;
