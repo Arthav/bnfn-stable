@@ -12,6 +12,10 @@ export const siteConfig = {
       label: "AI Chat",
       href: "/aichat",
     },
+    {
+      label: "Next Do",
+      href: "/nextdo",
+    },
   ],
   navMenuItems: [
     {
@@ -21,6 +25,10 @@ export const siteConfig = {
     {
       label: "AI Chat",
       href: "/aichat",
+    },
+    {
+      label: "Next Do",
+      href: "/nextdo",
     },
   ],
   links: {

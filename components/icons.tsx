@@ -186,6 +186,55 @@ export const SearchIcon = (props: IconSvgProps) => (
   </svg>
 );
 
+export const TrashIcon = (props: IconSvgProps) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="2em"
+    role="presentation"
+    viewBox="0 0 24 24"
+    width="2em"
+    {...props}
+  >
+    <path
+      d="M3 6H5H21"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    />
+    <path
+      d="M19 6V5C19 4.44772 18.5523 4 18 4H6C5.44772 4 5 4.44772 5 5V6"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    />
+    <path
+      d="M19 6V17C19 18.1046 18.1046 19 17 19H7C5.89543 19 5 18.1046 5 17V6"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    />
+    <path
+      d="M10 10V15"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    />
+    <path
+      d="M14 10V15"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    />
+  </svg>
+);
+
 export const NextUILogo: React.FC<IconSvgProps> = (props) => {
   const { width, height = 40 } = props;
 

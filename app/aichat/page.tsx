@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { title } from "@/components/primitives";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Stream } from "stream";
 import clsx from "clsx";
+
+import {data} from "./data";
 
 const AIChatPage = () => {
   const [messages, setMessages] = useState<{ user: string; text: string }[]>(
@@ -12,6 +12,43 @@ const AIChatPage = () => {
   );
   const [inputValue, setInputValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+
+  const generationConfig = {
+    temperature: 0.7, 
+    maxOutputTokens: 150, 
+    topP: 0.9, 
+    topK: 50, 
+  }
+
+  const functionDeclarations = [
+    {
+      name: "fetchCustomerData",
+      description: "Retrieve customer data based on customer ID.",
+      parameters: {
+        type: "object",
+        properties: {
+          customerId: { type: "string" },
+        },
+        required: ["customerId"],
+      },
+    },
+    {
+      name: "logSupportTicket",
+      description: "Log a support ticket with the provided details.",
+      parameters: {
+        type: "object",
+        properties: {
+          customerId: { type: "string" },
+          issueDescription: { type: "string" },
+        },
+        required: ["customerId", "issueDescription"],
+      },
+    },
+  ]
+
+  const systempersonality = data;
+  const defaultPersonality = systempersonality;
+  const systemInstructionText = JSON.stringify(defaultPersonality);
 
   const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
@@ -29,7 +66,22 @@ const AIChatPage = () => {
       }
 
       const genAI = new GoogleGenerativeAI(geminiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        systemInstruction: {
+          role: "system",
+          parts: [
+            {
+              text: "You are a customer service assistant. Provide helpful, empathetic, and concise responses to customer inquiries."
+            }
+          ],
+        },
+        generationConfig,
+        tools: {
+          functionDeclarations
+        },
+      });
+      
       const result = await model.generateContent(inputValue);
 
       const aiMessage = {
