@@ -14,7 +14,7 @@ const AIChatPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const generationConfig = {
-    temperature: 0.7, 
+    temperature: 0.9, 
     maxOutputTokens: 150, 
     topP: 0.9, 
     topK: 50, 

@@ -19,6 +19,8 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import "@/styles/driver-js.css";
 
+import {instruction} from "@/components/constant/instruction";
+
 interface Todo {
   id: number;
   text: string;
@@ -53,7 +55,7 @@ const TodoList: React.FC = () => {
           role: "system",
           parts: [
             {
-              text: "You are an AI assistant that provides a to-do list with unnumbered, actionable items. Each item should be a concise, actionable task without special characters. The tasks should be relevant to the user's current goals and priorities. The task should be has objective measureable results unless it is a general task. For some task it may require number like do plank 30s or situps 5 times, you can add number objective to some tasks like that. Be creative in your task generation.",
+              text: instruction.todoList,
             },
           ],
         },
