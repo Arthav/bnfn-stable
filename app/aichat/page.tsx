@@ -31,7 +31,7 @@ const AIChatPage = () => {
 
   const generationConfig = {
     temperature: 0.9,
-    maxOutputTokens: 150,
+    maxOutputTokens: 250,
     topP: 0.9,
     topK: 50,
   };
@@ -132,15 +132,20 @@ const AIChatPage = () => {
         className="max-w-3xl min-w-3xl mx-auto p-4 md:p-6 rounded-lg bg-gray-100 dark:bg-gray-800 shadow-md overflow-y-scroll"
         style={{ maxHeight: "80vh", minHeight: "80vh" }}
       >
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-2">
           <select
             className="bg-gray-200 dark:bg-gray-700 border border-gray-300 rounded-md p-2"
             value={selectedInstruction}
-            onChange={(e) => setSelectedInstruction(e.target.value as keyof typeof instruction)}
+            onChange={(e) => {
+              setSelectedInstruction(
+                e.target.value as keyof typeof instruction
+              );
+              setMessages([]);
+            }}
           >
-            {Object.keys(instructionsOptions).map((instruction) => (
+            {Object.entries(instructionsOptions).map(([instruction, label]) => (
               <option value={instruction} key={instruction}>
-                {instruction}
+                {label}
               </option>
             ))}
           </select>
