@@ -1,4 +1,4 @@
-// export const data = {
+export const data = {}
 // 	introduction: `
 //         Anda sedang berbicara dengan **Groupy Assistant**! Saya di sini untuk membantu Anda mengatasi berbagai masalah terkait penggunaan **Groupy**, termasuk instalasi ekstensi, pemecahan masalah, dan layanan khusus seperti **Netflix**, **Turnitin**, dan **WeTV**. 
 

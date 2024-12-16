@@ -132,7 +132,15 @@ const AIChatPage = () => {
                 : "flex justify-start text-left"
             )}
           >
-            {message.text}
+            <div
+              dangerouslySetInnerHTML={{
+                __html: message.text
+                  .replace(/(?:\r\n|\r|\n)/g, "<br />")
+                  .replace(/`([^`]+)`/g, "<code>$1</code>")
+                  .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+                  .replace(/\*([^*]+)\*/g, "<em>$1</em>"),
+              }}
+            />
           </div>
         ))}
       </div>
