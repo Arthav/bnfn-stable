@@ -4,19 +4,37 @@ import React, { useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import clsx from "clsx";
 
-import {data} from "@/components/constant/data";
+import { instruction } from "@/components/constant/instruction";
 
 const AIChatPage = () => {
-  const [messages, setMessages] = useState<{ user: string; text: string }[]>([]);
+  const [messages, setMessages] = useState<{ user: string; text: string }[]>(
+    []
+  );
   const [inputValue, setInputValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedInstruction, setSelectedInstruction] =
+    useState<keyof typeof instruction>("customerService");
+
+  const instructionsOptions = {
+    customerService: "Customer Service",
+    datingSims: "Dating Sims",
+    therapist: "Therapist Consultant",
+    socialMedia: "Social Media Influencer",
+    storyTeller: "Story Teller",
+    writer: "Writer",
+    songWritter: "Song Writter",
+    careerCoach: "Career Coach",
+    relationshipCouncelor: "Relationship Counsellor",
+    triviaHost: "Trivia Host",
+    techSupport: "Dating Sims",
+  };
 
   const generationConfig = {
-    temperature: 0.9, 
-    maxOutputTokens: 150, 
-    topP: 0.9, 
-    topK: 50, 
-  }
+    temperature: 0.9,
+    maxOutputTokens: 150,
+    topP: 0.9,
+    topK: 50,
+  };
 
   const functionDeclarations = [
     {
@@ -41,12 +59,12 @@ const AIChatPage = () => {
         },
         required: ["customerId", "issueDescription"],
       },
-    }
-  ]
+    },
+  ];
 
-  const systempersonality = data;
-  const defaultPersonality = systempersonality;
-  const systemInstructionText = JSON.stringify(defaultPersonality);
+  // const systempersonality = data;
+  // const defaultPersonality = systempersonality;
+  // const systemInstructionText = JSON.stringify(defaultPersonality);
 
   const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
@@ -70,8 +88,8 @@ const AIChatPage = () => {
           role: "system",
           parts: [
             {
-              text: "You are a customer service assistant. Provide helpful, empathetic, and concise responses to customer inquiries."
-            }
+              text: instruction[selectedInstruction],
+            },
           ],
         },
         generationConfig,
@@ -79,7 +97,7 @@ const AIChatPage = () => {
         //   functionDeclarations
         // },
       });
-      
+
       const result = await model.generateContent(inputValue);
 
       const aiMessage = {
@@ -114,11 +132,19 @@ const AIChatPage = () => {
         className="max-w-3xl min-w-3xl mx-auto p-4 md:p-6 rounded-lg bg-gray-100 dark:bg-gray-800 shadow-md overflow-y-scroll"
         style={{ maxHeight: "80vh", minHeight: "80vh" }}
       >
-        {messages.length === 0 && (
-          <p className="text-center h-full flex items-center justify-center">
-            Start messaging by typing a message in the chatbox below.
-          </p>
-        )}
+        <div className="flex justify-center">
+          <select
+            className="bg-gray-200 dark:bg-gray-700 border border-gray-300 rounded-md p-2"
+            value={selectedInstruction}
+            onChange={(e) => setSelectedInstruction(e.target.value as keyof typeof instruction)}
+          >
+            {Object.keys(instructionsOptions).map((instruction) => (
+              <option value={instruction} key={instruction}>
+                {instruction}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {messages.map((message, index) => (
           <div
