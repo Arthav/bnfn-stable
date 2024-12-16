@@ -75,9 +75,9 @@ const AIChatPage = () => {
           ],
         },
         generationConfig,
-        tools: {
-          functionDeclarations
-        },
+        // tools: {
+        //   functionDeclarations
+        // },
       });
       
       const result = await model.generateContent(inputValue);
