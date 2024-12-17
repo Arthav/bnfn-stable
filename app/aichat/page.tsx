@@ -93,9 +93,6 @@ const AIChatPage = () => {
           ],
         },
         generationConfig,
-        // tools: {
-        //   functionDeclarations
-        // },
       });
 
       const result = await model.generateContent(inputValue);
@@ -128,28 +125,28 @@ const AIChatPage = () => {
 
   return (
     <div>
+    <div className="flex justify-center mb-2">
+      <select
+        className="bg-gray-200 dark:bg-gray-700 border border-gray-300 rounded-md p-2"
+        value={selectedInstruction}
+        onChange={(e) => {
+          setSelectedInstruction(
+            e.target.value as keyof typeof instruction
+          );
+          setMessages([]);
+        }}
+      >
+        {Object.entries(instructionsOptions).map(([instruction, label]) => (
+          <option value={instruction} key={instruction}>
+            {label}
+          </option>
+        ))}
+      </select>
+    </div>
       <div
-        className="max-w-3xl min-w-3xl mx-auto p-4 md:p-6 rounded-lg bg-gray-100 dark:bg-gray-800 shadow-md overflow-y-scroll"
+        className="mx-auto p-4 md:p-6 rounded-lg bg-gray-100 dark:bg-gray-900 shadow-md overflow-y-scroll"
         style={{ maxHeight: "80vh", minHeight: "80vh" }}
       >
-        <div className="flex justify-center mb-2">
-          <select
-            className="bg-gray-200 dark:bg-gray-700 border border-gray-300 rounded-md p-2"
-            value={selectedInstruction}
-            onChange={(e) => {
-              setSelectedInstruction(
-                e.target.value as keyof typeof instruction
-              );
-              setMessages([]);
-            }}
-          >
-            {Object.entries(instructionsOptions).map(([instruction, label]) => (
-              <option value={instruction} key={instruction}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
 
         {messages.map((message, index) => (
           <div
@@ -159,7 +156,7 @@ const AIChatPage = () => {
               "rounded-lg",
               "border",
               message.user === "User"
-                ? "bg-blue-500 text-white flex justify-end text-right"
+                ? "bg-gray-500 text-white flex justify-end text-right"
                 : "flex justify-start text-left"
             )}
           >
