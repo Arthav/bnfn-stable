@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, ChatSession } from "@google/generative-ai";
 import clsx from "clsx";
 
 import { instruction } from "@/components/constant/instruction";
@@ -14,10 +14,10 @@ const AIChatPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedInstruction, setSelectedInstruction] =
     useState<keyof typeof instruction>("customerService");
+  const [chatSession, setChatSession] = useState<ChatSession | null>(null);
 
   const instructionsOptions = {
     customerService: "Customer Service",
-    datingSims: "Dating Sims",
     therapist: "Therapist Consultant",
     socialMedia: "Social Media Influencer",
     storyTeller: "Story Teller",
@@ -26,7 +26,8 @@ const AIChatPage = () => {
     careerCoach: "Career Coach",
     relationshipCouncelor: "Relationship Counsellor",
     triviaHost: "Trivia Host",
-    techSupport: "Dating Sims",
+    techSupport: "Tech Support",
+    bhaktaSupport: "Bhakta Support",
   };
 
   const generationConfig = {
@@ -36,31 +37,23 @@ const AIChatPage = () => {
     topK: 50,
   };
 
-  const functionDeclarations = [
-    {
-      name: "fetchCustomerData",
-      description: "Retrieve customer data based on customer ID.",
-      parameters: {
-        type: "object",
-        properties: {
-          customerId: { type: "string" },
-        },
-        required: ["customerId"],
+  const initializeChatSession = (apiKey: string) => {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: {
+        role: "system",
+        parts: [
+          {
+            text: instruction[selectedInstruction],
+          },
+        ],
       },
-    },
-    {
-      name: "logSupportTicket",
-      description: "Log a support ticket with the provided details.",
-      parameters: {
-        type: "object",
-        properties: {
-          customerId: { type: "string" },
-          issueDescription: { type: "string" },
-        },
-        required: ["customerId", "issueDescription"],
-      },
-    },
-  ];
+      generationConfig,
+    });
+
+    return model.startChat(); // Return new ChatSession instance
+  };
 
   // const systempersonality = data;
   // const defaultPersonality = systempersonality;
@@ -81,21 +74,15 @@ const AIChatPage = () => {
         throw new Error("Missing API Key");
       }
 
-      const genAI = new GoogleGenerativeAI(geminiKey);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
-        systemInstruction: {
-          role: "system",
-          parts: [
-            {
-              text: instruction[selectedInstruction],
-            },
-          ],
-        },
-        generationConfig,
-      });
+      // Initialize ChatSession if not already initialized
+      let session = chatSession;
+      if (!session) {
+        session = initializeChatSession(geminiKey);
+        setChatSession(session);
+      }
 
-      const result = await model.generateContent(inputValue);
+      // Send the user's message to the model
+      const result = await session.sendMessage(inputValue);
 
       const aiMessage = {
         user: "AI",
@@ -134,6 +121,7 @@ const AIChatPage = () => {
             e.target.value as keyof typeof instruction
           );
           setMessages([]);
+          setChatSession(null);
         }}
       >
         {Object.entries(instructionsOptions).map(([instruction, label]) => (
