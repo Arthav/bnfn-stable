@@ -16,6 +16,10 @@ export const siteConfig = {
       label: "Next Do",
       href: "/nextdo",
     },
+    {
+      label: "Langlern",
+      href: "https://mulmod.vercel.app/",
+    },
   ],
   navMenuItems: [
     {
@@ -29,6 +33,10 @@ export const siteConfig = {
     {
       label: "Next Do",
       href: "/nextdo",
+    },
+    {
+      label: "Langlern",
+      href: "https://mulmod.vercel.app/",
     },
   ],
   links: {
