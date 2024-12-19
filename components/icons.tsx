@@ -24,6 +24,26 @@ export const Logo: React.FC<IconSvgProps> = ({
   </svg>
 );
 
+export const BNFNLogo: React.FC<IconSvgProps> = ({
+  size = 36,
+  width,
+  height,
+  ...props
+}) => (
+  <svg
+    id="fi_10966862"
+    enableBackground="new 0 0 512 512"
+    viewBox="0 0 512 512"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g id="guide"></g>
+    <g id="GLYPH">
+      <path d="m256 16c-10.7 220.5-19.5 229.3-240 240 220.5 10.7 229.3 19.5 240 240 10.7-220.5 19.5-229.3 240-240-220.5-10.7-229.3-19.5-240-240z"></path>
+    </g>
+    <g id="Number"></g>
+  </svg>
+);
+
 export const DiscordIcon: React.FC<IconSvgProps> = ({
   size = 24,
   width,

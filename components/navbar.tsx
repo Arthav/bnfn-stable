@@ -23,7 +23,7 @@ import {
   DiscordIcon,
   HeartFilledIcon,
   SearchIcon,
-  Logo,
+  BNFNLogo,
 } from "@/components/icons";
 
 export const Navbar = () => {
@@ -53,7 +53,7 @@ export const Navbar = () => {
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo />
+            <BNFNLogo />
             <p className="font-bold text-inherit">BNFN</p>
           </NextLink>
         </NavbarBrand>
