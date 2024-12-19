@@ -13,6 +13,7 @@ import {
   SiHtml5,
   SiCss3,
 } from "react-icons/si";
+import SkillCardComponent from "@/components/SkillCard";
 
 const SkillCard = ({
   icon: Icon,
@@ -26,7 +27,6 @@ const SkillCard = ({
     <span className="text-lg dark:text-white">{name}</span>
   </li>
 );
-
 
 export default function Home() {
   useEffect(() => {
@@ -86,7 +86,6 @@ export default function Home() {
   );
 }
 
-
 const heroSection = (
   <div className="flex flex-col items-center justify-center gap-10 text-center lg:text-left px-4 sm:px-8 md:px-16 mb-10 w-full relative">
     <h1 className="text-5xl font-extrabold leading-tight md:text-6xl lg:text-7xl relative z-10 select-none">
@@ -113,33 +112,27 @@ const heroSection = (
   </div>
 );
 const skillsSection = (
-  <div className="flex flex-col gap-10">
+  <div id="skillsection" className="flex flex-col gap-10">
     <div className="h-16"></div>
     <h2 className="text-4xl font-bold dark:text-white">My Skills</h2>
     <p className="text-lg text-gray-600 dark:text-gray-300">
       I specialize in web development, working with both frontend and backend
       technologies.
     </p>
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <ul className="flex flex-col gap-4">
-        <SkillCard icon={SiNextdotjs} name="Next.js" />
-        <SkillCard icon={FaReact} name="React" />
-        <SkillCard icon={SiJavascript} name="JavaScript" />
-        <SkillCard icon={SiTypescript} name="TypeScript" />
-        <SkillCard icon={SiHtml5} name="HTML" />
-        <SkillCard icon={SiCss3} name="CSS" />
-      </ul>
-      <ul className="flex flex-col gap-4">
-        <SkillCard icon={FaNodeJs} name="Node.js" />
-        <SkillCard icon={FaGitAlt} name="Git" />
-        <SkillCard icon={SiMongodb} name="MongoDB" />
-        <SkillCard icon={SiPostgresql} name="PostgreSQL" />
-        <SkillCard icon={SiGraphql} name="GraphQL" />
-        <SkillCard icon={FaDocker} name="Docker" />
-      </ul>
-      <ul className="flex flex-col gap-4">
-        <SkillCard icon={SiKubernetes} name="Kubernetes" />
-        <SkillCard icon={SiLinux} name="Linux" />
+    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+      <ul className="flex flex-col gap-4 w-full">
+        <SkillCardComponent icon={SiNextdotjs} name="Next.js" />
+        <SkillCardComponent icon={FaReact} name="React" />
+        <SkillCardComponent icon={SiJavascript} name="JavaScript" />
+        <SkillCardComponent icon={SiTypescript} name="TypeScript" />
+        <SkillCardComponent icon={SiHtml5} name="HTML" />
+        <SkillCardComponent icon={SiCss3} name="CSS" />
+        <SkillCardComponent icon={FaNodeJs} name="Nodejs" />
+        <SkillCardComponent icon={FaGitAlt} name="Git" />
+        <SkillCardComponent icon={SiMongodb} name="MongoDB" />
+        <SkillCardComponent icon={SiPostgresql} name="PostgreSQL" />
+        <SkillCardComponent icon={SiGraphql} name="GraphQL" />
+        <SkillCardComponent icon={FaDocker} name="Docker" />
       </ul>
     </div>
   </div>
@@ -148,7 +141,8 @@ const showcaseSection = (
   <div className="flex flex-col gap-6 w-full mt-12">
     <h2 className="text-4xl font-bold dark:text-white">Showcase</h2>
     <p className="text-lg text-gray-600 dark:text-gray-300">
-      Here are some of the projects I&apos;ve worked on. Click on each project to learn more.
+      Here are some of the projects I&apos;ve worked on. Click on each project
+      to learn more.
     </p>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       {/* Project 1 */}
@@ -159,9 +153,12 @@ const showcaseSection = (
           className="w-full h-48 object-cover"
         />
         <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Project Title 1</h3>
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+            Project Title 1
+          </h3>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            A brief description of the project, highlighting what it does and the technologies used.
+            A brief description of the project, highlighting what it does and
+            the technologies used.
           </p>
           <a
             href="/"
@@ -179,9 +176,12 @@ const showcaseSection = (
           className="w-full h-48 object-cover"
         />
         <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Project Title 2</h3>
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+            Project Title 2
+          </h3>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            A brief description of the project, highlighting what it does and the technologies used.
+            A brief description of the project, highlighting what it does and
+            the technologies used.
           </p>
           <a
             href="/"
@@ -199,9 +199,12 @@ const showcaseSection = (
           className="w-full h-48 object-cover"
         />
         <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Project Title 3</h3>
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+            Project Title 3
+          </h3>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            A brief description of the project, highlighting what it does and the technologies used.
+            A brief description of the project, highlighting what it does and
+            the technologies used.
           </p>
           <a
             href="/"
