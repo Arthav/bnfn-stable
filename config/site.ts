@@ -1,8 +1,8 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "BNFN",
-  description: "Christian Bonafena Personal Website.",
+  name: "Christian Bonafena",
+  description: "Christian Bonafena's Personal Website.",
   navItems: [
     {
       label: "Home",

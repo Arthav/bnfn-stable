@@ -14,6 +14,21 @@ export const metadata: Metadata = {
     default: siteConfig.name,
     template: `%s - ${siteConfig.name}`,
   },
+  authors: [
+    {
+      name: "Christian Bonafena",
+      url: "https://github.com/Arthav",
+    },
+  ],
+  generator: "Personal website of Christian Bonafena, next ui, vercel ",
+  keywords: [
+    "Personal website",
+    "next ui",
+    "vercel",
+    "Christian Bonafena",
+  ],
+  creator: "Christian Bonafena",
+  applicationName: siteConfig.name,
   description: siteConfig.description,
   icons: {
     icon: "/star.ico",
