@@ -6,7 +6,7 @@ import clsx from "clsx";
 
 import { instruction } from "@/components/constant/instruction";
 
-const AIChatPage = () => {
+const PdfChat = () => {
   const [messages, setMessages] = useState<{ user: string; text: string }[]>(
     []
   );
@@ -15,20 +15,6 @@ const AIChatPage = () => {
   const [selectedInstruction, setSelectedInstruction] =
     useState<keyof typeof instruction>("customerService");
   const [chatSession, setChatSession] = useState<ChatSession | null>(null);
-
-  const instructionsOptions = {
-    customerService: "Customer Service",
-    therapist: "Therapist Consultant",
-    socialMedia: "Social Media Influencer",
-    storyTeller: "Story Teller",
-    writer: "Writer",
-    songWritter: "Song Writter",
-    careerCoach: "Career Coach",
-    relationshipCouncelor: "Relationship Counsellor",
-    triviaHost: "Trivia Host",
-    techSupport: "Tech Support",
-    bhaktaSupport: "Bhakta Support",
-  };
 
   const generationConfig = {
     temperature: 0.9,
@@ -45,7 +31,7 @@ const AIChatPage = () => {
         role: "system",
         parts: [
           {
-            text: instruction[selectedInstruction],
+            text: instruction["bhaktaSupport"],
           },
         ],
       },
@@ -105,29 +91,9 @@ const AIChatPage = () => {
       handleSendMessage();
     }
   };
-  // add test comment
 
   return (
     <div>
-    <div className="flex justify-center mb-2">
-      <select
-        className="bg-gray-200 dark:bg-gray-700 border border-gray-300 rounded-md p-2"
-        value={selectedInstruction}
-        onChange={(e) => {
-          setSelectedInstruction(
-            e.target.value as keyof typeof instruction
-          );
-          setMessages([]);
-          setChatSession(null);
-        }}
-      >
-        {Object.entries(instructionsOptions).map(([instruction, label]) => (
-          <option value={instruction} key={instruction}>
-            {label}
-          </option>
-        ))}
-      </select>
-    </div>
       <div
         className="mx-auto p-4 md:p-6 rounded-lg bg-gray-100 dark:bg-gray-900 shadow-md overflow-y-scroll"
         style={{ maxHeight: "80vh", minHeight: "80vh" }}
@@ -178,4 +144,4 @@ const AIChatPage = () => {
   );
 };
 
-export default AIChatPage;
+export default PdfChat;
