@@ -8,25 +8,12 @@ import {
   SiMongodb,
   SiPostgresql,
   SiGraphql,
-  SiKubernetes,
-  SiLinux,
   SiHtml5,
   SiCss3,
 } from "react-icons/si";
 import SkillCardComponent from "@/components/SkillCard";
+import BioSection from "@/components/portoSection/bio";
 
-const SkillCard = ({
-  icon: Icon,
-  name,
-}: {
-  icon: React.ElementType;
-  name: string;
-}) => (
-  <li className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all rounded-md p-2">
-    <Icon className="text-xl text-blue-500 dark:text-blue-400" />
-    <span className="text-lg dark:text-white">{name}</span>
-  </li>
-);
 
 export default function Home() {
   useEffect(() => {
@@ -76,6 +63,9 @@ export default function Home() {
       {/* Skills section */}
       {skillsSection}
 
+      {/* Bio section */}
+      <BioSection />
+
       {/* Showcase section */}
       {showcaseSection}
 
@@ -102,17 +92,25 @@ const heroSection = (
       life through clean, elegant code.
     </p>
     <div className="select-none mt-6 flex gap-4 justify-center lg:justify-start relative z-10 mb-20">
-      <button className="hover:scale-105 text-2xl bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-4 px-8 rounded-lg shadow-md hover:opacity-90 transition duration-300 ease-in-out">
+      <a href="https://www.linkedin.com/in/cbonz/" target="_blank" rel="noopener noreferrer" className="hover:scale-105 text-2xl bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-4 px-8 rounded-lg shadow-md hover:opacity-90 transition duration-300 ease-in-out">
         Let&apos;s Connect
-      </button>
-      <button className="border-2 border-gradient-to-r from-blue-500 to-purple-500 text-2xl text-white font-semibold py-4 px-8 rounded-lg hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 transition duration-300 ease-in-out">
-        View Portfolio
+      </a>
+      <button
+        className="border-2 border-gradient-to-r from-blue-500 to-purple-500 text-2xl text-white font-semibold py-4 px-8 rounded-lg hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 transition duration-300 ease-in-out"
+        onClick={() => {
+          const section = document.getElementById("showcase");
+          if (section) {
+            section.scrollIntoView({ behavior: "smooth" });
+          }
+        }}
+      >
+        View Showcase
       </button>
     </div>
   </div>
 );
 const skillsSection = (
-  <div id="skillsection" className="flex flex-col gap-10">
+  <div id="skills" className="flex flex-col gap-10 w-full">
     <div className="h-16"></div>
     <h2 className="text-4xl font-bold dark:text-white">My Skills</h2>
     <p className="text-lg text-gray-600 dark:text-gray-300">
@@ -187,8 +185,8 @@ const skillsSection = (
   </div>
 );
 const showcaseSection = (
-  <div className="flex flex-col gap-6 w-full mt-12">
-    <h2 className="text-4xl font-bold dark:text-white">Showcase</h2>
+  <div id="showcase" className="flex flex-col gap-6 w-full mt-12">
+    <h2 className="text-4xl font-bold dark:text-white">Projects</h2>
     <p className="text-lg text-gray-600 dark:text-gray-300">
       Here are some of the projects I&apos;ve worked on. Click on each project
       to learn more.
@@ -197,7 +195,7 @@ const showcaseSection = (
       {/* Project 1 */}
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
         <img
-          src="https://via.placeholder.com/300" // Replace with your project image
+          src="https://via.placeholder.com/300"
           alt="Project 1"
           className="w-full h-48 object-cover"
         />
