@@ -67,7 +67,7 @@ export default function Home() {
       <BioSection />
 
       {/* Showcase section */}
-      {showcaseSection}
+      {/* {showcaseSection} */}
 
       {/* Contact section */}
 
