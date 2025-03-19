@@ -7,6 +7,7 @@ interface Worker {
   serviceTime: string | number;
   endTime: string;
   status: "Available" | "Busy" | "On Leave";
+  availableSince?: number; 
 }
 
 const initialWorkers: Worker[] = [
@@ -95,6 +96,7 @@ export default function MassageShift() {
   // Cron-like check: every minute, update status if the end time is reached.
   useEffect(() => {
     const interval = setInterval(() => {
+      const timestamp = Date.now();
       setWorkers((prev) =>
         prev.map((worker) => {
           if (worker.status === "Busy" && worker.endTime) {
@@ -107,6 +109,7 @@ export default function MassageShift() {
                 startTime: "",
                 serviceTime: "",
                 endTime: "",
+                availableSince: timestamp,
               };
             }
           }
@@ -182,6 +185,7 @@ export default function MassageShift() {
 
   // Immediately sets the worker status to Available.
   const finishWorker = (workerId: number) => {
+    const timestamp = Date.now();
     setWorkers((prev) =>
       prev.map((worker) =>
         worker.id === workerId
@@ -191,6 +195,7 @@ export default function MassageShift() {
               startTime: "",
               serviceTime: "",
               endTime: "",
+              availableSince: timestamp,
             }
           : worker
       )
@@ -258,9 +263,21 @@ export default function MassageShift() {
   };
 
   // Always sort the workers by status order.
-  const sortedWorkers = [...workers].sort(
-    (a, b) => statusOrder[a.status] - statusOrder[b.status]
-  );
+  const sortedWorkers = [...workers].sort((a, b) => {
+    const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+    if (statusDiff !== 0) return statusDiff;
+  
+    // Both workers have the same status:
+    if (a.status === "Available" && b.status === "Available") {
+      // Workers who never became busy (no timestamp) should appear first
+      const aTimestamp = a.availableSince || 0;
+      const bTimestamp = b.availableSince || 0;
+      return aTimestamp - bTimestamp;
+    }
+  
+    return 0; // If status isn't 'Available', maintain existing order
+  });
+  
 
   return (
     <div className="min-h-screen bg-black p-4 text-white">
@@ -303,7 +320,7 @@ export default function MassageShift() {
                 {worker.name}
               </td>
               <td className="px-6 py-4">{worker.startTime}</td>
-              <td className="px-6 py-4">{worker.serviceTime}</td>
+              <td className="px-6 py-4 text-center">{worker.serviceTime} {worker.serviceTime === "" ? "" : "Minute(s)"}</td>
               <td className="px-6 py-4">{worker.endTime}</td>
               <td className="px-6 py-4">
                 <span
