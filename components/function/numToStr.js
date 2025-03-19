@@ -70,7 +70,7 @@ function numToString(num) {
         currentNum = Math.floor(currentNum / 1000);
         counter++;
         continue;
-      }else {
+      } else {
         processedNum = currentNum % 1000;
       }
       currentNum = Math.floor(currentNum / 1000);
@@ -93,15 +93,22 @@ function numToString(num) {
       unit = processedNum % 10 > 0 ? angka[processedNum % 10] : "";
     }
 
-    result = hundreds + dozens + " "+ unit + " " + satuanBesar[counter]  + " "  + result;
+    result =
+      hundreds +
+      dozens +
+      " " +
+      unit +
+      " " +
+      satuanBesar[counter] +
+      " " +
+      result;
     counter++;
   }
   return normalizeSpaces(result);
 }
 
 function normalizeSpaces(string) {
-  return string.replace(/\s+/g, ' ').trim();
+  return string.replace(/\s+/g, " ").trim();
 }
 
 console.log(numToString(10010000));
-

@@ -63,7 +63,7 @@ export default function HorizontalScroll(): JSX.Element {
             <ul ref={ulRef} className="flex sticky top-0">
               <li className="h-screen w-screen bg-red-400 flex flex-col justify-center overflow-hidden  items-center">
                 <h2 className="text-[20vw] font-semibold relative bottom-5 inline-block text-black">
-                  PASSIONate
+                  PASSIONATE
                 </h2>
                 <Image
                   src="/images/pexels-chevanon-325044.jpg"
@@ -125,9 +125,13 @@ export default function HorizontalScroll(): JSX.Element {
           </section>
           <footer className="bg-red-600 text-white grid place-content-center h-[80vh]">
             <p>
-              "I am who i am" <br />
+              &quot;I am who i am&quot; <br />
               <br />
-              <a target="_blank" href="">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://www.linkedin.com/in/cbonz/"
+              >
                 ~ Christian Bonafena
               </a>
             </p>

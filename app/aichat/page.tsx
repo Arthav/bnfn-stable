@@ -55,7 +55,6 @@ const AIChatPage = () => {
     return model.startChat();
   };
 
-
   const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
 
@@ -109,30 +108,27 @@ const AIChatPage = () => {
 
   return (
     <div>
-    <div className="flex justify-center mb-2">
-      <select
-        className="bg-gray-200 dark:bg-gray-700 border border-gray-300 rounded-md p-2"
-        value={selectedInstruction}
-        onChange={(e) => {
-          setSelectedInstruction(
-            e.target.value as keyof typeof instruction
-          );
-          setMessages([]);
-          setChatSession(null);
-        }}
-      >
-        {Object.entries(instructionsOptions).map(([instruction, label]) => (
-          <option value={instruction} key={instruction}>
-            {label}
-          </option>
-        ))}
-      </select>
-    </div>
+      <div className="flex justify-center mb-2">
+        <select
+          className="bg-gray-200 dark:bg-gray-700 border border-gray-300 rounded-md p-2"
+          value={selectedInstruction}
+          onChange={(e) => {
+            setSelectedInstruction(e.target.value as keyof typeof instruction);
+            setMessages([]);
+            setChatSession(null);
+          }}
+        >
+          {Object.entries(instructionsOptions).map(([instruction, label]) => (
+            <option value={instruction} key={instruction}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </div>
       <div
         className="mx-auto p-4 md:p-6 rounded-lg bg-gray-100 dark:bg-gray-900 shadow-md overflow-y-scroll"
         style={{ maxHeight: "80vh", minHeight: "80vh" }}
       >
-
         {messages.map((message, index) => (
           <div
             key={index}

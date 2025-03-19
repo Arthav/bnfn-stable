@@ -41,7 +41,6 @@ const PdfChat = () => {
     return model.startChat();
   };
 
-
   const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
 
@@ -98,7 +97,6 @@ const PdfChat = () => {
         className="mx-auto p-4 md:p-6 rounded-lg bg-gray-100 dark:bg-gray-900 shadow-md overflow-y-scroll"
         style={{ maxHeight: "80vh", minHeight: "80vh" }}
       >
-
         {messages.map((message, index) => (
           <div
             key={index}
