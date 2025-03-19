@@ -28,7 +28,7 @@ const initialWorkers: Worker[] = [
   },
   {
     id: 3,
-    name: "Charlie",
+    name: "Klauzo",
     startTime: "",
     serviceTime: "",
     endTime: "",
