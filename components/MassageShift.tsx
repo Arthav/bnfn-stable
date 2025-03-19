@@ -7,7 +7,7 @@ interface Worker {
   serviceTime: string | number;
   endTime: string;
   status: "Available" | "Busy" | "On Leave";
-  availableSince?: number; 
+  availableSince?: number;
 }
 
 const initialWorkers: Worker[] = [
@@ -266,7 +266,7 @@ export default function MassageShift() {
   const sortedWorkers = [...workers].sort((a, b) => {
     const statusDiff = statusOrder[a.status] - statusOrder[b.status];
     if (statusDiff !== 0) return statusDiff;
-  
+
     // Both workers have the same status:
     if (a.status === "Available" && b.status === "Available") {
       // Workers who never became busy (no timestamp) should appear first
@@ -274,10 +274,9 @@ export default function MassageShift() {
       const bTimestamp = b.availableSince || 0;
       return aTimestamp - bTimestamp;
     }
-  
+
     return 0; // If status isn't 'Available', maintain existing order
   });
-  
 
   return (
     <div className="min-h-screen bg-black p-4 text-white">
@@ -290,78 +289,85 @@ export default function MassageShift() {
           Add Worker
         </button>
       </div>
-      <table className="min-w-full divide-y divide-gray-700">
-        <thead className="bg-gray-800">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Worker Name
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Start Time
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Service Time (minute)
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              End Time
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-              Action
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-gray-900 divide-y divide-gray-800">
-          {sortedWorkers.map((worker) => (
-            <tr key={worker.id} className="hover:bg-gray-800">
-              <td className="px-6 py-4 max-w-[150px] truncate">
-                {worker.name}
-              </td>
-              <td className="px-6 py-4">{worker.startTime}</td>
-              <td className="px-6 py-4 text-center">{worker.serviceTime} {worker.serviceTime === "" ? "" : "Minute(s)"}</td>
-              <td className="px-6 py-4">{worker.endTime}</td>
-              <td className="px-6 py-4">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs text-white ${statusClasses[worker.status]}`}
-                >
-                  {worker.status}
-                </span>
-              </td>
-              <td className="px-6 py-4 space-x-2">
-                <button
-                  onClick={() => openWorkTimeModal(worker)}
-                  disabled={worker.status === "Busy" || worker.status === "On Leave"}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded disabled:opacity-50"
-                >
-                  Work
-                </button>
-                <button
-                  onClick={() => openEditWorkerModal(worker)}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => finishWorker(worker.id)}
-                  disabled={worker.status !== "Busy"}
-                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded disabled:opacity-50"
-                >
-                  Done
-                </button>
-                <button
-                  onClick={() => toggleOnLeave(worker.id)}
-                  disabled={worker.status === "Busy"}
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded disabled:opacity-50"
-                >
-                  L
-                </button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-700">
+          <thead className="bg-gray-800">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Worker Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Start Time
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Service Time (minute)
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                End Time
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Action
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-gray-900 divide-y divide-gray-800">
+            {sortedWorkers.map((worker) => (
+              <tr key={worker.id} className="hover:bg-gray-800">
+                <td className="px-6 py-4 max-w-[150px] truncate">
+                  {worker.name}
+                </td>
+                <td className="px-6 py-4">{worker.startTime}</td>
+                <td className="px-6 py-4 text-center">
+                  {worker.serviceTime}{" "}
+                  {worker.serviceTime === "" ? "" : "Minute(s)"}
+                </td>
+                <td className="px-6 py-4">{worker.endTime}</td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs text-white ${statusClasses[worker.status]}`}
+                  >
+                    {worker.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 md:space-x-2 flex flex-col md:flex-row md:items-center md:justify-center">
+                  <button
+                    onClick={() => openWorkTimeModal(worker)}
+                    disabled={
+                      worker.status === "Busy" || worker.status === "On Leave"
+                    }
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded disabled:opacity-50"
+                  >
+                    Work
+                  </button>
+                  <button
+                    onClick={() => openEditWorkerModal(worker)}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => finishWorker(worker.id)}
+                    disabled={worker.status !== "Busy"}
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded disabled:opacity-50"
+                  >
+                    Done
+                  </button>
+                  <button
+                    onClick={() => toggleOnLeave(worker.id)}
+                    disabled={worker.status === "Busy"}
+                    className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded disabled:opacity-50"
+                  >
+                    L
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Modal */}
       {modalType && (
