@@ -20,6 +20,10 @@ export const siteConfig = {
       label: "Langlern",
       href: "https://mulmod.vercel.app/",
     },
+    {
+      label: "Massage",
+      href: "/massage",
+    },
   ],
   navMenuItems: [
     {
