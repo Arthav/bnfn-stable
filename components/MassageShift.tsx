@@ -65,14 +65,42 @@ export default function MassageShift() {
   });
   const [nameFormData, setNameFormData] = useState<string>("");
 
-  // Check every second if a worker's end time is reached and update status accordingly.
+  // Load workers from localStorage on component mount.
+  useEffect(() => {
+    const storedWorkers = localStorage.getItem("workers");
+    if (storedWorkers) {
+      setWorkers(JSON.parse(storedWorkers));
+    }
+  }, []);
+
+  // Save workers to localStorage whenever they change.
+  useEffect(() => {
+    localStorage.setItem("workers", JSON.stringify(workers));
+  }, [workers]);
+
+  const parseEndTime = (endTime: string): Date => {
+    const [hours, minutes, seconds] = endTime.split(":").map(Number);
+    const now = new Date();
+    const endDate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      hours,
+      minutes,
+      seconds || 0
+    );
+    return endDate;
+  };
+
+  // Cron-like check: every minute, update status if the end time is reached.
   useEffect(() => {
     const interval = setInterval(() => {
       setWorkers((prev) =>
         prev.map((worker) => {
           if (worker.status === "Busy" && worker.endTime) {
-            // Compare current time with the stored endTime (assumed format HH:MM:SS)
-            if (new Date() >= new Date(`1970-01-01T${worker.endTime}`)) {
+            // Because we save endTime in HH:MM:SS format, this will parse correctly.
+            const endDate = parseEndTime(worker.endTime);
+            if (new Date() > endDate) {
               return {
                 ...worker,
                 status: "Available",
@@ -85,7 +113,7 @@ export default function MassageShift() {
           return worker;
         })
       );
-    }, 1000);
+    }, 20000); // Run this check every 20 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -131,15 +159,19 @@ export default function MassageShift() {
     );
     const serviceMins = parseInt(workTimeFormData.serviceTime, 10);
     const end = new Date(start.getTime() + serviceMins * 60000);
+    // Format the end time in ISO format (HH:MM:SS)
+    const padZero = (num: number) => num.toString().padStart(2, "0");
+    const formattedEnd = `${padZero(end.getHours())}:${padZero(end.getMinutes())}:${padZero(end.getSeconds())}`;
 
     setWorkers((prev) =>
       prev.map((worker) =>
         worker.id === currentWorker.id
           ? {
               ...worker,
-              startTime: start.toLocaleTimeString(),
+              // Save start time in en-GB format (optional) and end time in ISO HH:MM:SS format
+              startTime: start.toLocaleTimeString("en-GB"),
               serviceTime: serviceMins,
-              endTime: end.toLocaleTimeString(),
+              endTime: formattedEnd,
               status: "Busy",
             }
           : worker
@@ -162,6 +194,35 @@ export default function MassageShift() {
             }
           : worker
       )
+    );
+  };
+
+  // Toggle On Leave status between "Available" and "On Leave".
+  const toggleOnLeave = (workerId: number) => {
+    setWorkers((prev) =>
+      prev.map((worker) => {
+        if (worker.id === workerId) {
+          if (worker.status === "On Leave") {
+            return {
+              ...worker,
+              status: "Available",
+              startTime: "",
+              serviceTime: "",
+              endTime: "",
+            };
+          }
+          if (worker.status === "Available") {
+            return {
+              ...worker,
+              status: "On Leave",
+              startTime: "",
+              serviceTime: "",
+              endTime: "",
+            };
+          }
+        }
+        return worker;
+      })
     );
   };
 
@@ -254,7 +315,7 @@ export default function MassageShift() {
               <td className="px-6 py-4 space-x-2">
                 <button
                   onClick={() => openWorkTimeModal(worker)}
-                  disabled={worker.status === "Busy"}
+                  disabled={worker.status === "Busy" || worker.status === "On Leave"}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded disabled:opacity-50"
                 >
                   Work
@@ -267,9 +328,17 @@ export default function MassageShift() {
                 </button>
                 <button
                   onClick={() => finishWorker(worker.id)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                  disabled={worker.status !== "Busy"}
+                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded disabled:opacity-50"
                 >
-                  Finish
+                  Done
+                </button>
+                <button
+                  onClick={() => toggleOnLeave(worker.id)}
+                  disabled={worker.status === "Busy"}
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded disabled:opacity-50"
+                >
+                  L
                 </button>
               </td>
             </tr>
@@ -288,13 +357,17 @@ export default function MassageShift() {
                 </h2>
                 <form onSubmit={handleWorkTimeSubmit}>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="startTime"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Start Time:
                     </label>
                     <input
+                      id="startTime"
                       type="time"
                       value={workTimeFormData.startTime}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      onChange={(e) =>
                         setWorkTimeFormData({
                           ...workTimeFormData,
                           startTime: e.target.value,
@@ -305,10 +378,14 @@ export default function MassageShift() {
                     />
                   </div>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="serviceTime"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Service Time (minutes):
                     </label>
                     <input
+                      id="serviceTime"
                       type="number"
                       value={workTimeFormData.serviceTime}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -346,10 +423,14 @@ export default function MassageShift() {
                 </h2>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="editWorkerName"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Worker Name:
                     </label>
                     <input
+                      id="editWorkerName"
                       type="text"
                       value={nameFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -382,10 +463,14 @@ export default function MassageShift() {
                 <h2 className="text-xl font-semibold mb-4">Add New Worker</h2>
                 <form onSubmit={handleAddWorkerSubmit}>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="addWorkerName"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Worker Name:
                     </label>
                     <input
+                      id="addWorkerName"
                       type="text"
                       value={nameFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
