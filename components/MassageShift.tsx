@@ -65,6 +65,8 @@ export default function MassageShift() {
     serviceTime: "",
   });
   const [nameFormData, setNameFormData] = useState<string>("");
+  // New state to track which row’s action menu (Edit/Delete) is open.
+  const [actionMenuOpenId, setActionMenuOpenId] = useState<number | null>(null);
 
   // Load workers from localStorage on component mount.
   useEffect(() => {
@@ -72,6 +74,17 @@ export default function MassageShift() {
     if (storedWorkers) {
       setWorkers(JSON.parse(storedWorkers));
     }
+  }, []);
+
+  // handle close edit delete menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!(event.target as HTMLElement).closest('.action-menu-container')) {
+        setActionMenuOpenId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Save workers to localStorage whenever they change.
@@ -82,7 +95,7 @@ export default function MassageShift() {
   const parseEndTime = (endTime: string): Date => {
     const [hours, minutes, seconds] = endTime.split(":").map(Number);
     const now = new Date();
-    const endDate = new Date(
+    return new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate(),
@@ -90,7 +103,6 @@ export default function MassageShift() {
       minutes,
       seconds || 0
     );
-    return endDate;
   };
 
   // Cron-like check: every minute, update status if the end time is reached.
@@ -100,7 +112,6 @@ export default function MassageShift() {
       setWorkers((prev) =>
         prev.map((worker) => {
           if (worker.status === "Busy" && worker.endTime) {
-            // Because we save endTime in HH:MM:SS format, this will parse correctly.
             const endDate = parseEndTime(worker.endTime);
             if (new Date() > endDate) {
               return {
@@ -116,32 +127,29 @@ export default function MassageShift() {
           return worker;
         })
       );
-    }, 20000); // Run this check every 20 seconds
+    }, 20000);
     return () => clearInterval(interval);
   }, []);
 
-  // Open the working time modal.
   const openWorkTimeModal = (worker: Worker) => {
     setCurrentWorker(worker);
     setWorkTimeFormData({ startTime: "", serviceTime: "" });
     setModalType("workTime");
   };
 
-  // Open the edit worker modal.
   const openEditWorkerModal = (worker: Worker) => {
     setCurrentWorker(worker);
     setNameFormData(worker.name);
     setModalType("editWorker");
+    setActionMenuOpenId(null); // close action menu if open
   };
 
-  // Open the add worker modal.
   const openAddWorkerModal = () => {
     setCurrentWorker(null);
     setNameFormData("");
     setModalType("addWorker");
   };
 
-  // Submits the working time form.
   const handleWorkTimeSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (
@@ -162,7 +170,6 @@ export default function MassageShift() {
     );
     const serviceMins = parseInt(workTimeFormData.serviceTime, 10);
     const end = new Date(start.getTime() + serviceMins * 60000);
-    // Format the end time in ISO format (HH:MM:SS)
     const padZero = (num: number) => num.toString().padStart(2, "0");
     const formattedEnd = `${padZero(end.getHours())}:${padZero(end.getMinutes())}:${padZero(end.getSeconds())}`;
 
@@ -171,7 +178,6 @@ export default function MassageShift() {
         worker.id === currentWorker.id
           ? {
               ...worker,
-              // Save start time in en-GB format (optional) and end time in ISO HH:MM:SS format
               startTime: start.toLocaleTimeString("en-GB"),
               serviceTime: serviceMins,
               endTime: formattedEnd,
@@ -183,7 +189,6 @@ export default function MassageShift() {
     setModalType(null);
   };
 
-  // Immediately sets the worker status to Available.
   const finishWorker = (workerId: number) => {
     const timestamp = Date.now();
     setWorkers((prev) =>
@@ -202,7 +207,6 @@ export default function MassageShift() {
     );
   };
 
-  // Toggle On Leave status between "Available" and "On Leave".
   const toggleOnLeave = (workerId: number) => {
     setWorkers((prev) =>
       prev.map((worker) => {
@@ -231,7 +235,6 @@ export default function MassageShift() {
     );
   };
 
-  // Submits the edit worker name form.
   const handleEditSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!currentWorker) return;
@@ -245,7 +248,14 @@ export default function MassageShift() {
     setModalType(null);
   };
 
-  // Submits the add worker form.
+  // New function to handle worker deletion.
+  const handleDeleteWorker = (workerId: number) => {
+    if (window.confirm("Are you sure you want to delete this worker?")) {
+      setWorkers((prev) => prev.filter((worker) => worker.id !== workerId));
+    }
+    setActionMenuOpenId(null); // close menu after deletion
+  };
+
   const handleAddWorkerSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!nameFormData) return;
@@ -262,20 +272,15 @@ export default function MassageShift() {
     setModalType(null);
   };
 
-  // Always sort the workers by status order.
   const sortedWorkers = [...workers].sort((a, b) => {
     const statusDiff = statusOrder[a.status] - statusOrder[b.status];
     if (statusDiff !== 0) return statusDiff;
-
-    // Both workers have the same status:
     if (a.status === "Available" && b.status === "Available") {
-      // Workers who never became busy (no timestamp) should appear first
       const aTimestamp = a.availableSince || 0;
       const bTimestamp = b.availableSince || 0;
       return aTimestamp - bTimestamp;
     }
-
-    return 0; // If status isn't 'Available', maintain existing order
+    return 0;
   });
 
   return (
@@ -289,7 +294,7 @@ export default function MassageShift() {
           Add Worker
         </button>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto min-h-[500px]">
         <table className="min-w-full divide-y divide-gray-700">
           <thead className="bg-gray-800">
             <tr>
@@ -332,7 +337,7 @@ export default function MassageShift() {
                     {worker.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 md:space-x-2 flex flex-col md:flex-row md:items-center md:justify-center">
+                <td className="px-6 py-4 md:space-x-2 flex flex-col md:flex-row md:items-center md:justify-center relative">
                   <button
                     onClick={() => openWorkTimeModal(worker)}
                     disabled={
@@ -341,12 +346,6 @@ export default function MassageShift() {
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded disabled:opacity-50"
                   >
                     Work
-                  </button>
-                  <button
-                    onClick={() => openEditWorkerModal(worker)}
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded"
-                  >
-                    Edit
                   </button>
                   <button
                     onClick={() => finishWorker(worker.id)}
@@ -362,6 +361,36 @@ export default function MassageShift() {
                   >
                     L
                   </button>
+
+                  {/* New More button for Edit & Delete */}
+                  <div className="relative inline-block action-menu-container">
+                    <button
+                      onClick={() =>
+                        setActionMenuOpenId(
+                          actionMenuOpenId === worker.id ? null : worker.id
+                        )
+                      }
+                      className="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded"
+                    >
+                      ⋮
+                    </button>
+                    {actionMenuOpenId === worker.id && (
+                      <div className="absolute right-0 mt-1 w-28 bg-gray-700 rounded shadow-lg z-10">
+                        <button
+                          onClick={() => openEditWorkerModal(worker)}
+                          className="bg-yellow-600 block w-full text-left px-3 py-1 mb-1 hover:bg-yellow-700"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteWorker(worker.id)}
+                          className="bg-red-600 block w-full text-left px-3 py-1 mb-1 hover:bg-red-700"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
