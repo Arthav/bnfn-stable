@@ -11,30 +11,30 @@ interface Worker {
 }
 
 const initialWorkers: Worker[] = [
-  {
-    id: 1,
-    name: "Alice",
-    startTime: "",
-    serviceTime: "",
-    endTime: "",
-    status: "Available",
-  },
-  {
-    id: 2,
-    name: "Bob",
-    startTime: "",
-    serviceTime: "",
-    endTime: "",
-    status: "On Leave",
-  },
-  {
-    id: 3,
-    name: "Klauzo",
-    startTime: "",
-    serviceTime: "",
-    endTime: "",
-    status: "Available",
-  },
+  // {
+  //   id: 1,
+  //   name: "Alice",
+  //   startTime: "",
+  //   serviceTime: "",
+  //   endTime: "",
+  //   status: "Available",
+  // },
+  // {
+  //   id: 2,
+  //   name: "Bob",
+  //   startTime: "",
+  //   serviceTime: "",
+  //   endTime: "",
+  //   status: "On Leave",
+  // },
+  // {
+  //   id: 3,
+  //   name: "Klauzo",
+  //   startTime: "",
+  //   serviceTime: "",
+  //   endTime: "",
+  //   status: "Available",
+  // },
 ];
 
 const statusOrder: Record<Worker["status"], number> = {
@@ -394,6 +394,13 @@ export default function MassageShift() {
                 </td>
               </tr>
             ))}
+            {!sortedWorkers.length && (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  No workers available. Please add workers.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
