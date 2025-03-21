@@ -336,7 +336,7 @@ export default function MassageShift() {
                       worker.status === "On Leave"
                     }
                   >
-                    &uarr;
+                    {"↑"}
                   </button>
                   <button
                     onClick={() => handleMoveDown(worker.id)}
@@ -348,7 +348,7 @@ export default function MassageShift() {
                       worker.status === "On Leave"
                     }
                   >
-                    &darr;
+                    {"↓"}
                   </button>
                 </td>
                 <td className="px-6 py-4 max-w-[150px] truncate">
