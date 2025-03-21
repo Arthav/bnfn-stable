@@ -10,33 +10,6 @@ interface Worker {
   availableSince?: number;
 }
 
-const initialWorkers: Worker[] = [
-  // {
-  //   id: 1,
-  //   name: "Alice",
-  //   startTime: "",
-  //   serviceTime: "",
-  //   endTime: "",
-  //   status: "Available",
-  // },
-  // {
-  //   id: 2,
-  //   name: "Bob",
-  //   startTime: "",
-  //   serviceTime: "",
-  //   endTime: "",
-  //   status: "On Leave",
-  // },
-  // {
-  //   id: 3,
-  //   name: "Klauzo",
-  //   startTime: "",
-  //   serviceTime: "",
-  //   endTime: "",
-  //   status: "Available",
-  // },
-];
-
 const statusOrder: Record<Worker["status"], number> = {
   Available: 0,
   Busy: 1,
@@ -57,7 +30,10 @@ interface FormData {
 type ModalType = "workTime" | "editWorker" | "addWorker" | null;
 
 export default function MassageShift() {
-  const [workers, setWorkers] = useState<Worker[]>(initialWorkers);
+  const [workers, setWorkers] = useState<Worker[]>(() => {
+    const stored = localStorage.getItem("workers");
+    return stored ? JSON.parse(stored) : [];
+  });
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
   const [workTimeFormData, setWorkTimeFormData] = useState<FormData>({
@@ -79,7 +55,7 @@ export default function MassageShift() {
   // handle close edit delete menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!(event.target as HTMLElement).closest('.action-menu-container')) {
+      if (!(event.target as HTMLElement).closest(".action-menu-container")) {
         setActionMenuOpenId(null);
       }
     };
@@ -253,13 +229,15 @@ export default function MassageShift() {
     if (window.confirm("Are you sure you want to delete this worker?")) {
       setWorkers((prev) => prev.filter((worker) => worker.id !== workerId));
     }
-    setActionMenuOpenId(null); // close menu after deletion
+    setActionMenuOpenId(null);
   };
 
   const handleAddWorkerSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!nameFormData) return;
-    const newId = Math.max(...workers.map((w) => w.id)) + 1;
+    const newId = workers.length
+      ? Math.max(...workers.map((w) => w.id)) + 1
+      : 1;
     const newWorker: Worker = {
       id: newId,
       name: nameFormData,
@@ -270,6 +248,32 @@ export default function MassageShift() {
     };
     setWorkers((prev) => [...prev, newWorker]);
     setModalType(null);
+  };
+
+  const handleMoveDown = (workerId: number) => {
+    setWorkers((prev) => {
+      const workerIndex = prev.findIndex((w) => w.id === workerId);
+      if (workerIndex === -1 || workerIndex === prev.length - 1) return prev;
+      const newWorkers = [...prev];
+      [newWorkers[workerIndex], newWorkers[workerIndex + 1]] = [
+        newWorkers[workerIndex + 1],
+        newWorkers[workerIndex],
+      ];
+      return newWorkers;
+    });
+  };
+
+  const handleMoveUp = (workerId: number) => {
+    setWorkers((prev) => {
+      const workerIndex = prev.findIndex((w) => w.id === workerId);
+      if (workerIndex === -1 || workerIndex === 0) return prev;
+      const newWorkers = [...prev];
+      [newWorkers[workerIndex], newWorkers[workerIndex - 1]] = [
+        newWorkers[workerIndex - 1],
+        newWorkers[workerIndex],
+      ];
+      return newWorkers;
+    });
   };
 
   const sortedWorkers = [...workers].sort((a, b) => {
@@ -298,6 +302,7 @@ export default function MassageShift() {
         <table className="min-w-full divide-y divide-gray-700">
           <thead className="bg-gray-800">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"></th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Worker Name
               </th>
@@ -321,6 +326,31 @@ export default function MassageShift() {
           <tbody className="bg-gray-900 divide-y divide-gray-800">
             {sortedWorkers.map((worker) => (
               <tr key={worker.id} className="hover:bg-gray-800">
+                <td className="px-6 py-4 flex flex-row gap-2">
+                  <button
+                    onClick={() => handleMoveUp(worker.id)}
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded disabled:opacity-50"
+                    disabled={
+                      worker.id === sortedWorkers[0].id ||
+                      worker.status === "Busy" ||
+                      worker.status === "On Leave"
+                    }
+                  >
+                    &uarr;
+                  </button>
+                  <button
+                    onClick={() => handleMoveDown(worker.id)}
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded disabled:opacity-50"
+                    disabled={
+                      worker.id ===
+                        sortedWorkers[sortedWorkers.length - 1].id ||
+                      worker.status === "Busy" ||
+                      worker.status === "On Leave"
+                    }
+                  >
+                    &darr;
+                  </button>
+                </td>
                 <td className="px-6 py-4 max-w-[150px] truncate">
                   {worker.name}
                 </td>

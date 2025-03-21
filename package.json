@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@google/generative-ai": "^0.21.0",
+		"@heroui/tabs": "^2.2.13",
 		"@nextui-org/button": "2.2.3",
 		"@nextui-org/code": "2.2.3",
 		"@nextui-org/input": "2.4.3",
