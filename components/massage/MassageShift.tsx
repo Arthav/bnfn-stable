@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import { toast } from "react-toastify";
 
 interface Worker {
   id: number;
@@ -88,6 +90,16 @@ export default function MassageShift() {
           if (worker.status === "Busy" && worker.endTime) {
             const endDate = parseEndTime(worker.endTime);
             if (new Date() > endDate) {
+              toast.success(`${worker.name} has done working`, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+              
               return {
                 ...worker,
                 status: "Available",
@@ -160,6 +172,15 @@ export default function MassageShift() {
           : worker
       )
     );
+    toast.success("Worker is set to work", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
     setModalType(null);
   };
 
@@ -179,6 +200,17 @@ export default function MassageShift() {
           : worker
       )
     );
+    
+    const currentWorker = workers.find((w) => w.id === workerId);
+    toast.success(`${currentWorker?.name} has done working`, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   const toggleOnLeave = (workerId: number) => {
@@ -186,6 +218,15 @@ export default function MassageShift() {
       prev.map((worker) => {
         if (worker.id === workerId) {
           if (worker.status === "On Leave") {
+            toast.success("Worker is available", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
             return {
               ...worker,
               status: "Available",
@@ -195,6 +236,15 @@ export default function MassageShift() {
             };
           }
           if (worker.status === "Available") {
+            toast.success("Worker is on leave", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
             return {
               ...worker,
               status: "On Leave",
@@ -220,12 +270,42 @@ export default function MassageShift() {
       )
     );
     setModalType(null);
+    toast.success("Worker updated", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   // New function to handle worker deletion.
   const handleDeleteWorker = (workerId: number) => {
-    if (window.confirm("Are you sure you want to delete this worker?")) {
-      setWorkers((prev) => prev.filter((worker) => worker.id !== workerId));
+    if (workers.length > 1) {
+      if (window.confirm("Are you sure you want to delete this worker?")) {
+        setWorkers((prev) => prev.filter((worker) => worker.id !== workerId));
+        toast.success("Worker removed", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } else {
+      toast.error("Minimum 1 worker is required", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
     setActionMenuOpenId(null);
   };

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import MassageShift from "@/components/massage/MassageShift";
 import ComingSoon from "@/components/comingsoon";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const tabs = [
   { key: "massage-shift", title: "Massage Shift", component: <MassageShift /> },
@@ -20,6 +22,7 @@ export default function MassageShiftPage() {
     <div className="container mx-auto max-w-7xl px-6">
       <div className="pb-5 mb-4 mb-2">
         <nav className="-mb-px flex justify-center space-x-6">
+          <ToastContainer />
           {tabs.map(({ key, title }) => (
             <button
               key={key}
