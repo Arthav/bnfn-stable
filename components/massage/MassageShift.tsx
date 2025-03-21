@@ -1,16 +1,8 @@
 
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
+import { Services, Worker } from "@/components/types/massage";
 
-interface Worker {
-  id: number;
-  name: string;
-  startTime: string;
-  serviceTime: string | number;
-  endTime: string;
-  status: "Available" | "Busy" | "On Leave";
-  availableSince?: number;
-}
 
 const statusOrder: Record<Worker["status"], number> = {
   Available: 0,
@@ -31,7 +23,7 @@ interface FormData {
 
 type ModalType = "workTime" | "editWorker" | "addWorker" | null;
 
-export default function MassageShift() {
+export default function MassageShift({services}: {services: Services[]}) {
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
