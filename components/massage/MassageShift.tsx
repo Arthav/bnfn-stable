@@ -62,6 +62,7 @@ export default function MassageShift() {
 
   // Save workers to localStorage whenever they change.
   useEffect(() => {
+    if (workers.length === 0) return;
     localStorage.setItem("workers", JSON.stringify(workers));
   }, [workers]);
 
