@@ -36,13 +36,13 @@ export default function MassageShiftPage() {
     },
     {
       key: "manage-service",
-      title: "Manage Service",
+      title: "Service",
       icon: <FaConciergeBell />,
       component: <ComingSoon />,
     },
     {
       key: "manage-addons",
-      title: "Manage Add-ons",
+      title: "Add-ons",
       icon: <FaPlusSquare />,
       component: <ComingSoon />,
     },
