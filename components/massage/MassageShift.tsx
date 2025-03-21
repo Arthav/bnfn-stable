@@ -30,10 +30,7 @@ interface FormData {
 type ModalType = "workTime" | "editWorker" | "addWorker" | null;
 
 export default function MassageShift() {
-  const [workers, setWorkers] = useState<Worker[]>(() => {
-    const stored = localStorage.getItem("workers");
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [workers, setWorkers] = useState<Worker[]>([]);
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
   const [workTimeFormData, setWorkTimeFormData] = useState<FormData>({
