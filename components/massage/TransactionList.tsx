@@ -1,5 +1,5 @@
 import React from "react";
-import { Transaction } from "./interfaces"; // adjust the import path as needed
+import { Transaction } from "@/components/types/massage";
 
 interface TransactionListProps {
   transactions: Transaction[];
