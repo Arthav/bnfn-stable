@@ -595,7 +595,10 @@ export default function MassageShift({
                     </label>
                   </div>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="selectService"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Select Service:
                     </label>
                     <select
