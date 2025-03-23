@@ -3,7 +3,7 @@ export interface Services {
   name: string;
   description: string;
   price: number;
-  status: "Active" | "On Hold" | "Discontinued";
+  status: "Active" | "Discontinued";
   serviceTimeMin: number;
   footTimeMin: number;
   bodyTimeMin: number;
@@ -14,10 +14,12 @@ export interface Worker {
   id: number;
   name: string;
   startTime: string;
-  serviceTime: string | number;
+  serviceTime: number;
   endTime: string;
-  status: "Available" | "Busy" | "On Leave";
+  status: "Available" | "Busy" | "On Leave" | "Booked";
   availableSince?: number;
+  serviceId?: number;
+  serviceName?: string;
 }
 
 export interface Transaction {
@@ -25,8 +27,14 @@ export interface Transaction {
   workerId: number;
   serviceId: number;
   startTime: string;
-  serviceTime: string | number;
+  serviceTime: number;
   endTime: string;
   sales: number;
   commission: number;
+  workerName?: string;
+  serviceName?: string;
+  footTime: number;
+  bodyTime: number;
+  customerName?: string;
+  customerPhone?: string;
 }

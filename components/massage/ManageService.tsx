@@ -2,7 +2,18 @@ import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import { Services } from "@/components/types/massage";
 
+// Constants for service status ordering and classes.
+const statusOrder: Record<Services["status"], number> = {
+  Active: 0,
+  Discontinued: 1,
+};
+
 type ModalType = "add" | "edit" | null;
+
+const statusClasses: Record<Services["status"], string> = {
+  Active: "bg-green-600",
+  Discontinued: "bg-gray-600",
+};
 
 export default function ManageServicePage({
   services,
@@ -22,6 +33,12 @@ export default function ManageServicePage({
   const [footTimeFormData, setFootTimeFormData] = useState<string>("");
   const [bodyTimeFormData, setBodyTimeFormData] = useState<string>("");
   const [commissionFormData, setCommissionFormData] = useState<string>("");
+
+  const sortedServices = [...services].sort((a, b) => {
+    const diff = statusOrder[a.status] - statusOrder[b.status];
+    if (diff !== 0) return diff;
+    return 0;
+  });
 
   // Load services from localStorage on mount.
   useEffect(() => {
@@ -115,8 +132,26 @@ export default function ManageServicePage({
   // Handles service deletion.
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
-      setServices(services.filter((service) => service.id !== id));
-      toast.success("Service deleted", {
+      setServices(
+        services.map((service) =>
+          service.id === id ? { ...service, status: "Discontinued" } : service
+        )
+      );
+      toast.success("Service discontinued", {
+        position: "top-center",
+        autoClose: 5000,
+      });
+    }
+  };
+
+  const handleActivate = (id: number) => {
+    if (window.confirm("Are you sure you want to activate this service?")) {
+      setServices(
+        services.map((service) =>
+          service.id === id ? { ...service, status: "Active" } : service
+        )
+      );
+      toast.success("Service activated", {
         position: "top-center",
         autoClose: 5000,
       });
@@ -171,7 +206,7 @@ export default function ManageServicePage({
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
-            {services.map((service) => (
+            {sortedServices.map((service) => (
               <tr key={service.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{service.name}</td>
                 <td className="px-6 py-4">{service.description}</td>
@@ -180,7 +215,13 @@ export default function ManageServicePage({
                 <td className="px-6 py-4">{service.footTimeMin}</td>
                 <td className="px-6 py-4">{service.bodyTimeMin}</td>
                 <td className="px-6 py-4">${service.commission.toFixed(2)}</td>
-                <td className="px-6 py-4">{service.status}</td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs text-white ${statusClasses[service.status]}`}
+                  >
+                    {service.status}
+                  </span>
+                </td>
                 <td className="px-6 py-4">
                   <button
                     onClick={() => openEditModal(service)}
@@ -188,18 +229,28 @@ export default function ManageServicePage({
                   >
                     Edit
                   </button>
-                  <button
-                    onClick={() => handleDelete(service.id)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
-                  >
-                    Delete
-                  </button>
+                  {service.status !== "Discontinued" && (
+                    <button
+                      onClick={() => handleDelete(service.id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                    >
+                      Discontinue
+                    </button>
+                  )}
+                  {service.status === "Discontinued" && (
+                    <button
+                      onClick={() => handleActivate(service.id)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                    >
+                      Activate
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
             {!services.length && (
               <tr>
-                <td colSpan={5} className="text-center py-4">
+                <td colSpan={9} className="text-center py-4">
                   No services available. Please add services.
                 </td>
               </tr>
@@ -281,6 +332,7 @@ export default function ManageServicePage({
                       id="serviceTime"
                       type="number"
                       value={serviceTimeFormData}
+                      min={0}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setServiceTimeFormData(e.target.value)
                       }
@@ -298,6 +350,7 @@ export default function ManageServicePage({
                     <input
                       id="footTime"
                       type="number"
+                      min={0}
                       value={footTimeFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setFootTimeFormData(e.target.value)
@@ -316,6 +369,7 @@ export default function ManageServicePage({
                     <input
                       id="bodyTime"
                       type="number"
+                      min={0}
                       value={bodyTimeFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setBodyTimeFormData(e.target.value)
@@ -335,6 +389,7 @@ export default function ManageServicePage({
                       id="commission"
                       type="number"
                       value={commissionFormData}
+                      min={0}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setCommissionFormData(e.target.value)
                       }

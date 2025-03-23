@@ -8,6 +8,7 @@ import ComingSoon from "@/components/comingsoon";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TemplatePage from "@/components/massage/TemplatePage";
+import TransactionList from "@/components/massage/TransactionList";
 import {
   FaSpa,
   FaCalendarAlt,
@@ -28,7 +29,7 @@ export default function MassageShiftPage() {
       key: "massage-shift",
       title: "Massage Shift",
       icon: <FaSpa />,
-      component: <MassageShift services={services} />,
+      component: <MassageShift services={services} transactions={transactions} setTransactions={setTransactions} />,
     },
     {
       key: "manage-service",
@@ -46,7 +47,7 @@ export default function MassageShiftPage() {
       key: "transaction",
       title: "Transaction",
       icon: <FaMoneyBillAlt />,
-      component: <ComingSoon />,
+      component: <TransactionList transactions={transactions} />,
     },
     {
       key: "report",
@@ -54,12 +55,12 @@ export default function MassageShiftPage() {
       icon: <FaChartBar />,
       component: <ComingSoon />,
     },
-    {
-      key: "template",
-      title: "Template",
-      icon: <FaFileAlt />,
-      component: <TemplatePage />,
-    },
+    // {
+    //   key: "template",
+    //   title: "Template",
+    //   icon: <FaFileAlt />,
+    //   component: <TemplatePage />,
+    // },
   ];
 
   useEffect(() => {
