@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Services } from "@/components/types/massage";
+import { Services, Transaction } from "@/components/types/massage";
 import MassageShift from "@/components/massage/MassageShift";
+import ManageService from "@/components/massage/ManageService";
 import ComingSoon from "@/components/comingsoon";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,6 +21,7 @@ import {
 export default function MassageShiftPage() {
   const [activeTab, setActiveTab] = useState("massage-shift");
   const [services, setServices] = useState<Services[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const tabs = [
     {
@@ -29,16 +31,10 @@ export default function MassageShiftPage() {
       component: <MassageShift services={services} />,
     },
     {
-      key: "booking",
-      title: "Booking",
-      icon: <FaCalendarAlt />,
-      component: <ComingSoon />,
-    },
-    {
       key: "manage-service",
       title: "Service",
       icon: <FaConciergeBell />,
-      component: <ComingSoon />,
+      component: <ManageService services={services} setServices={setServices} />,
     },
     {
       key: "manage-addons",
@@ -70,6 +66,13 @@ export default function MassageShiftPage() {
     const storedServices = localStorage.getItem("services");
     if (storedServices) {
       setServices(JSON.parse(storedServices));
+    }
+  }, []);
+
+  useEffect(() => {
+    const storedTransactions = localStorage.getItem("transactions");
+    if (storedTransactions) {
+      setTransactions(JSON.parse(storedTransactions));
     }
   }, []);
 
