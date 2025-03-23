@@ -42,12 +42,15 @@ export default function MassageShift({
   const [nameFormData, setNameFormData] = useState<string>("");
   // New states for optional customer name and phone for addWorker
   const [customerNameFormData, setCustomerNameFormData] = useState<string>("");
-  const [customerPhoneFormData, setCustomerPhoneFormData] = useState<string>("");
+  const [customerPhoneFormData, setCustomerPhoneFormData] =
+    useState<string>("");
 
   const [actionMenuOpenId, setActionMenuOpenId] = useState<number | null>(null);
   // New state for Booked checkbox and service selection.
   const [isBooked, setIsBooked] = useState(false);
-  const [selectedService, setSelectedService] = useState<number>(services[0]?.id ?? 0);
+  const [selectedService, setSelectedService] = useState<number>(
+    services[0]?.id ?? 0
+  );
 
   // Load workers from localStorage.
   useEffect(() => {
@@ -93,7 +96,10 @@ export default function MassageShift({
       const timestamp = Date.now();
       setWorkers((prev) =>
         prev.map((worker) => {
-          if ((worker.status === "Busy" || worker.status === "Booked") && worker.endTime) {
+          if (
+            (worker.status === "Busy" || worker.status === "Booked") &&
+            worker.endTime
+          ) {
             const endDate = parseEndTime(worker.endTime);
             if (new Date() > endDate) {
               toast.success(`${worker.name} has done working`, {
@@ -106,7 +112,8 @@ export default function MassageShift({
                 startTime: "",
                 serviceTime: 0,
                 endTime: "",
-                availableSince: worker.status === "Busy" ? timestamp : undefined,
+                availableSince:
+                  worker.status === "Busy" ? timestamp : undefined,
                 serviceId: undefined,
                 serviceName: undefined,
               };
@@ -145,9 +152,13 @@ export default function MassageShift({
 
   const handleWorkTimeSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!workTimeFormData.startTime || !workTimeFormData.serviceTime || !currentWorker)
+    if (
+      !workTimeFormData.startTime ||
+      !workTimeFormData.serviceTime ||
+      !currentWorker
+    )
       return;
-    
+
     const now = new Date();
     const [hours, minutes] = workTimeFormData.startTime.split(":").map(Number);
     const start = new Date(
@@ -162,7 +173,9 @@ export default function MassageShift({
     const padZero = (num: number) => num.toString().padStart(2, "0");
     const formattedEnd = `${padZero(end.getHours())}:${padZero(end.getMinutes())}:${padZero(end.getSeconds())}`;
 
-    const selectedServiceObj = services.find(service => service.id === selectedService);
+    const selectedServiceObj = services.find(
+      (service) => service.id === selectedService
+    );
     if (!selectedServiceObj) return;
 
     // Determine the new status based on the checkbox.
@@ -282,7 +295,9 @@ export default function MassageShift({
     if (!currentWorker) return;
     setWorkers((prev) =>
       prev.map((worker) =>
-        worker.id === currentWorker.id ? { ...worker, name: nameFormData } : worker
+        worker.id === currentWorker.id
+          ? { ...worker, name: nameFormData }
+          : worker
       )
     );
     setModalType(null);
@@ -313,7 +328,9 @@ export default function MassageShift({
   const handleAddWorkerSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!nameFormData) return;
-    const newId = workers.length ? Math.max(...workers.map((w) => w.id)) + 1 : 1;
+    const newId = workers.length
+      ? Math.max(...workers.map((w) => w.id)) + 1
+      : 1;
     const newWorker = {
       id: newId,
       name: nameFormData,
@@ -356,12 +373,12 @@ export default function MassageShift({
   };
 
   const sortedWorkers = workers
-  .map((worker, index) => ({ ...worker, originalIndex: index }))
-  .sort((a, b) => {
-    const statusDiff = statusOrder[a.status] - statusOrder[b.status];
-    if (statusDiff !== 0) return statusDiff;
-    return a.originalIndex - b.originalIndex;
-  });
+    .map((worker, index) => ({ ...worker, originalIndex: index }))
+    .sort((a, b) => {
+      const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+      if (statusDiff !== 0) return statusDiff;
+      return a.originalIndex - b.originalIndex;
+    });
 
   return (
     <div className="min-h-screen bg-black p-4 text-white">
@@ -418,7 +435,8 @@ export default function MassageShift({
                     onClick={() => handleMoveDown(worker.id)}
                     className="bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded disabled:opacity-50"
                     disabled={
-                      worker.id === sortedWorkers[sortedWorkers.length - 1].id ||
+                      worker.id ===
+                        sortedWorkers[sortedWorkers.length - 1].id ||
                       worker.status === "Busy" ||
                       worker.status === "On Leave"
                     }
@@ -426,28 +444,37 @@ export default function MassageShift({
                     ↓
                   </button>
                 </td>
-                <td className="px-6 py-4 max-w-[150px] truncate">{worker.name}</td>
+                <td className="px-6 py-4 max-w-[150px] truncate">
+                  {worker.name}
+                </td>
                 <td className="px-6 py-4">{worker.startTime}</td>
                 <td className="px-6 py-4 text-center">
-                  {worker.serviceTime} {worker.serviceTime === 0 ? "" : "Minute(s)"}
+                  {worker.serviceTime}{" "}
+                  {worker.serviceTime === 0 ? "" : "Minute(s)"}
                 </td>
                 <td className="px-6 py-4">{worker.endTime}</td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs text-white ${statusClasses[worker.status]}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs text-white ${statusClasses[worker.status]}`}
+                  >
                     {worker.status}
                   </span>
                 </td>
                 <td className="px-6 py-4 md:space-x-2 flex flex-col md:flex-row md:items-center md:justify-center relative">
                   <button
                     onClick={() => openWorkTimeModal(worker)}
-                    disabled={worker.status === "Busy" || worker.status === "On Leave"}
+                    disabled={
+                      worker.status === "Busy" || worker.status === "On Leave"
+                    }
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded disabled:opacity-50"
                   >
                     Work
                   </button>
                   <button
                     onClick={() => finishWorker(worker.id)}
-                    disabled={worker.status !== "Busy" && worker.status !== "Booked"}
+                    disabled={
+                      worker.status !== "Busy" && worker.status !== "Booked"
+                    }
                     className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded disabled:opacity-50"
                   >
                     Done
@@ -462,7 +489,9 @@ export default function MassageShift({
                   <div className="relative inline-block action-menu-container">
                     <button
                       onClick={() =>
-                        setActionMenuOpenId(actionMenuOpenId === worker.id ? null : worker.id)
+                        setActionMenuOpenId(
+                          actionMenuOpenId === worker.id ? null : worker.id
+                        )
                       }
                       className="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded"
                     >
@@ -509,7 +538,10 @@ export default function MassageShift({
                 </h2>
                 <form onSubmit={handleWorkTimeSubmit}>
                   <div className="mb-4">
-                    <label htmlFor="startTime" className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="startTime"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Start Time:
                     </label>
                     <input
@@ -517,14 +549,20 @@ export default function MassageShift({
                       type="time"
                       value={workTimeFormData.startTime}
                       onChange={(e) =>
-                        setWorkTimeFormData({ ...workTimeFormData, startTime: e.target.value })
+                        setWorkTimeFormData({
+                          ...workTimeFormData,
+                          startTime: e.target.value,
+                        })
                       }
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="serviceTime" className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="serviceTime"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Service Time (minutes):
                     </label>
                     <input
@@ -532,7 +570,10 @@ export default function MassageShift({
                       type="number"
                       value={workTimeFormData.serviceTime}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        setWorkTimeFormData({ ...workTimeFormData, serviceTime: e.target.value })
+                        setWorkTimeFormData({
+                          ...workTimeFormData,
+                          serviceTime: e.target.value,
+                        })
                       }
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
@@ -546,15 +587,23 @@ export default function MassageShift({
                       onChange={(e) => setIsBooked(e.target.checked)}
                       className="mr-2"
                     />
-                    <label htmlFor="bookedCheckbox" className="text-sm font-medium">
+                    <label
+                      htmlFor="bookedCheckbox"
+                      className="text-sm font-medium"
+                    >
                       Booked
                     </label>
                   </div>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Select Service:</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Select Service:
+                    </label>
                     <select
+                      id="selectService"
                       value={selectedService}
-                      onChange={(e) => setSelectedService(Number(e.target.value))}
+                      onChange={(e) =>
+                        setSelectedService(Number(e.target.value))
+                      }
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     >
                       {services.map((service) => (
@@ -566,27 +615,37 @@ export default function MassageShift({
                   </div>
                   {/* New optional customer fields */}
                   <div className="mb-4">
-                    <label htmlFor="addCustomerName" className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="addCustomerName"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Customer Name:
                     </label>
                     <input
                       id="addCustomerName"
                       type="text"
                       value={customerNameFormData}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setCustomerNameFormData(e.target.value)}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setCustomerNameFormData(e.target.value)
+                      }
                       placeholder="Optional"
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="addCustomerPhone" className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="addCustomerPhone"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Customer Phone:
                     </label>
                     <input
                       id="addCustomerPhone"
                       type="text"
                       value={customerPhoneFormData}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setCustomerPhoneFormData(e.target.value)}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setCustomerPhoneFormData(e.target.value)
+                      }
                       placeholder="Optional"
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
@@ -611,17 +670,24 @@ export default function MassageShift({
             )}
             {modalType === "editWorker" && currentWorker && (
               <>
-                <h2 className="text-xl font-semibold mb-4">Edit Name for {currentWorker.name}</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Edit Name for {currentWorker.name}
+                </h2>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-4">
-                    <label htmlFor="editWorkerName" className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="editWorkerName"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Worker Name:
                     </label>
                     <input
                       id="editWorkerName"
                       type="text"
                       value={nameFormData}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setNameFormData(e.target.value)}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setNameFormData(e.target.value)
+                      }
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
@@ -634,7 +700,10 @@ export default function MassageShift({
                     >
                       Cancel
                     </button>
-                    <button type="submit" className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded">
+                    <button
+                      type="submit"
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded"
+                    >
                       Save
                     </button>
                   </div>
@@ -646,14 +715,19 @@ export default function MassageShift({
                 <h2 className="text-xl font-semibold mb-4">Add New Worker</h2>
                 <form onSubmit={handleAddWorkerSubmit}>
                   <div className="mb-4">
-                    <label htmlFor="addWorkerName" className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="addWorkerName"
+                      className="block text-sm font-medium mb-1"
+                    >
                       Worker Name:
                     </label>
                     <input
                       id="addWorkerName"
                       type="text"
                       value={nameFormData}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setNameFormData(e.target.value)}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setNameFormData(e.target.value)
+                      }
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
@@ -666,7 +740,10 @@ export default function MassageShift({
                     >
                       Cancel
                     </button>
-                    <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded">
+                    <button
+                      type="submit"
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded"
+                    >
                       Add
                     </button>
                   </div>
