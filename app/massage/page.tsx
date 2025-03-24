@@ -73,17 +73,17 @@ export default function MassageShiftPage() {
 
   useEffect(() => {
     console.log(`
-      ========================================
-      Dear Developer, my name is Christian Bonafena
-      
-      Welcome to the hidden gateway of our code. Your unexpected discovery is not only a testament to your keen curiosity but also a nod to the finer nuances of our craft. In this realm, every semicolon shines with precision, and every curly brace holds a story of excellence.
-      
-      ★ Embrace the Mystery ★
-      
-      May your commits be legendary, your debugging swift, and your journey through code forever inspiring.
-      
-      ========================================
-      `);
+========================================
+Dear Developer, my name is Christian Bonafena
+
+Welcome to the hidden gateway of our code. Your unexpected discovery is not only a testament to your keen curiosity but also a nod to the finer nuances of our craft. In this realm, every semicolon shines with precision, and every curly brace holds a story of excellence.
+
+★ Embrace the Mystery ★
+
+May your commits be legendary, your debugging swift, and your journey through code forever inspiring.
+
+========================================
+`);
 
     const storedServices = localStorage.getItem("services");
     if (storedServices) {
