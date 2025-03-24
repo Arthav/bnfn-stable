@@ -407,6 +407,9 @@ export default function MassageShift({
                 Service Time (minute)
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Remaining Time (minute)
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 End Time
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -453,6 +456,29 @@ export default function MassageShift({
                   {worker.serviceTime}{" "}
                   {worker.serviceTime === 0 ? "" : "Minute(s)"}
                 </td>
+                <td className="px-6 py-4 text-center">
+                  {(() => {
+                    if (!worker.endTime) return "N/A";
+                    // Parse worker.endTime (assumed format "HH:MM:SS")
+                    const [h, m, s] = worker.endTime.split(":").map(Number);
+                    const now = new Date();
+                    const endTimeDate = new Date(
+                      now.getFullYear(),
+                      now.getMonth(),
+                      now.getDate(),
+                      h,
+                      m,
+                      s || 0
+                    );
+                    // Calculate remaining minutes (ceiling, and ensure non-negative)
+                    const remainingMinutes = Math.max(
+                      Math.ceil((endTimeDate.getTime() - Date.now()) / 60000),
+                      0
+                    );
+                    return `${remainingMinutes} ${remainingMinutes === 1 ? "Minute" : "Minutes"}`;
+                  })()}
+                </td>
+
                 <td className="px-6 py-4">{worker.endTime}</td>
                 <td className="px-6 py-4">
                   <span
