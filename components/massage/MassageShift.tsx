@@ -482,11 +482,12 @@ export default function MassageShift({
                 <td className="px-6 py-4">{worker.endTime}</td>
                 <td className="px-6 py-4">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs text-white ${statusClasses[worker.status]}`}
+                    className={`px-2 py-1 rounded-full text-xs text-white ${statusClasses[worker.status]} whitespace-nowrap`}
                   >
                     {worker.status}
                   </span>
                 </td>
+
                 <td className="px-6 py-4 md:space-x-2 flex flex-col md:flex-row md:items-center md:justify-center relative">
                   <button
                     onClick={() => openWorkTimeModal(worker)}
@@ -546,7 +547,7 @@ export default function MassageShift({
             ))}
             {!sortedWorkers.length && (
               <tr>
-                <td colSpan={7} className="text-center py-4">
+                <td colSpan={8} className="text-center py-4">
                   No workers available. Please add workers.
                 </td>
               </tr>
