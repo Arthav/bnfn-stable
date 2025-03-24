@@ -66,7 +66,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
             ))}
             {transactions.length === 0 && (
               <tr>
-                <td colSpan={8} className="text-center py-4">
+                <td colSpan={9} className="text-center py-4">
                   No transactions available.
                 </td>
               </tr>
