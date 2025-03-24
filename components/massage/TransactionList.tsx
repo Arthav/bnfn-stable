@@ -17,6 +17,9 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                 Transaction ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Transaction Date
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Worker
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -46,6 +49,17 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
             {transactions.map((transaction) => (
               <tr key={transaction.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{transaction.id}</td>
+                <td className="px-6 py-4">
+                  {new Date(transaction.transactionDate).toLocaleDateString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    }
+                  )}
+                </td>
+
                 <td className="px-6 py-4">
                   {transaction.workerName || transaction.workerId}
                 </td>

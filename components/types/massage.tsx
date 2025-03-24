@@ -37,4 +37,5 @@ export interface Transaction {
   bodyTime: number;
   customerName?: string;
   customerPhone?: string;
+  transactionDate: string;
 }

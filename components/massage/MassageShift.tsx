@@ -209,6 +209,7 @@ export default function MassageShift({
       bodyTime: selectedServiceObj.bodyTimeMin,
       customerName: customerNameFormData,
       customerPhone: customerPhoneFormData,
+      transactionDate: new Date().toISOString(),
     };
     setTransactions([...transactions, newTransaction]);
     localStorage.setItem(

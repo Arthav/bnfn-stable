@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Services, Worker, Transaction } from "@/components/types/massage";
 
 interface ReportPageProps {
@@ -12,15 +12,66 @@ export default function ReportPage({
   services,
   transactions,
 }: ReportPageProps) {
-  // Overall Metrics
-  const totalTransactions = transactions.length;
-  const totalSales = transactions.reduce((acc, t) => acc + t.sales, 0);
-  const totalCommission = transactions.reduce((acc, t) => acc + t.commission, 0);
+  // Filter states
+  const [filterType, setFilterType] = useState<"dayRange" | "day" | "month" | "year">("dayRange");
+  const [startDate, setStartDate] = useState<string>(""); // for day range: start date
+  const [endDate, setEndDate] = useState<string>(""); // for day range: end date
+  const [filterDate, setFilterDate] = useState<string>(""); // for day filter
+  const [filterMonth, setFilterMonth] = useState<string>(""); // for month filter (YYYY-MM)
+  const [filterYear, setFilterYear] = useState<string>(""); // for year filter
+
+  // Filter transactions based on selected criteria.
+  const filteredTransactions = transactions.filter((tx) => {
+    // Assume tx.transactionDate is an ISO date string.
+    const txDate = new Date(tx.transactionDate);
+    if (filterType === "dayRange") {
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        // Allow txDate if it falls between start and end (inclusive)
+        return txDate >= start && txDate <= end;
+      }
+      return true;
+    }
+    if (filterType === "day") {
+      if (filterDate) {
+        const selectedDate = new Date(filterDate);
+        return (
+          txDate.getFullYear() === selectedDate.getFullYear() &&
+          txDate.getMonth() === selectedDate.getMonth() &&
+          txDate.getDate() === selectedDate.getDate()
+        );
+      }
+      return true;
+    }
+    if (filterType === "month") {
+      if (filterMonth) {
+        const [year, month] = filterMonth.split("-").map(Number);
+        return (
+          txDate.getFullYear() === year &&
+          txDate.getMonth() === month - 1 // months are 0-indexed in JS
+        );
+      }
+      return true;
+    }
+    if (filterType === "year") {
+      if (filterYear) {
+        return txDate.getFullYear() === parseInt(filterYear, 10);
+      }
+      return true;
+    }
+    return true;
+  });
+
+  // Overall Metrics using filtered transactions
+  const totalTransactions = filteredTransactions.length;
+  const totalSales = filteredTransactions.reduce((acc, t) => acc + t.sales, 0);
+  const totalCommission = filteredTransactions.reduce((acc, t) => acc + t.commission, 0);
   const averageSales = totalTransactions > 0 ? totalSales / totalTransactions : 0;
 
-  // Service Performance Metrics
+  // Service Performance Metrics using filtered transactions
   const serviceMetrics = services.map((service) => {
-    const txs = transactions.filter((t) => t.serviceId === service.id);
+    const txs = filteredTransactions.filter((t) => t.serviceId === service.id);
     return {
       ...service,
       transactionCount: txs.length,
@@ -29,9 +80,9 @@ export default function ReportPage({
     };
   });
 
-  // Worker Performance Metrics
+  // Worker Performance Metrics using filtered transactions
   const workerMetrics = workers.map((worker) => {
-    const txs = transactions.filter((t) => t.workerId === worker.id);
+    const txs = filteredTransactions.filter((t) => t.workerId === worker.id);
     return {
       ...worker,
       transactionCount: txs.length,
@@ -57,7 +108,7 @@ export default function ReportPage({
     ];
     const csvRows = [
       headers.join(","),
-      ...transactions.map((tx) => {
+      ...filteredTransactions.map((tx) => {
         const row = [
           tx.id,
           tx.workerName || "",
@@ -89,6 +140,71 @@ export default function ReportPage({
     <div className="min-h-screen bg-gray-900 text-white p-4">
       <div className="container mx-auto">
         <h1 className="text-3xl font-bold mb-4">Report Page</h1>
+
+        {/* Filter Controls */}
+        <div className="mb-6 p-4 bg-gray-800 rounded">
+          <h2 className="text-xl font-semibold mb-2">Filter Transactions</h2>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value as any)}
+              className="bg-gray-700 text-white p-2 rounded"
+            >
+              <option value="dayRange">Day Range</option>
+              <option value="day">Day</option>
+              <option value="month">Month</option>
+              <option value="year">Year</option>
+            </select>
+
+            {filterType === "dayRange" && (
+              <>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="bg-gray-700 text-white p-2 rounded"
+                  placeholder="Start Date"
+                />
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="bg-gray-700 text-white p-2 rounded"
+                  placeholder="End Date"
+                />
+              </>
+            )}
+
+            {filterType === "day" && (
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="bg-gray-700 text-white p-2 rounded"
+              />
+            )}
+
+            {filterType === "month" && (
+              <input
+                type="month"
+                value={filterMonth}
+                onChange={(e) => setFilterMonth(e.target.value)}
+                className="bg-gray-700 text-white p-2 rounded"
+              />
+            )}
+
+            {filterType === "year" && (
+              <input
+                type="number"
+                placeholder="YYYY"
+                value={filterYear}
+                onChange={(e) => setFilterYear(e.target.value)}
+                className="bg-gray-700 text-white p-2 rounded"
+              />
+            )}
+          </div>
+        </div>
+
         <div className="mb-4 flex flex-col sm:flex-row justify-between items-center">
           <div className="mb-4 sm:mb-0">
             <h2 className="text-xl font-semibold">Overall Metrics</h2>
@@ -121,7 +237,7 @@ export default function ReportPage({
               </tr>
             </thead>
             <tbody className="bg-gray-900 divide-y divide-gray-800">
-              {transactions.map((tx) => (
+              {filteredTransactions.map((tx) => (
                 <tr key={tx.id}>
                   <td className="px-4 py-2">{tx.id}</td>
                   <td className="px-4 py-2">{tx.workerName || "-"}</td>
@@ -132,7 +248,7 @@ export default function ReportPage({
                   <td className="px-4 py-2">${tx.commission.toFixed(2)}</td>
                 </tr>
               ))}
-              {!transactions.length && (
+              {!filteredTransactions.length && (
                 <tr>
                   <td colSpan={7} className="text-center py-4">
                     No transactions available.
