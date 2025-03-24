@@ -72,9 +72,18 @@ export default function MassageShiftPage() {
   ];
 
   useEffect(() => {
-    console.log(
-      "Dear Developer, welcome to this exclusive enclave of our code. Your discovery of this concealed message is a testament to your discerning curiosity and a nod to the finer nuances of our craft. In a realm where every semicolon is meticulously placed and each curly brace is a mark of precision, we offer you this subtle Easter egg as both a delight and a reminder: elegance and wit coexist even in the strictest of logic. May your commits be flawless, your debugging swift, and your journey through code ever inspiring."
-    );
+    console.log(`
+      ========================================
+      Dear Developer, my name is Christian Bonafena
+      
+      Welcome to the hidden gateway of our code. Your unexpected discovery is not only a testament to your keen curiosity but also a nod to the finer nuances of our craft. In this realm, every semicolon shines with precision, and every curly brace holds a story of excellence.
+      
+      ★ Embrace the Mystery ★
+      
+      May your commits be legendary, your debugging swift, and your journey through code forever inspiring.
+      
+      ========================================
+      `);
 
     const storedServices = localStorage.getItem("services");
     if (storedServices) {
