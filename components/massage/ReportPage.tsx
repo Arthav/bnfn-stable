@@ -87,89 +87,55 @@ export default function ReportPage({
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
-      <h1 className="text-3xl font-bold mb-4">Report Page</h1>
-      <div className="mb-4 flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-semibold">Overall Metrics</h2>
-          <p>Total Transactions: {totalTransactions}</p>
-          <p>Total Sales: ${totalSales.toFixed(2)}</p>
-          <p>Total Commission: ${totalCommission.toFixed(2)}</p>
-          <p>
-            Average Sales per Transaction: ${averageSales.toFixed(2)}
-          </p>
+      <div className="container mx-auto">
+        <h1 className="text-3xl font-bold mb-4">Report Page</h1>
+        <div className="mb-4 flex flex-col sm:flex-row justify-between items-center">
+          <div className="mb-4 sm:mb-0">
+            <h2 className="text-xl font-semibold">Overall Metrics</h2>
+            <p>Total Transactions: {totalTransactions}</p>
+            <p>Total Sales: ${totalSales.toFixed(2)}</p>
+            <p>Total Commission: ${totalCommission.toFixed(2)}</p>
+            <p>Average Sales per Transaction: ${averageSales.toFixed(2)}</p>
+          </div>
+          <button
+            onClick={exportToExcel}
+            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
+          >
+            Export to Excel
+          </button>
         </div>
-        <button
-          onClick={exportToExcel}
-          className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
-        >
-          Export to Excel
-        </button>
-      </div>
 
-      {/* Transactions Table */}
-      <div className="overflow-x-auto mb-6">
-        <h2 className="text-xl font-semibold mb-2">Transactions</h2>
-        <table className="min-w-full divide-y divide-gray-700">
-          <thead className="bg-gray-800">
-            <tr>
-              <th className="px-4 py-2">ID</th>
-              <th className="px-4 py-2">Worker Name</th>
-              <th className="px-4 py-2">Service Name</th>
-              <th className="px-4 py-2">Start Time</th>
-              <th className="px-4 py-2">End Time</th>
-              <th className="px-4 py-2">Sales</th>
-              <th className="px-4 py-2">Commission</th>
-            </tr>
-          </thead>
-          <tbody className="bg-gray-900 divide-y divide-gray-800">
-            {transactions.map((tx) => (
-              <tr key={tx.id}>
-                <td className="px-4 py-2">{tx.id}</td>
-                <td className="px-4 py-2">{tx.workerName || "-"}</td>
-                <td className="px-4 py-2">{tx.serviceName || "-"}</td>
-                <td className="px-4 py-2">{tx.startTime}</td>
-                <td className="px-4 py-2">{tx.endTime}</td>
-                <td className="px-4 py-2">${tx.sales.toFixed(2)}</td>
-                <td className="px-4 py-2">${tx.commission.toFixed(2)}</td>
-              </tr>
-            ))}
-            {!transactions.length && (
-              <tr>
-                <td colSpan={7} className="text-center py-4">
-                  No transactions available.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Service & Worker Performance Tables */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Service Performance</h2>
+        {/* Transactions Table */}
+        <div className="overflow-x-auto mb-6">
+          <h2 className="text-xl font-semibold mb-2">Transactions</h2>
           <table className="min-w-full divide-y divide-gray-700">
             <thead className="bg-gray-800">
               <tr>
-                <th className="px-4 py-2">Service</th>
-                <th className="px-4 py-2">Transactions</th>
-                <th className="px-4 py-2">Total Sales</th>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Worker Name</th>
+                <th className="px-4 py-2">Service Name</th>
+                <th className="px-4 py-2">Start Time</th>
+                <th className="px-4 py-2">End Time</th>
+                <th className="px-4 py-2">Sales</th>
+                <th className="px-4 py-2">Commission</th>
               </tr>
             </thead>
             <tbody className="bg-gray-900 divide-y divide-gray-800">
-              {serviceMetrics.map((service) => (
-                <tr key={service.id}>
-                  <td className="px-4 py-2">{service.name}</td>
-                  <td className="px-4 py-2">{service.transactionCount}</td>
-                  <td className="px-4 py-2">
-                    ${service.totalSales.toFixed(2)}
-                  </td>
+              {transactions.map((tx) => (
+                <tr key={tx.id}>
+                  <td className="px-4 py-2">{tx.id}</td>
+                  <td className="px-4 py-2">{tx.workerName || "-"}</td>
+                  <td className="px-4 py-2">{tx.serviceName || "-"}</td>
+                  <td className="px-4 py-2">{tx.startTime}</td>
+                  <td className="px-4 py-2">{tx.endTime}</td>
+                  <td className="px-4 py-2">${tx.sales.toFixed(2)}</td>
+                  <td className="px-4 py-2">${tx.commission.toFixed(2)}</td>
                 </tr>
               ))}
-              {!serviceMetrics.length && (
+              {!transactions.length && (
                 <tr>
-                  <td colSpan={3} className="text-center py-4">
-                    No services available.
+                  <td colSpan={7} className="text-center py-4">
+                    No transactions available.
                   </td>
                 </tr>
               )}
@@ -177,35 +143,67 @@ export default function ReportPage({
           </table>
         </div>
 
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Worker Performance</h2>
-          <table className="min-w-full divide-y divide-gray-700">
-            <thead className="bg-gray-800">
-              <tr>
-                <th className="px-4 py-2">Worker</th>
-                <th className="px-4 py-2">Transactions</th>
-                <th className="px-4 py-2">Total Sales</th>
-              </tr>
-            </thead>
-            <tbody className="bg-gray-900 divide-y divide-gray-800">
-              {workerMetrics.map((worker) => (
-                <tr key={worker.id}>
-                  <td className="px-4 py-2">{worker.name}</td>
-                  <td className="px-4 py-2">{worker.transactionCount}</td>
-                  <td className="px-4 py-2">
-                    ${worker.totalSales.toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-              {!workerMetrics.length && (
+        {/* Service & Worker Performance Tables */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="overflow-x-auto">
+            <h2 className="text-xl font-semibold mb-2">Service Performance</h2>
+            <table className="min-w-full divide-y divide-gray-700">
+              <thead className="bg-gray-800">
                 <tr>
-                  <td colSpan={3} className="text-center py-4">
-                    No workers available.
-                  </td>
+                  <th className="px-4 py-2">Service</th>
+                  <th className="px-4 py-2">Transactions</th>
+                  <th className="px-4 py-2">Total Sales</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-gray-900 divide-y divide-gray-800">
+                {serviceMetrics.map((service) => (
+                  <tr key={service.id}>
+                    <td className="px-4 py-2">{service.name}</td>
+                    <td className="px-4 py-2">{service.transactionCount}</td>
+                    <td className="px-4 py-2">
+                      ${service.totalSales.toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+                {!serviceMetrics.length && (
+                  <tr>
+                    <td colSpan={3} className="text-center py-4">
+                      No services available.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="overflow-x-auto">
+            <h2 className="text-xl font-semibold mb-2">Worker Performance</h2>
+            <table className="min-w-full divide-y divide-gray-700">
+              <thead className="bg-gray-800">
+                <tr>
+                  <th className="px-4 py-2">Worker</th>
+                  <th className="px-4 py-2">Transactions</th>
+                  <th className="px-4 py-2">Total Sales</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-900 divide-y divide-gray-800">
+                {workerMetrics.map((worker) => (
+                  <tr key={worker.id}>
+                    <td className="px-4 py-2">{worker.name}</td>
+                    <td className="px-4 py-2">{worker.transactionCount}</td>
+                    <td className="px-4 py-2">${worker.totalSales.toFixed(2)}</td>
+                  </tr>
+                ))}
+                {!workerMetrics.length && (
+                  <tr>
+                    <td colSpan={3} className="text-center py-4">
+                      No workers available.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

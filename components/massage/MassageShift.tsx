@@ -211,7 +211,10 @@ export default function MassageShift({
       customerPhone: customerPhoneFormData,
     };
     setTransactions([...transactions, newTransaction]);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
+    localStorage.setItem(
+      "transactions",
+      JSON.stringify([...transactions, newTransaction])
+    );
 
     toast.success(`${currentWorker?.name} is set to work`, {
       position: "top-center",
