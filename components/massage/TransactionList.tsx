@@ -51,7 +51,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                 <td className="px-6 py-4">{transaction.id}</td>
                 <td className="px-6 py-4">
                   {new Date(transaction.transactionDate).toLocaleDateString(
-                    "en-US",
+                    "en-GB",
                     {
                       year: "numeric",
                       month: "short",
