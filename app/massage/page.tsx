@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Services, Transaction } from "@/components/types/massage";
+import { Worker, Services, Transaction } from "@/components/types/massage";
 import MassageShift from "@/components/massage/MassageShift";
 import ManageService from "@/components/massage/ManageService";
 import ComingSoon from "@/components/comingsoon";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TemplatePage from "@/components/massage/TemplatePage";
 import TransactionList from "@/components/massage/TransactionList";
+import ReportPage from "@/components/massage/ReportPage";
 import {
   FaSpa,
   FaCalendarAlt,
@@ -23,6 +23,7 @@ export default function MassageShiftPage() {
   const [activeTab, setActiveTab] = useState("massage-shift");
   const [services, setServices] = useState<Services[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [workers, setWorkers] = useState<Worker[]>([]);
 
   const tabs = [
     {
@@ -33,6 +34,8 @@ export default function MassageShiftPage() {
         <MassageShift
           services={services}
           transactions={transactions}
+          workers={workers}
+          setWorkers={setWorkers}
           setTransactions={setTransactions}
         />
       ),
@@ -46,8 +49,8 @@ export default function MassageShiftPage() {
       ),
     },
     {
-      key: "manage-addons",
-      title: "Add-ons",
+      key: "memberships",
+      title: "Memberships",
       icon: <FaPlusSquare />,
       component: <ComingSoon />,
     },
@@ -61,7 +64,13 @@ export default function MassageShiftPage() {
       key: "report",
       title: "Report",
       icon: <FaChartBar />,
-      component: <ComingSoon />,
+      component: (
+        <ReportPage
+          workers={workers}
+          services={services}
+          transactions={transactions}
+        />
+      ),
     },
     // {
     //   key: "template",
@@ -71,6 +80,7 @@ export default function MassageShiftPage() {
     // },
   ];
 
+  // Load from localStorage.
   useEffect(() => {
     console.log(`
 ========================================
@@ -88,6 +98,13 @@ May your commits be legendary, your debugging swift, and your journey through co
     const storedServices = localStorage.getItem("services");
     if (storedServices) {
       setServices(JSON.parse(storedServices));
+    }
+  }, []);
+
+  useEffect(() => {
+    const storedWorkers = localStorage.getItem("workers");
+    if (storedWorkers) {
+      setWorkers(JSON.parse(storedWorkers));
     }
   }, []);
 

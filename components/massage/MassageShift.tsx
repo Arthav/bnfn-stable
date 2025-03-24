@@ -26,13 +26,16 @@ type ModalType = "workTime" | "editWorker" | "addWorker" | null;
 export default function MassageShift({
   services,
   transactions,
+  workers,
+  setWorkers,
   setTransactions,
 }: {
   services: Services[];
   transactions: Transaction[];
-  setTransactions: (transactions: Transaction[]) => void;
+  workers: Worker[];
+  setWorkers: React.Dispatch<React.SetStateAction<Worker[]>>;
+  setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
 }) {
-  const [workers, setWorkers] = useState<Worker[]>([]);
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
   const [workTimeFormData, setWorkTimeFormData] = useState<FormData>({
@@ -51,14 +54,6 @@ export default function MassageShift({
   const [selectedService, setSelectedService] = useState<number>(
     services[0]?.id ?? 0
   );
-
-  // Load workers from localStorage.
-  useEffect(() => {
-    const storedWorkers = localStorage.getItem("workers");
-    if (storedWorkers) {
-      setWorkers(JSON.parse(storedWorkers));
-    }
-  }, []);
 
   // Handle closing the action menu.
   useEffect(() => {
