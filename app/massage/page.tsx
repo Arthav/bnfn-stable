@@ -29,13 +29,21 @@ export default function MassageShiftPage() {
       key: "massage-shift",
       title: "Massage Shift",
       icon: <FaSpa />,
-      component: <MassageShift services={services} transactions={transactions} setTransactions={setTransactions} />,
+      component: (
+        <MassageShift
+          services={services}
+          transactions={transactions}
+          setTransactions={setTransactions}
+        />
+      ),
     },
     {
       key: "manage-service",
       title: "Service",
       icon: <FaConciergeBell />,
-      component: <ManageService services={services} setServices={setServices} />,
+      component: (
+        <ManageService services={services} setServices={setServices} />
+      ),
     },
     {
       key: "manage-addons",
@@ -64,6 +72,10 @@ export default function MassageShiftPage() {
   ];
 
   useEffect(() => {
+    console.log(
+      "Dear Developer, welcome to this exclusive enclave of our code. Your discovery of this concealed message is a testament to your discerning curiosity and a nod to the finer nuances of our craft. In a realm where every semicolon is meticulously placed and each curly brace is a mark of precision, we offer you this subtle Easter egg as both a delight and a reminder: elegance and wit coexist even in the strictest of logic. May your commits be flawless, your debugging swift, and your journey through code ever inspiring."
+    );
+
     const storedServices = localStorage.getItem("services");
     if (storedServices) {
       setServices(JSON.parse(storedServices));
