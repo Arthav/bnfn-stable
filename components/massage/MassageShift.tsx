@@ -377,6 +377,9 @@ export default function MassageShift({
     .sort((a, b) => {
       const statusDiff = statusOrder[a.status] - statusOrder[b.status];
       if (statusDiff !== 0) return statusDiff;
+      const availableSinceDiff =
+        (a.availableSince ?? 0) - (b.availableSince ?? 0);
+      if (availableSinceDiff !== 0) return availableSinceDiff;
       return a.originalIndex - b.originalIndex;
     });
 
