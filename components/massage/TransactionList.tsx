@@ -165,8 +165,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
         <div className="flex flex-wrap gap-4">
           {/* Time Filter */}
           <div>
-            <label className="block mb-1">Time Filter</label>
+            <label htmlFor="timeFilter" className="block mb-1">
+              Time Filter
+            </label>
             <select
+              id="timeFilter"
               value={timeFilter}
               onChange={(e) =>
                 setTimeFilter(e.target.value as "custom" | "week" | "month")
@@ -181,8 +184,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
           {timeFilter === "custom" && (
             <>
               <div>
-                <label className="block mb-1">Start Date</label>
+                <label htmlFor="customStartDate" className="block mb-1">
+                  Start Date
+                </label>
                 <input
+                  id="customStartDate"
                   type="date"
                   value={customStartDate}
                   onChange={(e) => setCustomStartDate(e.target.value)}
@@ -190,8 +196,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
                 />
               </div>
               <div>
-                <label className="block mb-1">End Date</label>
+                <label htmlFor="customEndDate" className="block mb-1">
+                  End Date
+                </label>
                 <input
+                  id="customEndDate"
                   type="date"
                   value={customEndDate}
                   onChange={(e) => setCustomEndDate(e.target.value)}
@@ -202,8 +211,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
           )}
           {timeFilter === "week" && (
             <div>
-              <label className="block mb-1">Select a Date (Week)</label>
+              <label htmlFor="weekDate" className="block mb-1">
+                Select a Date (Week)
+              </label>
               <input
+                id="weekDate"
                 type="date"
                 value={weekDate}
                 onChange={(e) => setWeekDate(e.target.value)}
@@ -213,8 +225,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
           )}
           {timeFilter === "month" && (
             <div>
-              <label className="block mb-1">Select Month</label>
+              <label htmlFor="month" className="block mb-1">
+                Select Month
+              </label>
               <input
+                id="month"
                 type="month"
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
@@ -225,8 +240,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
           {/* Worker Filter */}
           <div>
-            <label className="block mb-1">Filter by Worker Name</label>
+            <label htmlFor="filterWorker" className="block mb-1">
+              Filter by Worker Name
+            </label>
             <input
+              id="filterWorker"
               type="text"
               value={filterWorker}
               onChange={(e) => setFilterWorker(e.target.value)}
@@ -237,8 +255,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
           {/* Sort Options */}
           <div>
-            <label className="block mb-1">Sort By</label>
+            <label htmlFor="sortBy" className="block mb-1">
+              Sort By
+            </label>
             <select
+              id="sortBy"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="bg-gray-700 p-2 rounded"
@@ -374,8 +395,11 @@ const TransactionList: React.FC<TransactionListProps> = ({
             </h2>
             <form onSubmit={handleRefundSubmit}>
               <div className="mb-4">
-                <label className="block mb-1">Refund Reason</label>
+                <label htmlFor="refundReason" className="block mb-1">
+                  Refund Reason
+                </label>
                 <textarea
+                  id="refundReason"
                   value={refundReason}
                   onChange={(e) => setRefundReason(e.target.value)}
                   className="w-full bg-gray-700 p-2 rounded"

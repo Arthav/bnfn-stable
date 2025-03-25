@@ -46,3 +46,33 @@ export interface Transaction {
 
   isRefundTransaction?: boolean;
 }
+
+
+export interface Membership {
+  /** Unique identifier for the member */
+  id: number;
+  /** Member's first name */
+  firstName: string;
+  /** Member's last name */
+  lastName: string;
+  /** Email address for the member */
+  email: string;
+  /** Primary phone number */
+  phoneNumber: string;
+  /** Optional mailing address */
+  address?: string;
+  /** Membership type (e.g., Basic, Premium, VIP) */
+  membershipType: "Basic" | "Premium" | "VIP" | string;
+  /** Date when the membership started (ISO string) */
+  membershipStartDate: string;
+  /** Optional membership end or expiration date (ISO string) */
+  membershipEndDate?: string;
+  /** Indicates if the membership is currently active */
+  isActive: boolean;
+  /** Loyalty or membership points accumulated */
+  points: number;
+  /** Record creation timestamp (ISO string) */
+  createdAt: string;
+  /** Optional record last update timestamp (ISO string) */
+  updatedAt?: string;
+}
