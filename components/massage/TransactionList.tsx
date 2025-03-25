@@ -3,25 +3,34 @@ import { Transaction } from "@/components/types/massage";
 
 interface TransactionListProps {
   transactions: Transaction[];
+  setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
 }
 
-const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
-  // Time filter states: "custom" (custom days), "week", "month"
-  const [timeFilter, setTimeFilter] = useState<"custom" | "week" | "month">("custom");
+const TransactionList: React.FC<TransactionListProps> = ({
+  transactions,
+  setTransactions,
+}) => {
+  // Filter states (same as before)
+  const [timeFilter, setTimeFilter] = useState<"custom" | "week" | "month">(
+    "custom"
+  );
   const [customStartDate, setCustomStartDate] = useState<string>("");
   const [customEndDate, setCustomEndDate] = useState<string>("");
   const [weekDate, setWeekDate] = useState<string>("");
   const [month, setMonth] = useState<string>("");
 
-  // Other filter & sort states
   const [filterWorker, setFilterWorker] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("");
+
+  // State for refund modal (only refund reason is input)
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
+  const [refundReason, setRefundReason] = useState<string>("");
 
   // Compute filtered and sorted transactions.
   const filteredTransactions = useMemo(() => {
     let filtered = transactions;
-
-    // Apply time filter.
+    // Time filtering logic
     if (timeFilter === "custom" && customStartDate && customEndDate) {
       const start = new Date(customStartDate);
       const end = new Date(customEndDate);
@@ -31,9 +40,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
       });
     } else if (timeFilter === "week" && weekDate) {
       const selectedDate = new Date(weekDate);
-      // Assuming week starts on Monday.
       const day = selectedDate.getDay();
-      // If Sunday (0), treat it as 7.
       const adjustedDay = day === 0 ? 7 : day;
       const startOfWeek = new Date(selectedDate);
       startOfWeek.setDate(selectedDate.getDate() - adjustedDay + 1);
@@ -47,11 +54,13 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
       const [year, monthNum] = month.split("-").map(Number);
       filtered = filtered.filter((tx) => {
         const txDate = new Date(tx.transactionDate);
-        return txDate.getFullYear() === year && txDate.getMonth() === monthNum - 1;
+        return (
+          txDate.getFullYear() === year && txDate.getMonth() === monthNum - 1
+        );
       });
     }
 
-    // Filter by worker name (case-insensitive).
+    // Filter by worker name (case-insensitive)
     if (filterWorker.trim() !== "") {
       const lowerWorker = filterWorker.toLowerCase();
       filtered = filtered.filter((tx) => {
@@ -64,9 +73,15 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
     if (sortBy) {
       filtered = filtered.slice().sort((a, b) => {
         if (sortBy === "dateAsc") {
-          return new Date(a.transactionDate).getTime() - new Date(b.transactionDate).getTime();
+          return (
+            new Date(a.transactionDate).getTime() -
+            new Date(b.transactionDate).getTime()
+          );
         } else if (sortBy === "dateDesc") {
-          return new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime();
+          return (
+            new Date(b.transactionDate).getTime() -
+            new Date(a.transactionDate).getTime()
+          );
         } else if (sortBy === "salesAsc") {
           return a.sales - b.sales;
         } else if (sortBy === "salesDesc") {
@@ -84,7 +99,61 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
       });
     }
     return filtered;
-  }, [transactions, timeFilter, customStartDate, customEndDate, weekDate, month, filterWorker, sortBy]);
+  }, [
+    transactions,
+    timeFilter,
+    customStartDate,
+    customEndDate,
+    weekDate,
+    month,
+    filterWorker,
+    sortBy,
+  ]);
+
+  // Handle refund form submission.
+  const handleRefundSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTransaction) return;
+
+    // Generate a new id (e.g., max current id + 1)
+    const newId =
+      transactions.length > 0
+        ? Math.max(...transactions.map((tx) => tx.id)) + 1
+        : 1;
+    const now = new Date().toISOString();
+
+    // Update the original transaction to mark it as refunded.
+    const updatedOriginalTransaction = {
+      ...selectedTransaction,
+      isRefunded: true,
+    };
+
+    // Create a new refund transaction (full refund)
+    const refundTransaction: Transaction = {
+      ...updatedOriginalTransaction,
+      id: newId,
+      transactionDate: now, // refund date is now
+      isRefundTransaction: true,
+      refundAmount: selectedTransaction.sales, // full refund amount
+      refundDate: now,
+      refundReason,
+    };
+
+    // Update transactions:
+    // 1. Mark the original transaction as refunded.
+    // 2. Append the new refund transaction.
+    const updatedTransactions = transactions.map((tx) =>
+      tx.id === selectedTransaction.id ? updatedOriginalTransaction : tx
+    );
+    updatedTransactions.push(refundTransaction);
+
+    setTransactions(updatedTransactions);
+    localStorage.setItem("transactions", JSON.stringify(updatedTransactions));
+
+    // Reset modal state.
+    setSelectedTransaction(null);
+    setRefundReason("");
+  };
 
   return (
     <div className="min-h-screen bg-black p-4 text-white">
@@ -99,7 +168,9 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
             <label className="block mb-1">Time Filter</label>
             <select
               value={timeFilter}
-              onChange={(e) => setTimeFilter(e.target.value as "custom" | "week" | "month")}
+              onChange={(e) =>
+                setTimeFilter(e.target.value as "custom" | "week" | "month")
+              }
               className="bg-gray-700 p-2 rounded"
             >
               <option value="custom">Custom Days</option>
@@ -218,6 +289,9 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Commission
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Refund Options
+              </th>
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
@@ -225,11 +299,14 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
               <tr key={transaction.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{transaction.id}</td>
                 <td className="px-6 py-4">
-                  {new Date(transaction.transactionDate).toLocaleDateString("en-GB", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  {new Date(transaction.transactionDate).toLocaleDateString(
+                    "en-GB",
+                    {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    }
+                  )}
                 </td>
                 <td className="px-6 py-4">
                   {transaction.workerName || transaction.workerId}
@@ -239,17 +316,47 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                 </td>
                 <td className="px-6 py-4">
                   {transaction.customerName ? transaction.customerName : "N/A"}
-                  {transaction.customerPhone && ` (${transaction.customerPhone})`}
+                  {transaction.customerPhone &&
+                    ` (${transaction.customerPhone})`}
                 </td>
                 <td className="px-6 py-4">{transaction.startTime}</td>
                 <td className="px-6 py-4">{transaction.endTime}</td>
                 <td className="px-6 py-4">${transaction.sales}</td>
                 <td className="px-6 py-4">${transaction.commission}</td>
+                <td className="px-6 py-4">
+                  {transaction.isRefundTransaction ? (
+                    <div className="text-green-400">
+                      Refunded: ${transaction.refundAmount}
+                      <br />
+                      On:{" "}
+                      {transaction.refundDate
+                        ? new Date(transaction.refundDate).toLocaleDateString(
+                            "en-GB",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )
+                        : "N/A"}
+                      <br />
+                      Reason: {transaction.refundReason}
+                    </div>
+                  ) : (
+                    <button
+                      className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs disabled:hover:bg-gray-200"
+                      onClick={() => setSelectedTransaction(transaction)}
+                      disabled={transaction.isRefunded}
+                    >
+                      Refund
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
             {filteredTransactions.length === 0 && (
               <tr>
-                <td colSpan={9} className="text-center py-4">
+                <td colSpan={10} className="text-center py-4">
                   No transactions available.
                 </td>
               </tr>
@@ -257,6 +364,43 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Refund Modal */}
+      {selectedTransaction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">
+              Refund Transaction #{selectedTransaction.id}
+            </h2>
+            <form onSubmit={handleRefundSubmit}>
+              <div className="mb-4">
+                <label className="block mb-1">Refund Reason</label>
+                <textarea
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  className="w-full bg-gray-700 p-2 rounded"
+                  required
+                ></textarea>
+              </div>
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
+                  onClick={() => setSelectedTransaction(null)}
+                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
+                >
+                  Submit Refund
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

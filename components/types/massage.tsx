@@ -38,4 +38,11 @@ export interface Transaction {
   customerName?: string;
   customerPhone?: string;
   transactionDate: string;
+
+  isRefunded?: boolean;
+  refundAmount?: number;
+  refundDate?: string;
+  refundReason?: string;
+
+  isRefundTransaction?: boolean;
 }

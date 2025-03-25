@@ -45,11 +45,7 @@ export default function MassageShiftPage() {
       key: "booking",
       title: "Booking List",
       icon: <FaCalendarAlt />,
-      component: (
-        <BookingList
-          workers={workers}
-        />
-      ),
+      component: <BookingList workers={workers} />,
     },
     {
       key: "manage-service",
@@ -69,7 +65,12 @@ export default function MassageShiftPage() {
       key: "transaction",
       title: "Transaction",
       icon: <FaMoneyBillAlt />,
-      component: <TransactionList transactions={transactions} />,
+      component: (
+        <TransactionList
+          transactions={transactions}
+          setTransactions={setTransactions}
+        />
+      ),
     },
     {
       key: "report",
