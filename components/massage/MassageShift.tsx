@@ -638,11 +638,13 @@ export default function MassageShift({
                       }
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     >
-                      {services.map((service) => (
-                        <option key={service.id} value={service.id}>
-                          [${service.price}] - {service.name}
-                        </option>
-                      ))}
+                      {services
+                        .filter((service) => service.status === "Active")
+                        .map((service) => (
+                          <option key={service.id} value={service.id}>
+                            [${service.price}] - {service.name}
+                          </option>
+                        ))}
                     </select>
                   </div>
                   {/* New optional customer fields */}
