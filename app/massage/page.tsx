@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TransactionList from "@/components/massage/TransactionList";
 import ReportPage from "@/components/massage/ReportPage";
+import BookingList from "@/components/massage/BookingList";
 import {
   FaSpa,
   FaCalendarAlt,
@@ -37,6 +38,16 @@ export default function MassageShiftPage() {
           workers={workers}
           setWorkers={setWorkers}
           setTransactions={setTransactions}
+        />
+      ),
+    },
+    {
+      key: "booking",
+      title: "Booking List",
+      icon: <FaCalendarAlt />,
+      component: (
+        <BookingList
+          workers={workers}
         />
       ),
     },

@@ -50,7 +50,6 @@ export default function ManageServicePage({
 
   // Save services to localStorage whenever they change.
   useEffect(() => {
-    if (services.length === 0) return;
     localStorage.setItem("services", JSON.stringify(services));
   }, [services]);
 

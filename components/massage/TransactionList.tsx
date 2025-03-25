@@ -40,9 +40,6 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Commission
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Total
-              </th>
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
@@ -75,7 +72,6 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
                 <td className="px-6 py-4">{transaction.endTime}</td>
                 <td className="px-6 py-4">${transaction.sales}</td>
                 <td className="px-6 py-4">${transaction.commission}</td>
-                <td className="px-6 py-4">Unknown?</td>
               </tr>
             ))}
             {transactions.length === 0 && (

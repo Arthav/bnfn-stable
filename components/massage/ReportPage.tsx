@@ -14,21 +14,19 @@ export default function ReportPage({
 }: ReportPageProps) {
   // Filter states
   const [filterType, setFilterType] = useState<"dayRange" | "day" | "month" | "year">("dayRange");
-  const [startDate, setStartDate] = useState<string>(""); // for day range: start date
-  const [endDate, setEndDate] = useState<string>(""); // for day range: end date
-  const [filterDate, setFilterDate] = useState<string>(""); // for day filter
-  const [filterMonth, setFilterMonth] = useState<string>(""); // for month filter (YYYY-MM)
-  const [filterYear, setFilterYear] = useState<string>(""); // for year filter
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [filterDate, setFilterDate] = useState<string>("");
+  const [filterMonth, setFilterMonth] = useState<string>("");
+  const [filterYear, setFilterYear] = useState<string>("");
 
   // Filter transactions based on selected criteria.
   const filteredTransactions = transactions.filter((tx) => {
-    // Assume tx.transactionDate is an ISO date string.
     const txDate = new Date(tx.transactionDate);
     if (filterType === "dayRange") {
       if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
-        // Allow txDate if it falls between start and end (inclusive)
         return txDate >= start && txDate <= end;
       }
       return true;
@@ -49,7 +47,7 @@ export default function ReportPage({
         const [year, month] = filterMonth.split("-").map(Number);
         return (
           txDate.getFullYear() === year &&
-          txDate.getMonth() === month - 1 // months are 0-indexed in JS
+          txDate.getMonth() === month - 1
         );
       }
       return true;
@@ -300,6 +298,7 @@ export default function ReportPage({
                   <th className="px-4 py-2">Worker</th>
                   <th className="px-4 py-2">Transactions</th>
                   <th className="px-4 py-2">Total Sales</th>
+                  <th className="px-4 py-2">Total Commission</th>
                 </tr>
               </thead>
               <tbody className="bg-gray-900 divide-y divide-gray-800">
@@ -308,11 +307,12 @@ export default function ReportPage({
                     <td className="px-4 py-2">{worker.name}</td>
                     <td className="px-4 py-2">{worker.transactionCount}</td>
                     <td className="px-4 py-2">${worker.totalSales.toFixed(2)}</td>
+                    <td className="px-4 py-2">${worker.totalCommission.toFixed(2)}</td>
                   </tr>
                 ))}
                 {!workerMetrics.length && (
                   <tr>
-                    <td colSpan={3} className="text-center py-4">
+                    <td colSpan={4} className="text-center py-4">
                       No workers available.
                     </td>
                   </tr>
