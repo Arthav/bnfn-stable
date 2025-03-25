@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Services, Worker, Transaction } from "@/components/types/massage";
+import { jsPDF } from "jspdf";
+import { autoTable } from 'jspdf-autotable'
 
 interface ReportPageProps {
   workers: Worker[];
@@ -13,7 +15,9 @@ export default function ReportPage({
   transactions,
 }: ReportPageProps) {
   // Filter states
-  const [filterType, setFilterType] = useState<"dayRange" | "day" | "month" | "year">("dayRange");
+  const [filterType, setFilterType] = useState<
+    "dayRange" | "day" | "month" | "year"
+  >("dayRange");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [filterDate, setFilterDate] = useState<string>("");
@@ -45,10 +49,7 @@ export default function ReportPage({
     if (filterType === "month") {
       if (filterMonth) {
         const [year, month] = filterMonth.split("-").map(Number);
-        return (
-          txDate.getFullYear() === year &&
-          txDate.getMonth() === month - 1
-        );
+        return txDate.getFullYear() === year && txDate.getMonth() === month - 1;
       }
       return true;
     }
@@ -64,8 +65,12 @@ export default function ReportPage({
   // Overall Metrics using filtered transactions
   const totalTransactions = filteredTransactions.length;
   const totalSales = filteredTransactions.reduce((acc, t) => acc + t.sales, 0);
-  const totalCommission = filteredTransactions.reduce((acc, t) => acc + t.commission, 0);
-  const averageSales = totalTransactions > 0 ? totalSales / totalTransactions : 0;
+  const totalCommission = filteredTransactions.reduce(
+    (acc, t) => acc + t.commission,
+    0
+  );
+  const averageSales =
+    totalTransactions > 0 ? totalSales / totalTransactions : 0;
 
   // Service Performance Metrics using filtered transactions
   const serviceMetrics = services.map((service) => {
@@ -132,6 +137,145 @@ export default function ReportPage({
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  };
+
+  // Export to PDF using jsPDF
+  const exportToPdf = () => {
+    const doc = new jsPDF();
+  
+    // Helper to add a header to the current page.
+    const addHeader = () => {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      doc.setFillColor(60, 60, 60);
+      doc.rect(0, 0, pageWidth, 20, "F");
+  
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("Transactions Report", pageWidth / 2, 14, { align: "center" });
+      doc.setTextColor(0, 0, 0);
+    };
+  
+    // Helper to add a footer with page number.
+    const addFooter = () => {
+      const pageHeight = doc.internal.pageSize.getHeight();
+      doc.setFontSize(10);
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageNumber = doc.getNumberOfPages();
+      doc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
+        align: "center",
+      });
+    };
+  
+    // Initialize first page with header.
+    addHeader();
+    let currentY = 30; // starting below header
+  
+    // ----------------
+    // Summary Section
+    // ----------------
+    const summaryData = [
+      ["Total Transactions", totalTransactions],
+      ["Total Sales", `$${totalSales.toFixed(2)}`],
+      ["Total Commission", `$${totalCommission.toFixed(2)}`],
+      ["Average Sales per Transaction", `$${averageSales.toFixed(2)}`],
+    ];
+  
+    doc.setFontSize(14);
+    doc.text("Summary", 10, currentY);
+    currentY += 5;
+  
+    autoTable(doc, {
+      startY: currentY,
+      head: [["Metric", "Value"]],
+      body: summaryData,
+      theme: "grid",
+      headStyles: { fillColor: [60, 60, 60] },
+      styles: { fontSize: 10 },
+      margin: { left: 10, right: 10 },
+    });
+    currentY = (doc as any).lastAutoTable.finalY + 10;
+  
+    // ----------------
+    // Transactions Section
+    // ----------------
+    doc.setFontSize(14);
+    doc.text("Transactions", 10, currentY);
+    currentY += 5;
+  
+    const transactionsData = filteredTransactions.map((tx) => [
+      tx.id,
+      tx.workerName || "-",
+      tx.serviceName || "-",
+      `$${tx.sales.toFixed(2)}`,
+      `$${tx.commission.toFixed(2)}`,
+    ]);
+  
+    autoTable(doc, {
+      startY: currentY,
+      head: [["ID", "Worker", "Service", "Sales", "Commission"]],
+      body: transactionsData,
+      theme: "grid",
+      headStyles: { fillColor: [60, 60, 60] },
+      styles: { fontSize: 10 },
+      margin: { left: 10, right: 10 },
+    });
+    currentY = (doc as any).lastAutoTable.finalY + 10;
+  
+    // ---------------------------
+    // Service Performance Section
+    // ---------------------------
+    if (serviceMetrics.length > 0) {
+      doc.setFontSize(14);
+      doc.text("Service Performance", 10, currentY);
+      currentY += 5;
+  
+      const serviceData = serviceMetrics.map((service) => [
+        service.name,
+        service.transactionCount,
+        `$${service.totalSales.toFixed(2)}`,
+      ]);
+  
+      autoTable(doc, {
+        startY: currentY,
+        head: [["Service", "Transactions", "Total Sales"]],
+        body: serviceData,
+        theme: "grid",
+        headStyles: { fillColor: [60, 60, 60] },
+        styles: { fontSize: 10 },
+        margin: { left: 10, right: 10 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 10;
+    }
+  
+    // ---------------------------
+    // Worker Performance Section
+    // ---------------------------
+    if (workerMetrics.length > 0) {
+      doc.setFontSize(14);
+      doc.text("Worker Performance", 10, currentY);
+      currentY += 5;
+  
+      const workerData = workerMetrics.map((worker) => [
+        worker.name,
+        worker.transactionCount,
+        `$${worker.totalSales.toFixed(2)}`,
+        `$${worker.totalCommission.toFixed(2)}`,
+      ]);
+  
+      autoTable(doc, {
+        startY: currentY,
+        head: [["Worker", "Transactions", "Total Sales", "Total Commission"]],
+        body: workerData,
+        theme: "grid",
+        headStyles: { fillColor: [60, 60, 60] },
+        styles: { fontSize: 10 },
+        margin: { left: 10, right: 10 },
+      });
+    }
+  
+    // Final footer on last page.
+    addFooter();
+    doc.save("transactions_report.pdf");
   };
 
   return (
@@ -211,12 +355,20 @@ export default function ReportPage({
             <p>Total Commission: ${totalCommission.toFixed(2)}</p>
             <p>Average Sales per Transaction: ${averageSales.toFixed(2)}</p>
           </div>
-          <button
-            onClick={exportToExcel}
-            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
-          >
-            Export to Excel
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={exportToExcel}
+              className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
+            >
+              Export to Excel
+            </button>
+            <button
+              onClick={exportToPdf}
+              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
+            >
+              Export to PDF
+            </button>
+          </div>
         </div>
 
         {/* Transactions Table */}
@@ -306,8 +458,12 @@ export default function ReportPage({
                   <tr key={worker.id}>
                     <td className="px-4 py-2">{worker.name}</td>
                     <td className="px-4 py-2">{worker.transactionCount}</td>
-                    <td className="px-4 py-2">${worker.totalSales.toFixed(2)}</td>
-                    <td className="px-4 py-2">${worker.totalCommission.toFixed(2)}</td>
+                    <td className="px-4 py-2">
+                      ${worker.totalSales.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-2">
+                      ${worker.totalCommission.toFixed(2)}
+                    </td>
                   </tr>
                 ))}
                 {!workerMetrics.length && (
