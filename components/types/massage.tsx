@@ -20,6 +20,7 @@ export interface Worker {
   availableSince?: number;
   serviceId?: number;
   serviceName?: string;
+  addOns?: AddOns[];
 }
 
 export interface Transaction {
@@ -38,6 +39,7 @@ export interface Transaction {
   customerName?: string;
   customerPhone?: string;
   transactionDate: string;
+  addOns?: AddOns[];
 
   isRefunded?: boolean;
   refundAmount?: number;

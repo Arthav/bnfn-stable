@@ -45,6 +45,7 @@ export default function MassageShiftPage() {
           workers={workers}
           setWorkers={setWorkers}
           setTransactions={setTransactions}
+          addOns={addOns}
         />
       ),
     },

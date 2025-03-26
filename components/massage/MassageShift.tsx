@@ -1,6 +1,12 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
-import { Services, Worker, Transaction } from "@/components/types/massage";
+import {
+  Services,
+  Worker,
+  Transaction,
+  AddOns,
+} from "@/components/types/massage";
+import MultiSelectDropdown from "./MultiSelectDropDown";
 
 const statusOrder: Record<Worker["status"], number> = {
   Available: 0,
@@ -29,12 +35,14 @@ export default function MassageShift({
   workers,
   setWorkers,
   setTransactions,
+  addOns,
 }: {
   services: Services[];
   transactions: Transaction[];
   workers: Worker[];
   setWorkers: React.Dispatch<React.SetStateAction<Worker[]>>;
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
+  addOns: AddOns[];
 }) {
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
@@ -43,19 +51,17 @@ export default function MassageShift({
     serviceTime: "",
   });
   const [nameFormData, setNameFormData] = useState<string>("");
-  // New states for optional customer name and phone for addWorker
   const [customerNameFormData, setCustomerNameFormData] = useState<string>("");
   const [customerPhoneFormData, setCustomerPhoneFormData] =
     useState<string>("");
-
   const [actionMenuOpenId, setActionMenuOpenId] = useState<number | null>(null);
-  // New state for Booked checkbox and service selection.
   const [isBooked, setIsBooked] = useState(false);
   const [selectedService, setSelectedService] = useState<number>(
     services[0]?.id ?? 0
   );
+  // New state for selected add‑Ons (array of add‑On IDs)
+  const [selectedAddOnIds, setSelectedAddOnIds] = useState<number[]>([]);
 
-  // Handle closing the action menu.
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (!(event.target as HTMLElement).closest(".action-menu-container")) {
@@ -66,7 +72,6 @@ export default function MassageShift({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Save workers to localStorage whenever they change.
   useEffect(() => {
     if (workers.length === 0) return;
     localStorage.setItem("workers", JSON.stringify(workers));
@@ -85,7 +90,6 @@ export default function MassageShift({
     );
   };
 
-  // Cron-like check: update worker status when the end time is reached.
   useEffect(() => {
     const interval = setInterval(() => {
       const timestamp = Date.now();
@@ -111,6 +115,7 @@ export default function MassageShift({
                   worker.status === "Busy" ? timestamp : undefined,
                 serviceId: undefined,
                 serviceName: undefined,
+                addOns: [],
               };
             }
           }
@@ -126,6 +131,7 @@ export default function MassageShift({
     setWorkTimeFormData({ startTime: "", serviceTime: "" });
     setIsBooked(false);
     setSelectedService(services[0]?.id ?? 0);
+    setSelectedAddOnIds([]); // reset add‑On selection
     setModalType("workTime");
   };
 
@@ -139,7 +145,6 @@ export default function MassageShift({
   const openAddWorkerModal = () => {
     setCurrentWorker(null);
     setNameFormData("");
-    // Clear customer info fields
     setCustomerNameFormData("");
     setCustomerPhoneFormData("");
     setModalType("addWorker");
@@ -166,17 +171,23 @@ export default function MassageShift({
     const serviceMins = parseInt(workTimeFormData.serviceTime, 10);
     const end = new Date(start.getTime() + serviceMins * 60000);
     const padZero = (num: number) => num.toString().padStart(2, "0");
-    const formattedEnd = `${padZero(end.getHours())}:${padZero(end.getMinutes())}:${padZero(end.getSeconds())}`;
+    const formattedEnd = `${padZero(end.getHours())}:${padZero(
+      end.getMinutes()
+    )}:${padZero(end.getSeconds())}`;
 
     const selectedServiceObj = services.find(
       (service) => service.id === selectedService
     );
     if (!selectedServiceObj) return;
 
-    // Determine the new status based on the checkbox.
     const newStatus = isBooked ? "Booked" : "Busy";
 
-    // Update the worker with the work and service details.
+    // Get the selected add‑On objects
+    const selectedAddOns = addOns.filter((addon) =>
+      selectedAddOnIds.includes(addon.id)
+    );
+
+    // Update the worker with work details including add‑Ons.
     setWorkers((prev) =>
       prev.map((worker) =>
         worker.id === currentWorker.id
@@ -188,12 +199,12 @@ export default function MassageShift({
               status: newStatus,
               serviceId: selectedServiceObj.id,
               serviceName: selectedServiceObj.name,
+              addOns: selectedAddOns,
             }
           : worker
       )
     );
 
-    // Create a new transaction record.
     const newTransaction: Transaction = {
       id: Date.now(),
       workerId: currentWorker.id,
@@ -210,14 +221,16 @@ export default function MassageShift({
       customerName: customerNameFormData,
       customerPhone: customerPhoneFormData,
       transactionDate: new Date().toISOString(),
+      addOns: selectedAddOns,
     };
+
     setTransactions([...transactions, newTransaction]);
     localStorage.setItem(
       "transactions",
       JSON.stringify([...transactions, newTransaction])
     );
 
-    toast.success(`${currentWorker?.name} is set to work`, {
+    toast.success(`${currentWorker.name} is set to work`, {
       position: "top-center",
       autoClose: 5000,
     });
@@ -238,6 +251,7 @@ export default function MassageShift({
               availableSince: worker.status === "Busy" ? timestamp : undefined,
               serviceId: undefined,
               serviceName: undefined,
+              addOns: [],
             }
           : worker
       )
@@ -250,24 +264,18 @@ export default function MassageShift({
   };
 
   const toggleOnLeave = (workerId: number) => {
-    // Find the worker to update.
     const workerToToggle = workers.find((worker) => worker.id === workerId);
     if (!workerToToggle) return;
-  
-    // Only toggle if the status is either "On Leave" or "Available".
     if (
       workerToToggle.status !== "On Leave" &&
       workerToToggle.status !== "Available"
     )
       return;
-  
-    // Compute the new status.
     const newStatus =
       workerToToggle.status === "On Leave" ? "Available" : "On Leave";
     const toastMessage =
       newStatus === "Available" ? "Worker is available" : "Worker is on leave";
-  
-    // Update the workers state.
+
     setWorkers((prev) =>
       prev.map((worker) =>
         worker.id === workerId
@@ -279,12 +287,12 @@ export default function MassageShift({
               endTime: "",
               serviceId: undefined,
               serviceName: undefined,
+              addOns: [],
             }
           : worker
       )
     );
-  
-    // Defer the toast call.
+
     setTimeout(() => {
       toast.success(toastMessage, {
         position: "top-center",
@@ -292,7 +300,6 @@ export default function MassageShift({
       });
     }, 0);
   };
-  
 
   const handleEditSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -342,6 +349,7 @@ export default function MassageShift({
       serviceTime: 0,
       endTime: "",
       status: "Available",
+      addOns: [],
     } as Worker;
     setWorkers((prev) => [...prev, newWorker]);
     setModalType(null);
@@ -465,7 +473,6 @@ export default function MassageShift({
                 <td className="px-6 py-4 text-center">
                   {(() => {
                     if (!worker.endTime) return "N/A";
-                    // Parse worker.endTime (assumed format "HH:MM:SS")
                     const [h, m, s] = worker.endTime.split(":").map(Number);
                     const now = new Date();
                     const endTimeDate = new Date(
@@ -476,15 +483,15 @@ export default function MassageShift({
                       m,
                       s || 0
                     );
-                    // Calculate remaining minutes (ceiling, and ensure non-negative)
                     const remainingMinutes = Math.max(
                       Math.ceil((endTimeDate.getTime() - Date.now()) / 60000),
                       0
                     );
-                    return `${remainingMinutes} ${remainingMinutes === 1 ? "Minute" : "Minutes"}`;
+                    return `${remainingMinutes} ${
+                      remainingMinutes === 1 ? "Minute" : "Minutes"
+                    }`;
                   })()}
                 </td>
-
                 <td className="px-6 py-4">{worker.endTime}</td>
                 <td className="px-6 py-4">
                   <span
@@ -493,7 +500,6 @@ export default function MassageShift({
                     {worker.status}
                   </span>
                 </td>
-
                 <td className="px-6 py-4 md:space-x-2 flex flex-col md:flex-row md:items-center md:justify-center relative">
                   <button
                     onClick={() => openWorkTimeModal(worker)}
@@ -561,7 +567,6 @@ export default function MassageShift({
           </tbody>
         </table>
       </div>
-
       {modalType && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
           <div className="bg-gray-800 p-6 rounded shadow-lg w-96">
@@ -652,7 +657,19 @@ export default function MassageShift({
                         ))}
                     </select>
                   </div>
-                  {/* New optional customer fields */}
+                  <div className="mb-4">
+                    <label
+                      htmlFor="selectAddOns"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Select Add‑Ons:
+                    </label>
+                    <MultiSelectDropdown
+                      addOns={addOns}
+                      selectedAddOnIds={selectedAddOnIds}
+                      setSelectedAddOnIds={setSelectedAddOnIds}
+                    />
+                  </div>
                   <div className="mb-4">
                     <label
                       htmlFor="addCustomerName"
