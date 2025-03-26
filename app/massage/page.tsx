@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Worker, Services, Transaction } from "@/components/types/massage";
+import {
+  Worker,
+  Services,
+  Transaction,
+  AddOns,
+} from "@/components/types/massage";
 import MassageShift from "@/components/massage/MassageShift";
 import ManageService from "@/components/massage/ManageService";
 import ComingSoon from "@/components/comingsoon";
@@ -10,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import TransactionList from "@/components/massage/TransactionList";
 import ReportPage from "@/components/massage/ReportPage";
 import BookingList from "@/components/massage/BookingList";
+import ManageAddOnsPage from "@/components/massage/AddOns";
 import {
   FaSpa,
   FaCalendarAlt,
@@ -25,6 +31,7 @@ export default function MassageShiftPage() {
   const [services, setServices] = useState<Services[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
+  const [addOns, setAddOns] = useState<AddOns[]>([]);
 
   const tabs = [
     {
@@ -56,9 +63,15 @@ export default function MassageShiftPage() {
       ),
     },
     {
-      key: "memberships",
-      title: "Memberships",
+      key: "add-ons",
+      title: "Add-Ons",
       icon: <FaPlusSquare />,
+      component: <ManageAddOnsPage addOns={addOns} setAddOns={setAddOns} />,
+    },
+    {
+      key: "membership",
+      title: "Membership",
+      icon: <FaFileAlt />,
       component: <ComingSoon />,
     },
     {
@@ -110,19 +123,20 @@ May your commits be legendary, your debugging swift, and your journey through co
     if (storedServices) {
       setServices(JSON.parse(storedServices));
     }
-  }, []);
 
-  useEffect(() => {
     const storedWorkers = localStorage.getItem("workers");
     if (storedWorkers) {
       setWorkers(JSON.parse(storedWorkers));
     }
-  }, []);
 
-  useEffect(() => {
     const storedTransactions = localStorage.getItem("transactions");
     if (storedTransactions) {
       setTransactions(JSON.parse(storedTransactions));
+    }
+
+    const storedAddOns = localStorage.getItem("addOns");
+    if (storedAddOns) {
+      setAddOns(JSON.parse(storedAddOns));
     }
   }, []);
 

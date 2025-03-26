@@ -250,44 +250,49 @@ export default function MassageShift({
   };
 
   const toggleOnLeave = (workerId: number) => {
+    // Find the worker to update.
+    const workerToToggle = workers.find((worker) => worker.id === workerId);
+    if (!workerToToggle) return;
+  
+    // Only toggle if the status is either "On Leave" or "Available".
+    if (
+      workerToToggle.status !== "On Leave" &&
+      workerToToggle.status !== "Available"
+    )
+      return;
+  
+    // Compute the new status.
+    const newStatus =
+      workerToToggle.status === "On Leave" ? "Available" : "On Leave";
+    const toastMessage =
+      newStatus === "Available" ? "Worker is available" : "Worker is on leave";
+  
+    // Update the workers state.
     setWorkers((prev) =>
-      prev.map((worker) => {
-        if (worker.id === workerId) {
-          if (worker.status === "On Leave") {
-            toast.success("Worker is available", {
-              position: "top-center",
-              autoClose: 5000,
-            });
-            return {
+      prev.map((worker) =>
+        worker.id === workerId
+          ? {
               ...worker,
-              status: "Available",
+              status: newStatus,
               startTime: "",
               serviceTime: 0,
               endTime: "",
               serviceId: undefined,
               serviceName: undefined,
-            };
-          }
-          if (worker.status === "Available") {
-            toast.success("Worker is on leave", {
-              position: "top-center",
-              autoClose: 5000,
-            });
-            return {
-              ...worker,
-              status: "On Leave",
-              startTime: "",
-              serviceTime: 0,
-              endTime: "",
-              serviceId: undefined,
-              serviceName: undefined,
-            };
-          }
-        }
-        return worker;
-      })
+            }
+          : worker
+      )
     );
+  
+    // Defer the toast call.
+    setTimeout(() => {
+      toast.success(toastMessage, {
+        position: "top-center",
+        autoClose: 5000,
+      });
+    }, 0);
   };
+  
 
   const handleEditSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

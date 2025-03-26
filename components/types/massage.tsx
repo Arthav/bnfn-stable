@@ -76,3 +76,11 @@ export interface Membership {
   /** Optional record last update timestamp (ISO string) */
   updatedAt?: string;
 }
+
+export interface AddOns {
+  id: number;
+  name: string;
+  price: number;
+  profit: number;
+  status: "Active" | "Discontinued";
+}
