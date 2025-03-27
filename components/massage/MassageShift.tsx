@@ -24,7 +24,7 @@ const statusClasses: Record<Worker["status"], string> = {
 
 interface FormData {
   startTime: string;
-  serviceTime: string;
+  serviceTime: number;
 }
 
 type ModalType = "workTime" | "editWorker" | "addWorker" | null;
@@ -48,7 +48,7 @@ export default function MassageShift({
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
   const [workTimeFormData, setWorkTimeFormData] = useState<FormData>({
     startTime: "",
-    serviceTime: "",
+    serviceTime: 0,
   });
   const [nameFormData, setNameFormData] = useState<string>("");
   const [customerNameFormData, setCustomerNameFormData] = useState<string>("");
@@ -56,9 +56,7 @@ export default function MassageShift({
     useState<string>("");
   const [actionMenuOpenId, setActionMenuOpenId] = useState<number | null>(null);
   const [isBooked, setIsBooked] = useState(false);
-  const [selectedService, setSelectedService] = useState<number>(
-    services[0]?.id ?? 0
-  );
+  const [selectedService, setSelectedService] = useState<number>(0);
   // New state for selected add‑Ons (array of add‑On IDs)
   const [selectedAddOnIds, setSelectedAddOnIds] = useState<number[]>([]);
 
@@ -128,7 +126,7 @@ export default function MassageShift({
 
   const openWorkTimeModal = (worker: Worker) => {
     setCurrentWorker(worker);
-    setWorkTimeFormData({ startTime: "", serviceTime: "" });
+    setWorkTimeFormData({ startTime: "", serviceTime: 0 });
     setIsBooked(false);
     setSelectedService(services[0]?.id ?? 0);
     setSelectedAddOnIds([]); // reset add‑On selection
@@ -168,7 +166,7 @@ export default function MassageShift({
       hours,
       minutes
     );
-    const serviceMins = parseInt(workTimeFormData.serviceTime, 10);
+    const serviceMins = workTimeFormData.serviceTime;
     const end = new Date(start.getTime() + serviceMins * 60000);
     const padZero = (num: number) => num.toString().padStart(2, "0");
     const formattedEnd = `${padZero(end.getHours())}:${padZero(
@@ -241,7 +239,7 @@ export default function MassageShift({
     setWorkers((prev) => {
       const index = prev.findIndex((w) => w.id === workerId);
       if (index === -1) return prev;
-  
+
       // Create an updated worker with cleared work details
       const updatedWorker: Worker = {
         ...prev[index],
@@ -254,7 +252,7 @@ export default function MassageShift({
         serviceName: undefined,
         addOns: [],
       };
-  
+
       // If the worker was Busy, remove them from their current position and append them at the end.
       if (prev[index].status === "Busy") {
         const newWorkers = [...prev];
@@ -263,21 +261,24 @@ export default function MassageShift({
       }
       // If the worker was Booked, update them in place so their index remains the same.
       else if (prev[index].status === "Booked") {
-        return prev.map((worker, idx) => (idx === index ? updatedWorker : worker));
+        return prev.map((worker, idx) =>
+          idx === index ? updatedWorker : worker
+        );
       }
       // For any other status, update in place.
       else {
-        return prev.map((worker, idx) => (idx === index ? updatedWorker : worker));
+        return prev.map((worker, idx) =>
+          idx === index ? updatedWorker : worker
+        );
       }
     });
-  
+
     const currentW = workers.find((w) => w.id === workerId);
     toast.success(`${currentW?.name} has done working`, {
       position: "top-center",
       autoClose: 5000,
     });
   };
-  
 
   const toggleOnLeave = (workerId: number) => {
     const workerToToggle = workers.find((worker) => worker.id === workerId);
@@ -517,7 +518,7 @@ export default function MassageShift({
                   <button
                     onClick={() => openWorkTimeModal(worker)}
                     disabled={
-                      worker.status === "Busy" || worker.status === "On Leave"
+                      worker.status !== "Available"
                     }
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded disabled:opacity-50"
                   >
@@ -591,10 +592,44 @@ export default function MassageShift({
                 <form onSubmit={handleWorkTimeSubmit}>
                   <div className="mb-4">
                     <label
+                      htmlFor="selectService"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Select Service:
+                    </label>
+                    <select
+                      id="selectService"
+                      value={selectedService}
+                      onChange={(e) => {
+                        setSelectedService(Number(e.target.value));
+                        setWorkTimeFormData({
+                          ...workTimeFormData,
+                          serviceTime:
+                            services.find(
+                              (s) => s.id === Number(e.target.value)
+                            )?.serviceTimeMin || 0,
+                        });
+                      }}
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                    >
+                      <option value="default" disabled>
+                        Select a Service
+                      </option>
+                      {services
+                        .filter((service) => service.status === "Active")
+                        .map((service) => (
+                          <option key={service.id} value={service.id}>
+                            [${service.price}] - {service.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label
                       htmlFor="startTime"
                       className="block text-sm font-medium mb-1"
                     >
-                      Start Time:
+                      Start Time <span className="text-red-600">*</span>:
                     </label>
                     <input
                       id="startTime"
@@ -615,16 +650,17 @@ export default function MassageShift({
                       htmlFor="serviceTime"
                       className="block text-sm font-medium mb-1"
                     >
-                      Service Time (minutes):
+                      Service Time (minutes)<span className="text-red-600">*</span>:
                     </label>
                     <input
                       id="serviceTime"
                       type="number"
+                      min="1"
                       value={workTimeFormData.serviceTime}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setWorkTimeFormData({
                           ...workTimeFormData,
-                          serviceTime: e.target.value,
+                          serviceTime: Number(e.target.value),
                         })
                       }
                       required
@@ -645,30 +681,6 @@ export default function MassageShift({
                     >
                       Booked
                     </label>
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="selectService"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Select Service:
-                    </label>
-                    <select
-                      id="selectService"
-                      value={selectedService}
-                      onChange={(e) =>
-                        setSelectedService(Number(e.target.value))
-                      }
-                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
-                    >
-                      {services
-                        .filter((service) => service.status === "Active")
-                        .map((service) => (
-                          <option key={service.id} value={service.id}>
-                            [${service.price}] - {service.name}
-                          </option>
-                        ))}
-                    </select>
                   </div>
                   <div className="mb-4">
                     <label
