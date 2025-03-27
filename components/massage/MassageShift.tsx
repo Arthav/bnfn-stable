@@ -238,30 +238,46 @@ export default function MassageShift({
   };
 
   const finishWorker = (workerId: number) => {
-    const timestamp = Date.now();
-    setWorkers((prev) =>
-      prev.map((worker) =>
-        worker.id === workerId
-          ? {
-              ...worker,
-              status: "Available",
-              startTime: "",
-              serviceTime: 0,
-              endTime: "",
-              availableSince: worker.status === "Busy" ? timestamp : undefined,
-              serviceId: undefined,
-              serviceName: undefined,
-              addOns: [],
-            }
-          : worker
-      )
-    );
+    setWorkers((prev) => {
+      const index = prev.findIndex((w) => w.id === workerId);
+      if (index === -1) return prev;
+  
+      // Create an updated worker with cleared work details
+      const updatedWorker: Worker = {
+        ...prev[index],
+        status: "Available",
+        startTime: "",
+        serviceTime: 0,
+        endTime: "",
+        availableSince: undefined,
+        serviceId: undefined,
+        serviceName: undefined,
+        addOns: [],
+      };
+  
+      // If the worker was Busy, remove them from their current position and append them at the end.
+      if (prev[index].status === "Busy") {
+        const newWorkers = [...prev];
+        newWorkers.splice(index, 1);
+        return [...newWorkers, updatedWorker];
+      }
+      // If the worker was Booked, update them in place so their index remains the same.
+      else if (prev[index].status === "Booked") {
+        return prev.map((worker, idx) => (idx === index ? updatedWorker : worker));
+      }
+      // For any other status, update in place.
+      else {
+        return prev.map((worker, idx) => (idx === index ? updatedWorker : worker));
+      }
+    });
+  
     const currentW = workers.find((w) => w.id === workerId);
     toast.success(`${currentW?.name} has done working`, {
       position: "top-center",
       autoClose: 5000,
     });
   };
+  
 
   const toggleOnLeave = (workerId: number) => {
     const workerToToggle = workers.find((worker) => worker.id === workerId);
@@ -389,9 +405,6 @@ export default function MassageShift({
     .sort((a, b) => {
       const statusDiff = statusOrder[a.status] - statusOrder[b.status];
       if (statusDiff !== 0) return statusDiff;
-      const availableSinceDiff =
-        (a.availableSince ?? 0) - (b.availableSince ?? 0);
-      if (availableSinceDiff !== 0) return availableSinceDiff;
       return a.originalIndex - b.originalIndex;
     });
 

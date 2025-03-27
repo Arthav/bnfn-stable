@@ -17,7 +17,7 @@ export interface Worker {
   serviceTime: number;
   endTime: string;
   status: "Available" | "Busy" | "On Leave" | "Booked";
-  availableSince?: number;
+  availableSince?: number; // deprecated
   serviceId?: number;
   serviceName?: string;
   addOns?: AddOns[];
