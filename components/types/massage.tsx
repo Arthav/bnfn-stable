@@ -49,6 +49,13 @@ export interface Transaction {
   isRefundTransaction?: boolean;
 }
 
+export interface AddOns {
+  id: number;
+  name: string;
+  price: number;
+  profit: number;
+  status: "Active" | "Discontinued";
+}
 
 export interface Membership {
   /** Unique identifier for the member */
@@ -77,14 +84,6 @@ export interface Membership {
   createdAt: string;
   /** Optional record last update timestamp (ISO string) */
   updatedAt?: string;
-}
-
-export interface AddOns {
-  id: number;
-  name: string;
-  price: number;
-  profit: number;
-  status: "Active" | "Discontinued";
 }
 
 export interface User {

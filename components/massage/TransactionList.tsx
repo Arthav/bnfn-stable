@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { Transaction } from "@/components/types/massage";
+import React, { useState, useMemo, useEffect } from "react";
+import { Transaction, AddOns } from "@/components/types/massage";
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -10,22 +10,25 @@ const TransactionList: React.FC<TransactionListProps> = ({
   transactions,
   setTransactions,
 }) => {
-  // Filter states (same as before)
-  const [timeFilter, setTimeFilter] = useState<"custom" | "week" | "month">(
-    "custom"
-  );
+  // Filter states
+  const [timeFilter, setTimeFilter] = useState<"custom" | "week" | "month">("custom");
   const [customStartDate, setCustomStartDate] = useState<string>("");
   const [customEndDate, setCustomEndDate] = useState<string>("");
   const [weekDate, setWeekDate] = useState<string>("");
   const [month, setMonth] = useState<string>("");
-
   const [filterWorker, setFilterWorker] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("");
 
-  // State for refund modal (only refund reason is input)
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
+  // State for refund modal
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [refundReason, setRefundReason] = useState<string>("");
+
+  // New state for details modal
+  const [selectedTransactionDetails, setSelectedTransactionDetails] = useState<Transaction | null>(null);
 
   // Compute filtered and sorted transactions.
   const filteredTransactions = useMemo(() => {
@@ -73,15 +76,9 @@ const TransactionList: React.FC<TransactionListProps> = ({
     if (sortBy) {
       filtered = filtered.slice().sort((a, b) => {
         if (sortBy === "dateAsc") {
-          return (
-            new Date(a.transactionDate).getTime() -
-            new Date(b.transactionDate).getTime()
-          );
+          return new Date(a.transactionDate).getTime() - new Date(b.transactionDate).getTime();
         } else if (sortBy === "dateDesc") {
-          return (
-            new Date(b.transactionDate).getTime() -
-            new Date(a.transactionDate).getTime()
-          );
+          return new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime();
         } else if (sortBy === "salesAsc") {
           return a.sales - b.sales;
         } else if (sortBy === "salesDesc") {
@@ -99,16 +96,19 @@ const TransactionList: React.FC<TransactionListProps> = ({
       });
     }
     return filtered;
-  }, [
-    transactions,
-    timeFilter,
-    customStartDate,
-    customEndDate,
-    weekDate,
-    month,
-    filterWorker,
-    sortBy,
-  ]);
+  }, [transactions, timeFilter, customStartDate, customEndDate, weekDate, month, filterWorker, sortBy]);
+
+  // Reset to page 1 when filters change.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [timeFilter, customStartDate, customEndDate, weekDate, month, filterWorker, sortBy]);
+
+  // Pagination calculations.
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const paginatedTransactions = filteredTransactions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Handle refund form submission.
   const handleRefundSubmit = (e: React.FormEvent) => {
@@ -284,100 +284,69 @@ const TransactionList: React.FC<TransactionListProps> = ({
           <thead className="bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Transaction ID
+                ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Transaction Date
+                Date
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Worker
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Service
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Customer
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Start Time
+                Refund Info
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                End Time
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Sales
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Commission
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Refund Options
+                Actions
               </th>
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
-            {filteredTransactions.map((transaction) => (
-              <tr key={transaction.id} className="hover:bg-gray-800">
-                <td className="px-6 py-4">{transaction.id}</td>
+            {paginatedTransactions.map((tx) => (
+              <tr key={tx.id} className="hover:bg-gray-800">
+                <td className="px-6 py-4">{tx.id}</td>
                 <td className="px-6 py-4">
-                  {new Date(transaction.transactionDate).toLocaleDateString(
-                    "en-GB",
-                    {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    }
-                  )}
+                  {new Date(tx.transactionDate).toLocaleDateString("en-GB", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </td>
+                <td className="px-6 py-4">{tx.workerName || tx.workerId}</td>
+                <td className="px-6 py-4">
+                  {tx.customerName ? tx.customerName : "N/A"}
+                  {tx.customerPhone && ` (${tx.customerPhone})`}
                 </td>
                 <td className="px-6 py-4">
-                  {transaction.workerName || transaction.workerId}
-                </td>
-                <td className="px-6 py-4">
-                  {transaction.serviceName || transaction.serviceId}
-                </td>
-                <td className="px-6 py-4">
-                  {transaction.customerName ? transaction.customerName : "N/A"}
-                  {transaction.customerPhone &&
-                    ` (${transaction.customerPhone})`}
-                </td>
-                <td className="px-6 py-4">{transaction.startTime}</td>
-                <td className="px-6 py-4">{transaction.endTime}</td>
-                <td className="px-6 py-4">${transaction.sales}</td>
-                <td className="px-6 py-4">${transaction.commission}</td>
-                <td className="px-6 py-4">
-                  {transaction.isRefundTransaction ? (
+                  {tx.isRefundTransaction ? (
                     <div className="text-green-400">
-                      Refunded: ${transaction.refundAmount}
-                      <br />
-                      On:{" "}
-                      {transaction.refundDate
-                        ? new Date(transaction.refundDate).toLocaleDateString(
-                            "en-GB",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            }
-                          )
-                        : "N/A"}
-                      <br />
-                      Reason: {transaction.refundReason}
+                      Refunded: ${tx.refundAmount}
                     </div>
                   ) : (
                     <button
                       className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs disabled:hover:bg-gray-200"
-                      onClick={() => setSelectedTransaction(transaction)}
-                      disabled={transaction.isRefunded}
+                      onClick={() => setSelectedTransaction(tx)}
+                      disabled={tx.isRefunded}
                     >
                       Refund
                     </button>
                   )}
                 </td>
+                <td className="px-6 py-4">
+                  <button
+                    onClick={() => setSelectedTransactionDetails(tx)}
+                    className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs"
+                  >
+                    View Details
+                  </button>
+                </td>
               </tr>
             ))}
             {filteredTransactions.length === 0 && (
               <tr>
-                <td colSpan={10} className="text-center py-4">
+                <td colSpan={6} className="text-center py-4">
                   No transactions available.
                 </td>
               </tr>
@@ -386,10 +355,195 @@ const TransactionList: React.FC<TransactionListProps> = ({
         </table>
       </div>
 
+      {/* Pagination Controls */}
+      {filteredTransactions.length > itemsPerPage && (
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {/* Transaction Details Modal */}
+      {selectedTransactionDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded shadow-lg w-96 max-h-[80vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-6 border-b pb-2">
+              Transaction #{selectedTransactionDetails.id}
+            </h2>
+            <div className="space-y-4">
+              {/* Transaction Info */}
+              <div>
+                <h3 className="text-lg font-semibold mb-1">Transaction Info</h3>
+                <p>
+                  <span className="font-semibold">Date:</span>{" "}
+                  {new Date(selectedTransactionDetails.transactionDate).toLocaleDateString(
+                    "en-GB",
+                    { year: "numeric", month: "short", day: "numeric" }
+                  )}
+                </p>
+                <p>
+                  <span className="font-semibold">Worker:</span>{" "}
+                  {selectedTransactionDetails.workerName ||
+                    selectedTransactionDetails.workerId}
+                </p>
+                <p>
+                  <span className="font-semibold">Service:</span>{" "}
+                  {selectedTransactionDetails.serviceName ||
+                    selectedTransactionDetails.serviceId}
+                </p>
+              </div>
+
+              {/* Add-Ons */}
+              <div>
+                <h3 className="text-lg font-semibold mb-1">Add‑Ons</h3>
+                {selectedTransactionDetails.addOns &&
+                selectedTransactionDetails.addOns.length > 0 ? (
+                  <>
+                    <p>
+                      <span className="font-semibold">List:</span>{" "}
+                      {selectedTransactionDetails.addOns
+                        .map((addon) => addon.name)
+                        .join(", ")}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Total Price:</span> $
+                      {selectedTransactionDetails.addOns
+                        .reduce((total, addon) => total + addon.price, 0)
+                        .toFixed(2)}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Total Profit:</span> $
+                      {selectedTransactionDetails.addOns
+                        .reduce((total, addon) => total + addon.profit, 0)
+                        .toFixed(2)}
+                    </p>
+                    <ul className="list-disc list-inside mt-1">
+                      {selectedTransactionDetails.addOns.map((addon) => (
+                        <li key={addon.id}>
+                          {addon.name} (${addon.price})
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <p>N/A</p>
+                )}
+              </div>
+
+              {/* Customer & Timing */}
+              <div>
+                <h3 className="text-lg font-semibold mb-1">
+                  Customer & Timing
+                </h3>
+                <p>
+                  <span className="font-semibold">Customer:</span>{" "}
+                  {selectedTransactionDetails.customerName
+                    ? selectedTransactionDetails.customerName
+                    : "N/A"}{" "}
+                  {selectedTransactionDetails.customerPhone &&
+                    `(${selectedTransactionDetails.customerPhone})`}
+                </p>
+                <p>
+                  <span className="font-semibold">Start Time:</span>{" "}
+                  {selectedTransactionDetails.startTime}
+                </p>
+                <p>
+                  <span className="font-semibold">End Time:</span>{" "}
+                  {selectedTransactionDetails.endTime}
+                </p>
+              </div>
+
+              {/* Financials */}
+              <div>
+                <h3 className="text-lg font-semibold mb-1">Financials</h3>
+                <p>
+                  <span className="font-semibold">Sales:</span> $
+                  {selectedTransactionDetails.sales}
+                </p>
+                <p>
+                  <span className="font-semibold">Commission:</span> $
+                  {selectedTransactionDetails.commission}
+                </p>
+                <p>
+                  <span className="font-semibold">Foot Time:</span>{" "}
+                  {selectedTransactionDetails.footTime} min
+                </p>
+                <p>
+                  <span className="font-semibold">Body Time:</span>{" "}
+                  {selectedTransactionDetails.bodyTime} min
+                </p>
+              </div>
+
+              {/* Refund Info (if applicable) */}
+              {selectedTransactionDetails.isRefundTransaction && (
+                <div className="text-green-400">
+                  <h3 className="text-lg font-semibold mb-1">Refund Info</h3>
+                  <p>
+                    <span className="font-semibold">Refunded Amount:</span> $
+                    {selectedTransactionDetails.refundAmount}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Refund Date:</span>{" "}
+                    {selectedTransactionDetails.refundDate
+                      ? new Date(selectedTransactionDetails.refundDate).toLocaleDateString(
+                          "en-GB",
+                          { year: "numeric", month: "short", day: "numeric" }
+                        )
+                      : "N/A"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Refund Reason:</span>{" "}
+                    {selectedTransactionDetails.refundReason}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-4 mt-6">
+              {!selectedTransactionDetails.isRefunded &&
+                !selectedTransactionDetails.isRefundTransaction && (
+                  <button
+                    onClick={() => {
+                      setSelectedTransaction(selectedTransactionDetails);
+                      setSelectedTransactionDetails(null);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm"
+                  >
+                    Refund
+                  </button>
+                )}
+              <button
+                type="button"
+                onClick={() => setSelectedTransactionDetails(null)}
+                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Refund Modal */}
       {selectedTransaction && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded shadow-lg w-96">
+          <div className="bg-gray-800 p-6 rounded shadow-lg w-96 max-h-[80vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">
               Refund Transaction #{selectedTransaction.id}
             </h2>
