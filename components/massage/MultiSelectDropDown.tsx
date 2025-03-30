@@ -27,15 +27,23 @@ export default function MultiSelectDropdown({
     .map((addon) => addon.name)
     .join(", ");
 
+  // Compute the total price of selected add‑Ons
+  const totalPrice = activeAddOns
+    .filter((addon) => selectedAddOnIds.includes(addon.id))
+    .reduce((acc, addon) => acc + addon.price, 0);
+
   return (
-    <div className="relative">
+    // Wrap in a focusable div with onBlur to handle clicks outside
+    <div className="relative" tabIndex={0}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        onBlur={() => setIsOpen(false)}
         className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 text-left focus:outline-none"
       >
-        {selectedAddOnIds.length > 0 ? selectedLabels : "Select Add‑Ons"}
+        <div className="flex justify-between items-center">
+          <span>{selectedAddOnIds.length > 0 ? selectedLabels : "Select Add‑Ons"}</span>
+          <span>${totalPrice.toFixed(2)}</span>
+        </div>
       </button>
       {isOpen && (
         <div className="absolute z-10 mt-1 w-full bg-gray-700 border border-gray-600 rounded shadow-lg max-h-60 overflow-auto">

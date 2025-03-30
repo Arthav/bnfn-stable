@@ -86,3 +86,32 @@ export interface AddOns {
   profit: number;
   status: "Active" | "Discontinued";
 }
+
+export interface User {
+  id: number;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Companies {
+  id: number;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Admins {
+  id: number;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}

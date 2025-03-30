@@ -91,26 +91,24 @@ export default function MassageShift({
   useEffect(() => {
     const interval = setInterval(() => {
       const timestamp = Date.now();
-      setWorkers((prev) =>
-        prev.map((worker) => {
+      // Array to store names of workers that finished
+      let finishedWorkerNames: string[] = [];
+      setWorkers((prev) => {
+        return prev.map((worker) => {
           if (
             (worker.status === "Busy" || worker.status === "Booked") &&
             worker.endTime
           ) {
             const endDate = parseEndTime(worker.endTime);
             if (new Date() > endDate) {
-              toast.success(`${worker.name} has done working`, {
-                position: "top-center",
-                autoClose: 5000,
-              });
+              finishedWorkerNames.push(worker.name);
               return {
                 ...worker,
                 status: "Available",
                 startTime: "",
                 serviceTime: 0,
                 endTime: "",
-                availableSince:
-                  worker.status === "Busy" ? timestamp : undefined,
+                availableSince: worker.status === "Busy" ? timestamp : undefined,
                 serviceId: undefined,
                 serviceName: undefined,
                 addOns: [],
@@ -118,11 +116,20 @@ export default function MassageShift({
             }
           }
           return worker;
-        })
-      );
+        });
+      });
+
+      // trigger toast notifications after state has been updated
+      finishedWorkerNames.forEach((name) => {
+        toast.success(`${name} has done working`, {
+          position: "top-center",
+          autoClose: 5000,
+        });
+      });
     }, 20000);
     return () => clearInterval(interval);
   }, []);
+  
 
   const openWorkTimeModal = (worker: Worker) => {
     setCurrentWorker(worker);
@@ -582,8 +589,8 @@ export default function MassageShift({
         </table>
       </div>
       {modalType && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
-          <div className="bg-gray-800 p-6 rounded shadow-lg w-96">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 ">
+          <div className="bg-gray-800 p-6 rounded shadow-lg w-96  max-h-[80vh] overflow-y-auto">
             {modalType === "workTime" && currentWorker && (
               <>
                 <h2 className="text-xl font-semibold mb-4">
