@@ -88,12 +88,14 @@ export default function MassageShift({
     );
   };
 
+  // Handle check worker status and update
   useEffect(() => {
     const interval = setInterval(() => {
       const timestamp = Date.now();
-      // Array to store names of workers that finished
       let finishedWorkerNames: string[] = [];
+  
       setWorkers((prev) => {
+        // Process each worker and return an updated list of workers.
         return prev.map((worker) => {
           if (
             (worker.status === "Busy" || worker.status === "Booked") &&
@@ -102,7 +104,8 @@ export default function MassageShift({
             const endDate = parseEndTime(worker.endTime);
             if (new Date() > endDate) {
               finishedWorkerNames.push(worker.name);
-              return {
+  
+              const updatedWorker: Worker = {
                 ...worker,
                 status: "Available",
                 startTime: "",
@@ -113,13 +116,22 @@ export default function MassageShift({
                 serviceName: undefined,
                 addOns: [],
               };
+  
+              // If the worker was Busy, remove them from their current position and append them at the end.
+              if (worker.status === "Busy") {
+                return { ...updatedWorker }; // Make sure to return only the updated worker object.
+              }
+  
+              // If the worker was Booked, update them in place so their index remains the same.
+              return { ...updatedWorker }; // Return the updated worker object.
             }
           }
-          return worker;
+  
+          return worker; // Otherwise, return the worker as is.
         });
       });
-
-      // trigger toast notifications after state has been updated
+  
+      // Trigger toast notifications after state has been updated
       finishedWorkerNames.forEach((name) => {
         toast.success(`${name} has done working`, {
           position: "top-center",
@@ -127,9 +139,9 @@ export default function MassageShift({
         });
       });
     }, 20000);
+  
     return () => clearInterval(interval);
   }, []);
-  
 
   const openWorkTimeModal = (worker: Worker) => {
     setCurrentWorker(worker);

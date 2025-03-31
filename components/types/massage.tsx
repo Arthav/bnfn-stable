@@ -108,6 +108,7 @@ export interface Companies {
 export interface Admins {
   id: number;
   name: string;
+  password: string;
   address: string;
   phone: string;
   email: string;
