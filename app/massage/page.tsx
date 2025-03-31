@@ -95,6 +95,7 @@ export default function MassageShiftPage() {
           workers={workers}
           services={services}
           transactions={transactions}
+          addOns={addOns}
         />
       ),
     },
