@@ -88,60 +88,115 @@ export default function MassageShift({
     );
   };
 
-  // Handle check worker status and update
+  const updateWorkersStatus = () => {
+    let finishedWorkerNames: string[] = [];
+    setWorkers((prev) => {
+      const updatedWorkers = prev.map((worker) => {
+        if (
+          (worker.status === "Busy" || worker.status === "Booked") &&
+          worker.endTime
+        ) {
+          const endDate = parseEndTime(worker.endTime);
+          // Check if the current time is past the end time
+          if (new Date() > endDate) {
+            finishedWorkerNames.push(worker.name);
+            const updatedWorker: Worker = {
+              ...worker,
+              status: "Available",
+              startTime: "",
+              serviceTime: 0,
+              endTime: "",
+              availableSince: undefined,
+              serviceId: undefined,
+              serviceName: undefined,
+              addOns: [],
+            };
+
+            // If the status was "Busy", move the worker to the end of the array
+            if (worker.status === "Busy") {
+              return { updatedWorker, isMovedToEnd: true };
+            }
+
+            // If the status was "Booked", update the worker in place
+            return { updatedWorker, isMovedToEnd: false };
+          }
+        }
+        return { updatedWorker: worker, isMovedToEnd: false }; // No change
+      });
+
+      // Separate the workers that need to be moved to the end
+      const movedWorkers = updatedWorkers
+        .filter((w) => w.isMovedToEnd)
+        .map((w) => w.updatedWorker);
+      const updatedWorkersInPlace = updatedWorkers
+        .filter((w) => !w.isMovedToEnd)
+        .map((w) => w.updatedWorker);
+
+      // Combine the updated workers, placing the moved ones at the end
+      return [...updatedWorkersInPlace, ...movedWorkers];
+    });
+
+    // Show toast notifications for finished workers
+    finishedWorkerNames.forEach((name) => {
+      toast.success(`${name} has done working`, {
+        position: "top-center",
+        autoClose: 5000,
+      });
+    });
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
-      const timestamp = Date.now();
-      let finishedWorkerNames: string[] = [];
-  
-      setWorkers((prev) => {
-        // Process each worker and return an updated list of workers.
-        return prev.map((worker) => {
-          if (
-            (worker.status === "Busy" || worker.status === "Booked") &&
-            worker.endTime
-          ) {
-            const endDate = parseEndTime(worker.endTime);
-            if (new Date() > endDate) {
-              finishedWorkerNames.push(worker.name);
-  
-              const updatedWorker: Worker = {
-                ...worker,
-                status: "Available",
-                startTime: "",
-                serviceTime: 0,
-                endTime: "",
-                availableSince: worker.status === "Busy" ? timestamp : undefined,
-                serviceId: undefined,
-                serviceName: undefined,
-                addOns: [],
-              };
-  
-              // If the worker was Busy, remove them from their current position and append them at the end.
-              if (worker.status === "Busy") {
-                return { ...updatedWorker }; // Make sure to return only the updated worker object.
-              }
-  
-              // If the worker was Booked, update them in place so their index remains the same.
-              return { ...updatedWorker }; // Return the updated worker object.
-            }
-          }
-  
-          return worker; // Otherwise, return the worker as is.
-        });
-      });
-  
-      // Trigger toast notifications after state has been updated
-      finishedWorkerNames.forEach((name) => {
-        toast.success(`${name} has done working`, {
-          position: "top-center",
-          autoClose: 5000,
-        });
-      });
-    }, 20000);
-  
+      updateWorkersStatus();
+    }, 20000); // Runs every 20 seconds
+
     return () => clearInterval(interval);
   }, []);
+
+  const finishWorker = (workerId: number) => {
+    setWorkers((prev) => {
+      const index = prev.findIndex((w) => w.id === workerId);
+      if (index === -1) return prev;
+
+      // Create an updated worker with cleared work details
+      const updatedWorker: Worker = {
+        ...prev[index],
+        status: "Available",
+        startTime: "",
+        serviceTime: 0,
+        endTime: "",
+        availableSince: undefined,
+        serviceId: undefined,
+        serviceName: undefined,
+        addOns: [],
+      };
+
+      // If the worker was Busy, remove them from their current position and append them at the end.
+      if (prev[index].status === "Busy") {
+        const newWorkers = [...prev];
+        newWorkers.splice(index, 1);
+        return [...newWorkers, updatedWorker];
+      }
+      // If the worker was Booked, update them in place so their index remains the same.
+      else if (prev[index].status === "Booked") {
+        return prev.map((worker, idx) =>
+          idx === index ? updatedWorker : worker
+        );
+      }
+      // For any other status, update in place.
+      else {
+        return prev.map((worker, idx) =>
+          idx === index ? updatedWorker : worker
+        );
+      }
+    });
+
+    const currentW = workers.find((w) => w.id === workerId);
+    toast.success(`${currentW?.name} has done working`, {
+      position: "top-center",
+      autoClose: 5000,
+    });
+  };
 
   const openWorkTimeModal = (worker: Worker) => {
     setCurrentWorker(worker);
@@ -252,51 +307,6 @@ export default function MassageShift({
       autoClose: 5000,
     });
     setModalType(null);
-  };
-
-  const finishWorker = (workerId: number) => {
-    setWorkers((prev) => {
-      const index = prev.findIndex((w) => w.id === workerId);
-      if (index === -1) return prev;
-
-      // Create an updated worker with cleared work details
-      const updatedWorker: Worker = {
-        ...prev[index],
-        status: "Available",
-        startTime: "",
-        serviceTime: 0,
-        endTime: "",
-        availableSince: undefined,
-        serviceId: undefined,
-        serviceName: undefined,
-        addOns: [],
-      };
-
-      // If the worker was Busy, remove them from their current position and append them at the end.
-      if (prev[index].status === "Busy") {
-        const newWorkers = [...prev];
-        newWorkers.splice(index, 1);
-        return [...newWorkers, updatedWorker];
-      }
-      // If the worker was Booked, update them in place so their index remains the same.
-      else if (prev[index].status === "Booked") {
-        return prev.map((worker, idx) =>
-          idx === index ? updatedWorker : worker
-        );
-      }
-      // For any other status, update in place.
-      else {
-        return prev.map((worker, idx) =>
-          idx === index ? updatedWorker : worker
-        );
-      }
-    });
-
-    const currentW = workers.find((w) => w.id === workerId);
-    toast.success(`${currentW?.name} has done working`, {
-      position: "top-center",
-      autoClose: 5000,
-    });
   };
 
   const toggleOnLeave = (workerId: number) => {
@@ -536,9 +546,7 @@ export default function MassageShift({
                 <td className="px-6 py-4 md:space-x-2 flex flex-col md:flex-row md:items-center md:justify-center relative">
                   <button
                     onClick={() => openWorkTimeModal(worker)}
-                    disabled={
-                      worker.status !== "Available"
-                    }
+                    disabled={worker.status !== "Available"}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded disabled:opacity-50"
                   >
                     Work
@@ -669,7 +677,8 @@ export default function MassageShift({
                       htmlFor="serviceTime"
                       className="block text-sm font-medium mb-1"
                     >
-                      Service Time (minutes)<span className="text-red-600">*</span>:
+                      Service Time (minutes)
+                      <span className="text-red-600">*</span>:
                     </label>
                     <input
                       id="serviceTime"
