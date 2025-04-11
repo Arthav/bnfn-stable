@@ -98,6 +98,22 @@ export default function ManageAddOnsPage({
     }, 0);
   };
 
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "SGD",
+      minimumSignificantDigits: 1,
+      minimumIntegerDigits: 1,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Math.max(value, 0));
+  };
+
+  function formatNumber(num: number): string {
+    const safeNumber = Math.max(num, 0);
+    return safeNumber.toString();
+  }
+
   return (
     <div className="min-h-screen bg-black p-4 text-white">
       {/* Header */}
@@ -137,8 +153,8 @@ export default function ManageAddOnsPage({
             {addOns.map((addon) => (
               <tr key={addon.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{addon.name}</td>
-                <td className="px-6 py-4">{addon.price}</td>
-                <td className="px-6 py-4">{addon.profit}</td>
+                <td className="px-6 py-4">{formatCurrency(addon.price)}</td>
+                <td className="px-6 py-4">{formatCurrency(addon.profit)}</td>
                 <td className="px-6 py-4">{addon.status}</td>
                 <td className="px-6 py-4">
                   <button
@@ -212,11 +228,14 @@ export default function ManageAddOnsPage({
                       id="price"
                       name="price"
                       type="number"
-                      value={formData.price}
+                      value={formatNumber(formData.price)}
                       onChange={handleChange}
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    <p className="text-xs text-gray-400">
+                      {formData.price ? formatCurrency(formData.price) : "SGD 0,00"}
+                    </p>
                   </div>
                   <div className="mb-4">
                     <label
@@ -229,11 +248,14 @@ export default function ManageAddOnsPage({
                       id="profit"
                       name="profit"
                       type="number"
-                      value={formData.profit}
+                      value={formatNumber(formData.profit)}
                       onChange={handleChange}
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    <p className="text-xs text-gray-400">
+                      {formData.profit ? formatCurrency(formData.profit) : "SGD 0,00"}
+                    </p>
                   </div>
                   <div className="mb-4">
                     <label
