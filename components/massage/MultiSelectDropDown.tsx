@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { AddOns } from "@/components/types/massage";
 
 interface MultiSelectDropdownProps {
@@ -13,12 +13,15 @@ export default function MultiSelectDropdown({
   setSelectedAddOnIds,
 }: MultiSelectDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const activeAddOns = addOns.filter((addon) => addon.status === "Active");
 
   const toggleSelection = (id: number) => {
     setSelectedAddOnIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((item) => item !== id)
+        : [...prev, id]
     );
   };
 
@@ -27,21 +30,39 @@ export default function MultiSelectDropdown({
     .map((addon) => addon.name)
     .join(", ");
 
-  // Compute the total price of selected add‑Ons
   const totalPrice = activeAddOns
     .filter((addon) => selectedAddOnIds.includes(addon.id))
     .reduce((acc, addon) => acc + addon.price, 0);
 
+  // Close dropdown when clicking outside the component
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    // Wrap in a focusable div with onBlur to handle clicks outside
-    <div className="relative" tabIndex={0}>
+    <div className="relative" ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 text-left focus:outline-none"
       >
         <div className="flex justify-between items-center">
-          <span>{selectedAddOnIds.length > 0 ? selectedLabels : "Select Add‑Ons"}</span>
+          <span>
+            {selectedAddOnIds.length > 0
+              ? selectedLabels
+              : "Select Add‑Ons"}
+          </span>
           <span>${totalPrice.toFixed(2)}</span>
         </div>
       </button>
