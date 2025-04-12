@@ -23,6 +23,17 @@ export default function ManageAddOnsPage({
     status: "Active" as "Active" | "Discontinued",
   });
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Pagination calculations.
+  const totalPages = Math.ceil(addOns.length / itemsPerPage);
+  const paginatedAddOns = addOns.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   // Save add-ons to localStorage whenever they change.
   useEffect(() => {
     localStorage.setItem("addOns", JSON.stringify(addOns));
@@ -130,7 +141,7 @@ export default function ManageAddOnsPage({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto min-h-[500px]">
+      <div className="overflow-x-auto ">
         <table className="min-w-full divide-y divide-gray-700">
           <thead className="bg-gray-800">
             <tr>
@@ -152,7 +163,7 @@ export default function ManageAddOnsPage({
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
-            {addOns.map((addon) => (
+            {paginatedAddOns.map((addon) => (
               <tr key={addon.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{addon.name}</td>
                 <td className="px-6 py-4">{formatCurrency(addon.price)}</td>
@@ -193,6 +204,31 @@ export default function ManageAddOnsPage({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {addOns.length > itemsPerPage && (
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
       {modalType && (
@@ -236,7 +272,9 @@ export default function ManageAddOnsPage({
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <p className="text-xs text-gray-400">
-                      {formData.price ? formatCurrency(formData.price) : "SGD 0,00"}
+                      {formData.price
+                        ? formatCurrency(formData.price)
+                        : "SGD 0,00"}
                     </p>
                   </div>
                   <div className="mb-4">
@@ -256,7 +294,9 @@ export default function ManageAddOnsPage({
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <p className="text-xs text-gray-400">
-                      {formData.profit ? formatCurrency(formData.profit) : "SGD 0,00"}
+                      {formData.profit
+                        ? formatCurrency(formData.profit)
+                        : "SGD 0,00"}
                     </p>
                   </div>
                   <div className="mb-4">

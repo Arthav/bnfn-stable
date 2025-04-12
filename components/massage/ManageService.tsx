@@ -36,11 +36,22 @@ export default function ManageServicePage({
   const [bodyTimeFormData, setBodyTimeFormData] = useState<string>("");
   const [commissionFormData, setCommissionFormData] = useState<string>("");
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   const sortedServices = [...services].sort((a, b) => {
     const diff = statusOrder[a.status] - statusOrder[b.status];
     if (diff !== 0) return diff;
     return 0;
   });
+
+  // Pagination calculations.
+  const totalPages = Math.ceil(sortedServices.length / itemsPerPage);
+  const paginatedServices = sortedServices.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Load services from localStorage on mount.
   useEffect(() => {
@@ -208,7 +219,7 @@ export default function ManageServicePage({
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
-            {sortedServices.map((service) => (
+            {paginatedServices.map((service) => (
               <tr key={service.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{service.name}</td>
                 <td className="px-6 py-4">{service.description}</td>
@@ -260,6 +271,31 @@ export default function ManageServicePage({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {sortedServices.length > itemsPerPage && (
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
       {modalType && (
@@ -417,6 +453,7 @@ export default function ManageServicePage({
                 </form>
               </>
             )}
+
             {modalType === "edit" && currentService && (
               <>
                 <h2 className="text-xl font-semibold mb-4">Edit Service</h2>
