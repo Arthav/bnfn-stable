@@ -8,6 +8,7 @@ export interface Services {
   footTimeMin: number;
   bodyTimeMin: number;
   commission: number;
+  createdBy: Staff | null;
 }
 
 export interface Worker {
@@ -47,6 +48,7 @@ export interface Transaction {
   refundReason?: string;
 
   isRefundTransaction?: boolean;
+  createdBy: Staff | null;
 }
 
 export interface AddOns {
@@ -55,6 +57,7 @@ export interface AddOns {
   price: number;
   profit: number;
   status: "Active" | "Discontinued";
+  createdBy: Staff | null;
 }
 
 export interface Membership {
@@ -105,13 +108,15 @@ export interface Companies {
   createdAt: string;
   updatedAt: string;
 }
-export interface Admins {
+export interface Staff {
   id: number;
   name: string;
-  password: string;
-  address: string;
-  phone: string;
-  email: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Item {
+  id: number;
+  name: string;
+  // Add additional fields if needed.
 }

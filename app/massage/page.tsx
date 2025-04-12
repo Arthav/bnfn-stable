@@ -6,6 +6,8 @@ import {
   Services,
   Transaction,
   AddOns,
+  Staff,
+  // Item,
 } from "@/components/types/massage";
 import MassageShift from "@/components/massage/MassageShift";
 import ManageService from "@/components/massage/ManageService";
@@ -16,6 +18,7 @@ import TransactionList from "@/components/massage/TransactionList";
 import ReportPage from "@/components/massage/ReportPage";
 import BookingList from "@/components/massage/BookingList";
 import ManageAddOnsPage from "@/components/massage/AddOns";
+import StaffList from "@/components/massage/Staff";
 import {
   FaSpa,
   FaCalendarAlt,
@@ -32,6 +35,8 @@ export default function MassageShiftPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [addOns, setAddOns] = useState<AddOns[]>([]);
+  const [staffList, setStaffList] = useState<Staff[]>([]);
+  const [activeStaff, setActiveStaff] = useState<Staff | null>(null);
 
   const tabs = [
     {
@@ -46,6 +51,7 @@ export default function MassageShiftPage() {
           setWorkers={setWorkers}
           setTransactions={setTransactions}
           addOns={addOns}
+          activeStaff={activeStaff} // Pass active staff to the MassageShift component
         />
       ),
     },
@@ -57,17 +63,22 @@ export default function MassageShiftPage() {
     },
     {
       key: "manage-service",
-      title: "Service",
+      title: "Service and Add-Ons",
       icon: <FaConciergeBell />,
       component: (
-        <ManageService services={services} setServices={setServices} />
+        <div className="flex flex-col">
+          <ManageService services={services} setServices={setServices} activeStaff={activeStaff}/>
+          <ManageAddOnsPage addOns={addOns} setAddOns={setAddOns} activeStaff={activeStaff}/>
+        </div>
       ),
     },
     {
-      key: "add-ons",
-      title: "Add-Ons",
+      key: "staff",
+      title: "Staff",
       icon: <FaPlusSquare />,
-      component: <ManageAddOnsPage addOns={addOns} setAddOns={setAddOns} />,
+      component: (
+        <StaffList staffList={staffList} setStaffList={setStaffList} />
+      ),
     },
     {
       key: "membership",
@@ -83,6 +94,7 @@ export default function MassageShiftPage() {
         <TransactionList
           transactions={transactions}
           setTransactions={setTransactions}
+          activeStaff={activeStaff}
         />
       ),
     },
@@ -99,15 +111,9 @@ export default function MassageShiftPage() {
         />
       ),
     },
-    // {
-    //   key: "template",
-    //   title: "Template",
-    //   icon: <FaFileAlt />,
-    //   component: <TemplatePage />,
-    // },
   ];
 
-  // Load from localStorage.
+  // Load from localStorage
   useEffect(() => {
     console.log(`
 ========================================
@@ -121,6 +127,7 @@ May your commits be legendary, your debugging swift, and your journey through co
 
 ========================================
 `);
+
     const storedServices = localStorage.getItem("services");
     if (storedServices) {
       setServices(JSON.parse(storedServices));
@@ -140,14 +147,58 @@ May your commits be legendary, your debugging swift, and your journey through co
     if (storedAddOns) {
       setAddOns(JSON.parse(storedAddOns));
     }
+
+    const storedStaff = localStorage.getItem("staffList");
+    if (storedStaff) {
+      setStaffList(JSON.parse(storedStaff));
+    }
+
+    const storedActiveStaff = localStorage.getItem("activeStaff");
+    if (storedActiveStaff) {
+      setActiveStaff(JSON.parse(storedActiveStaff));
+    }
   }, []);
+
+  // Handle active staff change
+  const handleActiveStaffChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedStaffId = parseInt(e.target.value);
+    const selectedStaff =
+      staffList.find((staff) => staff.id === selectedStaffId) || null;
+    setActiveStaff(selectedStaff);
+
+    // Store active staff in localStorage
+    localStorage.setItem("activeStaff", JSON.stringify(selectedStaff));
+  };
 
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="pb-5 mb-4">
+        {/* Dropdown to select active staff */}
+        <div className="mb-4 flex justify-end gap-5">
+          <label htmlFor="activeStaff" className="block text-white mb-2">
+            Select Active Staff:
+          </label>
+          <select
+            id="activeStaff"
+            onChange={handleActiveStaffChange}
+            value={activeStaff ? activeStaff.id : ""}
+            className="bg-gray-700 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="" disabled>
+              Select a staff member
+            </option>
+            {staffList.map((staff) => (
+              <option key={staff.id} value={staff.id}>
+                {staff.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <p className="flex flex-col items-center justify-center text-center px-4 py-2 font-bold text-white">
           ADMIN MENU PANEL
         </p>
+
         <div className="overflow-x-auto overflow-y-hidden">
           <nav className="-mb-px flex gap-x-4 whitespace-nowrap">
             <ToastContainer />

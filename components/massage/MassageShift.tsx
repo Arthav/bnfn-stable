@@ -5,6 +5,7 @@ import {
   Worker,
   Transaction,
   AddOns,
+  Staff,
 } from "@/components/types/massage";
 import MultiSelectDropdown from "./MultiSelectDropDown";
 
@@ -36,6 +37,7 @@ export default function MassageShift({
   setWorkers,
   setTransactions,
   addOns,
+  activeStaff,
 }: {
   services: Services[];
   transactions: Transaction[];
@@ -43,6 +45,7 @@ export default function MassageShift({
   setWorkers: React.Dispatch<React.SetStateAction<Worker[]>>;
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
   addOns: AddOns[];
+  activeStaff: Staff | null;
 }) {
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
@@ -294,6 +297,7 @@ export default function MassageShift({
       customerPhone: customerPhoneFormData,
       transactionDate: new Date().toISOString(),
       addOns: selectedAddOns,
+      createdBy: activeStaff,
     };
 
     setTransactions([...transactions, newTransaction]);

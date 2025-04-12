@@ -234,6 +234,7 @@ const exportToPdf = () => {
     `$${tx.commission.toFixed(2)}`,
     tx.addOns?.map((addon) => addon.name).join(", ") || "-",
     tx.isRefunded ? "Yes" : "No",
+    tx.createdBy?.name || "Has not been set",
   ]);
 
   autoTable(doc, {
@@ -247,6 +248,7 @@ const exportToPdf = () => {
         "Commission",
         "Add Ons",
         "Refunded",
+        "Staff",
       ],
     ],
     body: transactionsData,

@@ -1,15 +1,17 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
-import { AddOns } from "@/components/types/massage";
+import { AddOns, Staff } from "@/components/types/massage";
 
 type ModalType = "add" | "edit" | null;
 
 export default function ManageAddOnsPage({
   addOns,
   setAddOns,
+  activeStaff,
 }: {
   addOns: AddOns[];
   setAddOns: React.Dispatch<React.SetStateAction<AddOns[]>>;
+  activeStaff: Staff | null;
 }) {
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentAddon, setCurrentAddon] = useState<AddOns | null>(null);
@@ -57,7 +59,7 @@ export default function ManageAddOnsPage({
   const handleAddSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newId = addOns.length ? Math.max(...addOns.map((a) => a.id)) + 1 : 1;
-    const newAddon: AddOns = { id: newId, ...formData };
+    const newAddon: AddOns = { id: newId, ...formData, createdBy: activeStaff };
     setAddOns((prev) => [...prev, newAddon]);
     setTimeout(() => {
       toast.success("Addon added", { position: "top-center", autoClose: 5000 });

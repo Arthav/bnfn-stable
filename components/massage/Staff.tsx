@@ -1,77 +1,91 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
-import { Item } from "@/components/types/massage";
+import { Staff } from "@/components/types/massage";
 
 type ModalType = "add" | "edit" | null;
 
-export default function TemplatePage({
-  items,
-  setItems,
+export default function StaffListPage({
+  staffList,
+  setStaffList,
 }: {
-  items: Item[];
-  setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  staffList: Staff[];
+  setStaffList: React.Dispatch<React.SetStateAction<Staff[]>>;
 }) {
-  // Modal management state.
   const [modalType, setModalType] = useState<ModalType>(null);
-  const [currentItem, setCurrentItem] = useState<Item | null>(null);
+  const [currentStaff, setCurrentStaff] = useState<Staff | null>(null);
   const [nameFormData, setNameFormData] = useState<string>("");
 
-  // Load items from localStorage on mount.
+
+  // Save to localStorage whenever the staff list changes.
   useEffect(() => {
-    const storedItems = localStorage.getItem("items");
-    if (storedItems) {
-      setItems(JSON.parse(storedItems));
+    if (staffList.length > 0) {
+      localStorage.setItem("staffList", JSON.stringify(staffList));
     }
-  }, []);
+  }, [staffList]);
 
-  // Save items to localStorage whenever they change (skip if empty).
-  useEffect(() => {
-    if (items.length === 0) return;
-    localStorage.setItem("items", JSON.stringify(items));
-  }, [items]);
-
-  // Opens modal to add a new item.
+  // Open modal to add a new staff member.
   const openAddModal = () => {
-    setCurrentItem(null);
+    setCurrentStaff(null);
     setNameFormData("");
     setModalType("add");
   };
 
-  // Opens modal to edit an existing item.
-  const openEditModal = (item: Item) => {
-    setCurrentItem(item);
-    setNameFormData(item.name);
+  // Open modal to edit an existing staff member.
+  const openEditModal = (staff: Staff) => {
+    setCurrentStaff(staff);
+    setNameFormData(staff.name);
     setModalType("edit");
   };
 
-  // Handles add item form submission.
+  // Handle add staff submission.
   const handleAddSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newId = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
-    const newItem: Item = { id: newId, name: nameFormData };
-    setItems(prev => [...prev, newItem]);
-    toast.success("Item added", { position: "top-center", autoClose: 5000 });
+    const newId = staffList.length
+      ? Math.max(...staffList.map((s) => s.id)) + 1
+      : 1;
+    const timestamp = new Date().toISOString();
+    const newStaff: Staff = {
+      id: newId,
+      name: nameFormData,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    };
+    const updatedStaff = [...staffList, newStaff];
+    setStaffList(updatedStaff);
+    toast.success("Staff member added", {
+      position: "top-center",
+      autoClose: 5000,
+    });
     setModalType(null);
   };
 
-  // Handles edit item form submission.
+  // Handle edit staff submission.
   const handleEditSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!currentItem) return;
-    setItems(prev =>
-      prev.map(item =>
-        item.id === currentItem.id ? { ...item, name: nameFormData } : item
+    if (!currentStaff) return;
+    setStaffList((prev) =>
+      prev.map((staff) =>
+        staff.id === currentStaff.id
+          ? {
+              ...staff,
+              name: nameFormData,
+              updatedAt: new Date().toISOString(),
+            }
+          : staff
       )
     );
-    toast.success("Item updated", { position: "top-center", autoClose: 5000 });
+    toast.success("Staff updated", { position: "top-center", autoClose: 5000 });
     setModalType(null);
   };
 
-  // Handles item deletion.
+  // Handle staff deletion.
   const handleDelete = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
-      setItems(prev => prev.filter(item => item.id !== id));
-      toast.success("Item deleted", { position: "top-center", autoClose: 5000 });
+    if (window.confirm("Are you sure you want to delete this staff member?")) {
+      setStaffList((prev) => prev.filter((staff) => staff.id !== id));
+      toast.success("Staff deleted", {
+        position: "top-center",
+        autoClose: 5000,
+      });
     }
   };
 
@@ -79,12 +93,12 @@ export default function TemplatePage({
     <div className="min-h-screen bg-black p-4 text-white">
       {/* Header */}
       <div className="mb-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Template Page</h1>
+        <h1 className="text-2xl font-bold">Staff List</h1>
         <button
           onClick={openAddModal}
           className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
         >
-          Add Item
+          Add Staff
         </button>
       </div>
 
@@ -94,7 +108,13 @@ export default function TemplatePage({
           <thead className="bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Item Name
+                Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Created At
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Updated At
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Actions
@@ -102,18 +122,24 @@ export default function TemplatePage({
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
-            {items.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-800">
-                <td className="px-6 py-4">{item.name}</td>
+            {staffList.map((staff) => (
+              <tr key={staff.id} className="hover:bg-gray-800">
+                <td className="px-6 py-4">{staff.name}</td>
+                <td className="px-6 py-4">
+                  {new Date(staff.createdAt).toLocaleString()}
+                </td>
+                <td className="px-6 py-4">
+                  {new Date(staff.updatedAt).toLocaleString()}
+                </td>
                 <td className="px-6 py-4">
                   <button
-                    onClick={() => openEditModal(item)}
+                    onClick={() => openEditModal(staff)}
                     className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded mr-2"
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(item.id)}
+                    onClick={() => handleDelete(staff.id)}
                     className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
                   >
                     Delete
@@ -121,10 +147,10 @@ export default function TemplatePage({
                 </td>
               </tr>
             ))}
-            {!items.length && (
+            {!staffList.length && (
               <tr>
-                <td colSpan={2} className="text-center py-4">
-                  No items available. Please add items.
+                <td colSpan={4} className="text-center py-4">
+                  No staff available. Please add a staff member.
                 </td>
               </tr>
             )}
@@ -132,23 +158,23 @@ export default function TemplatePage({
         </table>
       </div>
 
-      {/* Modal */}
+      {/* Modal for Add/Edit */}
       {modalType && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
           <div className="bg-gray-800 p-6 rounded shadow-lg w-96">
             {modalType === "add" && (
               <>
-                <h2 className="text-xl font-semibold mb-4">Add New Item</h2>
+                <h2 className="text-xl font-semibold mb-4">Add New Staff</h2>
                 <form onSubmit={handleAddSubmit}>
                   <div className="mb-4">
                     <label
-                      htmlFor="itemName"
+                      htmlFor="staffName"
                       className="block text-sm font-medium mb-1"
                     >
-                      Item Name:
+                      Name:
                     </label>
                     <input
-                      id="itemName"
+                      id="staffName"
                       type="text"
                       value={nameFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -176,19 +202,19 @@ export default function TemplatePage({
                 </form>
               </>
             )}
-            {modalType === "edit" && currentItem && (
+            {modalType === "edit" && currentStaff && (
               <>
-                <h2 className="text-xl font-semibold mb-4">Edit Item</h2>
+                <h2 className="text-xl font-semibold mb-4">Edit Staff</h2>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-4">
                     <label
-                      htmlFor="editItemName"
+                      htmlFor="editStaffName"
                       className="block text-sm font-medium mb-1"
                     >
-                      Item Name:
+                      Name:
                     </label>
                     <input
-                      id="editItemName"
+                      id="editStaffName"
                       type="text"
                       value={nameFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>

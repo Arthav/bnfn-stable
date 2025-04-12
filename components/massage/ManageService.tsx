@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
-import { Services } from "@/components/types/massage";
+import { Services, Staff } from "@/components/types/massage";
 
 // Constants for service status ordering and classes.
 const statusOrder: Record<Services["status"], number> = {
@@ -18,9 +18,11 @@ const statusClasses: Record<Services["status"], string> = {
 export default function ManageServicePage({
   services,
   setServices,
+  activeStaff,
 }: {
   services: Services[];
   setServices: (services: Services[]) => void;
+  activeStaff: Staff | null;
 }) {
   // Modal and current service state.
   const [modalType, setModalType] = useState<ModalType>(null);
@@ -95,6 +97,7 @@ export default function ManageServicePage({
       footTimeMin: parseFloat(footTimeFormData) || 0,
       bodyTimeMin: parseFloat(bodyTimeFormData) || 0,
       commission: parseFloat(commissionFormData) || 0,
+      createdBy: activeStaff,
     };
     setServices([...services, newService]);
     toast.success("Service added", { position: "top-center", autoClose: 5000 });

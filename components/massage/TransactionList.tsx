@@ -1,14 +1,16 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Transaction, AddOns } from "@/components/types/massage";
+import { Transaction, Staff } from "@/components/types/massage";
 
 interface TransactionListProps {
   transactions: Transaction[];
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
+  activeStaff: Staff | null;
 }
 
 const TransactionList: React.FC<TransactionListProps> = ({
   transactions,
   setTransactions,
+  activeStaff,
 }) => {
   // Filter states
   const [timeFilter, setTimeFilter] = useState<"custom" | "week" | "month">("custom");
@@ -137,6 +139,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
       refundAmount: selectedTransaction.sales, // full refund amount
       refundDate: now,
       refundReason,
+      createdBy: activeStaff,
     };
 
     // Update transactions:
@@ -296,6 +299,9 @@ const TransactionList: React.FC<TransactionListProps> = ({
                 Customer
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Staff
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Refund Info
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -319,6 +325,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
                   {tx.customerName ? tx.customerName : "N/A"}
                   {tx.customerPhone && ` (${tx.customerPhone})`}
                 </td>
+                <td className="px-6 py-4">{tx.createdBy?.name || "Has not been set"}</td>
                 <td className="px-6 py-4">
                   {tx.isRefundTransaction ? (
                     <div className="text-green-400">
