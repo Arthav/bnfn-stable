@@ -161,7 +161,7 @@ export default function ManageServicePage({
   };
 
   return (
-    <div className="min-h-screen bg-black p-4 text-white">
+    <div className=" bg-black p-4 text-white">
       {/* Header */}
       <div className="mb-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Manage Service</h1>
@@ -174,7 +174,7 @@ export default function ManageServicePage({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto min-h-[500px]">
+      <div className="overflow-x-auto ">
         <table className="min-w-full divide-y divide-gray-700">
           <thead className="bg-gray-800">
             <tr>

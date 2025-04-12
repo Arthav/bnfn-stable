@@ -66,9 +66,17 @@ export default function MassageShiftPage() {
       title: "Service and Add-Ons",
       icon: <FaConciergeBell />,
       component: (
-        <div className="flex flex-col">
-          <ManageService services={services} setServices={setServices} activeStaff={activeStaff}/>
-          <ManageAddOnsPage addOns={addOns} setAddOns={setAddOns} activeStaff={activeStaff}/>
+        <div className="flex flex-col gap-0">
+          <ManageService
+            services={services}
+            setServices={setServices}
+            activeStaff={activeStaff}
+          />
+          <ManageAddOnsPage
+            addOns={addOns}
+            setAddOns={setAddOns}
+            activeStaff={activeStaff}
+          />
         </div>
       ),
     },

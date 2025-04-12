@@ -4,7 +4,7 @@ export default function MassageLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-2 md:py-10">
+    <section className="flex flex-col items-center justify-center gap-4 py-2 md:py-2">
       <main className="container mx-auto max-w-7xl flex-grow">
         {children}
       </main>
