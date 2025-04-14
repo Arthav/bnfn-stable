@@ -269,30 +269,35 @@ May your commits be legendary, your debugging swift, and your journey through co
           aria-modal="true"
         >
           <div className="flex items-center justify-center min-h-screen px-4 text-center">
-            {/* Backdrop with click-to-close */}
+            {/* Backdrop with click-to-close and accessible keyboard interactions */}
             <div
               className="fixed inset-0 bg-black bg-opacity-75"
+              role="button"
+              tabIndex={0}
+              aria-label="Close modal"
               onClick={() => setShowStaffChangeLog(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setShowStaffChangeLog(false);
+                }
+              }}
             ></div>
-            {/* This element is to center the modal contents */}
+            {/* Hidden element for centering */}
             <span
               className="hidden sm:inline-block sm:align-middle"
               aria-hidden="true"
             >
               &#8203;
             </span>
-            <div className="inline-block align-middle bg-black rounded-lg shadow-xl sm:my-8 sm:max-w-lg sm:w-full">
+            <div className="inline-block align-middle bg-black rounded-lg shadow-xl sm:my-8 sm:max-w-lg sm:w-full max-h-[50vh] overflow-y-auto relative z-20">
               {/* Modal Header */}
               <div className="flex justify-between items-center border-b border-gray-200 px-4 py-3">
-                <h3
-                  className="text-lg font-medium text-white-900"
-                  id="modal-title"
-                >
+                <h3 className="text-lg font-medium text-white" id="modal-title">
                   Staff Change Log
                 </h3>
                 <button
                   type="button"
-                  className="text-white hover:text-gray-600 focus:outline-none"
+                  className="text-white hover:text-gray-300 focus:outline-none"
                   onClick={() => setShowStaffChangeLog(false)}
                   aria-label="Close modal"
                 >
