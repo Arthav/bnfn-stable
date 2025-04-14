@@ -298,6 +298,12 @@ export default function MassageShift({
       transactionDate: new Date().toISOString(),
       addOns: selectedAddOns,
       createdBy: activeStaff,
+      staffCommission:
+        (selectedServiceObj.staffCommission || 0) +
+          selectedAddOns.reduce(
+            (acc, addon) => acc + (addon.staffCommission || 0),
+            0
+          ),
     };
 
     setTransactions([...transactions, newTransaction]);

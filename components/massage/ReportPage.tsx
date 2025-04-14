@@ -4,6 +4,7 @@ import {
   Worker,
   Transaction,
   AddOns,
+  Staff,
 } from "@/components/types/massage";
 import { jsPDF } from "jspdf";
 import { autoTable } from "jspdf-autotable";
@@ -13,6 +14,7 @@ interface ReportPageProps {
   services: Services[];
   transactions: Transaction[];
   addOns: AddOns[];
+  staffList: Staff[];
 }
 
 export default function ReportPage({
@@ -20,6 +22,7 @@ export default function ReportPage({
   services,
   transactions,
   addOns,
+  staffList,
 }: ReportPageProps) {
   // Filter states
   const [filterType, setFilterType] = useState<
@@ -114,6 +117,30 @@ export default function ReportPage({
     };
   });
 
+  // Staff Performance Metrics using filtered transactions
+  const staffMetrics = staffList.map((staff) => {
+    const txs = filteredTransactions.filter(
+      (t) => t.createdBy?.id === staff.id && !t.isRefundTransaction
+    );
+    return {
+      ...staff,
+      transactionCount: txs.length,
+      totalRefundCount: txs.reduce((sum, t) => sum + (t.isRefunded ? 1 : 0), 0),
+      totalRefundAmount: txs.reduce(
+        (sum, t) => sum + (t.isRefunded ? t.refundAmount || 0 : 0),
+        0
+      ),
+      totalSales: txs.reduce(
+        (sum, t) => (t.isRefunded ? sum : sum + (t.sales || 0)),
+        0
+      ),
+      totalCommission: txs.reduce(
+        (sum, t) => sum + (t.staffCommission || 0),
+        0
+      ),
+    };
+  });
+
   const exportToExcel = () => {
     const headers = [
       "ID",
@@ -163,187 +190,215 @@ export default function ReportPage({
   };
 
   // Export to PDF using jsPDF
-// Export to PDF using jsPDF
-const exportToPdf = () => {
-  const doc = new jsPDF();
+  // Export to PDF using jsPDF
+  const exportToPdf = () => {
+    const doc = new jsPDF();
 
-  // Helper to add a header to the current page.
-  const addHeader = () => {
-    const pageWidth = doc.internal.pageSize.getWidth();
-    doc.setFillColor(60, 60, 60);
-    doc.rect(0, 0, pageWidth, 20, "F");
+    // Helper to add a header to the current page.
+    const addHeader = () => {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      doc.setFillColor(60, 60, 60);
+      doc.rect(0, 0, pageWidth, 20, "F");
 
-    doc.setFontSize(18);
-    doc.setTextColor(255, 255, 255);
-    doc.text("Transactions Report", pageWidth / 2, 14, { align: "center" });
-    doc.setTextColor(0, 0, 0);
-  };
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("Transactions Report", pageWidth / 2, 14, { align: "center" });
+      doc.setTextColor(0, 0, 0);
+    };
 
-  // Helper to add a footer with page number.
-  const addFooter = () => {
-    const pageHeight = doc.internal.pageSize.getHeight();
-    doc.setFontSize(10);
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageNumber = doc.getNumberOfPages();
-    doc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
-      align: "center",
+    // Helper to add a footer with page number.
+    const addFooter = () => {
+      const pageHeight = doc.internal.pageSize.getHeight();
+      doc.setFontSize(10);
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageNumber = doc.getNumberOfPages();
+      doc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
+        align: "center",
+      });
+    };
+
+    // Initialize first page with header.
+    addHeader();
+    let currentY = 30; // starting below header
+
+    // ----------------
+    // Summary Section
+    // ----------------
+    const summaryData = [
+      ["Total Transactions", totalTransactions],
+      ["Total Sales", `$${totalSales.toFixed(2)}`],
+      ["Total Commission", `$${totalCommission.toFixed(2)}`],
+      ["Average Sales per Transaction", `$${averageSales.toFixed(2)}`],
+    ];
+
+    doc.setFontSize(14);
+    doc.text("Summary", 10, currentY);
+    currentY += 5;
+
+    autoTable(doc, {
+      startY: currentY,
+      head: [["Metric", "Value"]],
+      body: summaryData,
+      theme: "grid",
+      headStyles: { fillColor: [60, 60, 60] },
+      styles: { fontSize: 10 },
+      margin: { left: 10, right: 10 },
     });
-  };
+    currentY = (doc as any).lastAutoTable.finalY + 10;
 
-  // Initialize first page with header.
-  addHeader();
-  let currentY = 30; // starting below header
+    // ----------------
+    // Transactions Section
+    // ----------------
+    doc.setFontSize(14);
+    doc.text("Transactions", 10, currentY);
+    currentY += 5;
 
-  // ----------------
-  // Summary Section
-  // ----------------
-  const summaryData = [
-    ["Total Transactions", totalTransactions],
-    ["Total Sales", `$${totalSales.toFixed(2)}`],
-    ["Total Commission", `$${totalCommission.toFixed(2)}`],
-    ["Average Sales per Transaction", `$${averageSales.toFixed(2)}`],
-  ];
+    const transactionsData = filteredTransactions.map((tx) => [
+      tx.id,
+      tx.workerName || "-",
+      tx.serviceName || "-",
+      `$${tx.sales.toFixed(2)}`,
+      `$${tx.commission.toFixed(2)}`,
+      tx.addOns?.map((addon) => addon.name).join(", ") || "-",
+      tx.isRefunded ? "Yes" : "No",
+      tx.createdBy?.name || "Has not been set",
+    ]);
 
-  doc.setFontSize(14);
-  doc.text("Summary", 10, currentY);
-  currentY += 5;
-
-  autoTable(doc, {
-    startY: currentY,
-    head: [["Metric", "Value"]],
-    body: summaryData,
-    theme: "grid",
-    headStyles: { fillColor: [60, 60, 60] },
-    styles: { fontSize: 10 },
-    margin: { left: 10, right: 10 },
-  });
-  currentY = (doc as any).lastAutoTable.finalY + 10;
-
-  // ----------------
-  // Transactions Section
-  // ----------------
-  doc.setFontSize(14);
-  doc.text("Transactions", 10, currentY);
-  currentY += 5;
-
-  const transactionsData = filteredTransactions.map((tx) => [
-    tx.id,
-    tx.workerName || "-",
-    tx.serviceName || "-",
-    `$${tx.sales.toFixed(2)}`,
-    `$${tx.commission.toFixed(2)}`,
-    tx.addOns?.map((addon) => addon.name).join(", ") || "-",
-    tx.isRefunded ? "Yes" : "No",
-    tx.createdBy?.name || "Has not been set",
-  ]);
-
-  autoTable(doc, {
-    startY: currentY,
-    head: [
-      [
-        "ID",
-        "Worker",
-        "Service",
-        "Sales",
-        "Commission",
-        "Add Ons",
-        "Refunded",
-        "Staff",
+    autoTable(doc, {
+      startY: currentY,
+      head: [
+        [
+          "ID",
+          "Worker",
+          "Service",
+          "Sales",
+          "Commission",
+          "Add Ons",
+          "Refunded",
+          "Staff",
+        ],
       ],
-    ],
-    body: transactionsData,
-    theme: "grid",
-    headStyles: { fillColor: [60, 60, 60] },
-    styles: { fontSize: 10 },
-    margin: { left: 10, right: 10 },
-  });
-  currentY = (doc as any).lastAutoTable.finalY + 10;
-
-  // ---------------------------
-  // Service Performance Section
-  // ---------------------------
-  if (serviceMetrics.length > 0) {
-    doc.setFontSize(14);
-    doc.text("Service Performance", 10, currentY);
-    currentY += 5;
-
-    const serviceData = serviceMetrics.map((service) => [
-      service.name,
-      service.transactionCount,
-      `$${service.totalSales.toFixed(2)}`,
-    ]);
-
-    autoTable(doc, {
-      startY: currentY,
-      head: [["Service", "Transactions", "Total Sales"]],
-      body: serviceData,
+      body: transactionsData,
       theme: "grid",
       headStyles: { fillColor: [60, 60, 60] },
       styles: { fontSize: 10 },
       margin: { left: 10, right: 10 },
     });
     currentY = (doc as any).lastAutoTable.finalY + 10;
-  }
 
-  // ---------------------------
-  // Worker Performance Section
-  // ---------------------------
-  if (workerMetrics.length > 0) {
-    doc.setFontSize(14);
-    doc.text("Worker Performance", 10, currentY);
-    currentY += 5;
+    // ---------------------------
+    // Service Performance Section
+    // ---------------------------
+    if (serviceMetrics.length > 0) {
+      doc.setFontSize(14);
+      doc.text("Service Performance", 10, currentY);
+      currentY += 5;
 
-    const workerData = workerMetrics.map((worker) => [
-      worker.name,
-      worker.transactionCount,
-      `$${worker.totalSales.toFixed(2)}`,
-      `$${worker.totalCommission.toFixed(2)}`,
-    ]);
+      const serviceData = serviceMetrics.map((service) => [
+        service.name,
+        service.transactionCount,
+        `$${service.totalSales.toFixed(2)}`,
+      ]);
 
-    autoTable(doc, {
-      startY: currentY,
-      head: [["Worker", "Transactions", "Total Sales", "Total Commission"]],
-      body: workerData,
-      theme: "grid",
-      headStyles: { fillColor: [60, 60, 60] },
-      styles: { fontSize: 10 },
-      margin: { left: 10, right: 10 },
-    });
-    currentY = (doc as any).lastAutoTable.finalY + 10;
-  }
+      autoTable(doc, {
+        startY: currentY,
+        head: [["Service", "Transactions", "Total Sales"]],
+        body: serviceData,
+        theme: "grid",
+        headStyles: { fillColor: [60, 60, 60] },
+        styles: { fontSize: 10 },
+        margin: { left: 10, right: 10 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 10;
+    }
 
-  // ---------------------------
-  // Addons Performance Section
-  // ---------------------------
-  if (addOnsMetrics.length > 0) {
-    doc.setFontSize(14);
-    doc.text("Addons Performance", 10, currentY);
-    currentY += 5;
+    // ---------------------------
+    // Worker Performance Section
+    // ---------------------------
+    if (workerMetrics.length > 0) {
+      doc.setFontSize(14);
+      doc.text("Worker Performance", 10, currentY);
+      currentY += 5;
 
-    const addonsData = addOnsMetrics.map((addon) => [
-      addon.name,
-      addon.transactionCount,
-      `$${addon.totalSales.toFixed(2)}`,
-      `$${addon.totalProfit.toFixed(2)}`,
-    ]);
+      const workerData = workerMetrics.map((worker) => [
+        worker.name,
+        worker.transactionCount,
+        `$${worker.totalSales.toFixed(2)}`,
+        `$${worker.totalCommission.toFixed(2)}`,
+      ]);
 
-    autoTable(doc, {
-      startY: currentY,
-      head: [["Add Ons", "Transactions", "Total Sales", "Total Profit"]],
-      body: addonsData,
-      theme: "grid",
-      headStyles: { fillColor: [60, 60, 60] },
-      styles: { fontSize: 10 },
-      margin: { left: 10, right: 10 },
-    });
-    currentY = (doc as any).lastAutoTable.finalY + 10;
-  }
+      autoTable(doc, {
+        startY: currentY,
+        head: [["Worker", "Transactions", "Total Sales", "Total Commission"]],
+        body: workerData,
+        theme: "grid",
+        headStyles: { fillColor: [60, 60, 60] },
+        styles: { fontSize: 10 },
+        margin: { left: 10, right: 10 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 10;
+    }
 
-  // Final footer on last page.
-  addFooter();
-  doc.save("transactions_report.pdf");
-};
+    // ---------------------------
+    // Addons Performance Section
+    // ---------------------------
+    if (addOnsMetrics.length > 0) {
+      doc.setFontSize(14);
+      doc.text("Addons Performance", 10, currentY);
+      currentY += 5;
 
+      const addonsData = addOnsMetrics.map((addon) => [
+        addon.name,
+        addon.transactionCount,
+        `$${addon.totalSales.toFixed(2)}`,
+        `$${addon.totalProfit.toFixed(2)}`,
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        head: [["Add Ons", "Transactions", "Total Sales", "Total Profit"]],
+        body: addonsData,
+        theme: "grid",
+        headStyles: { fillColor: [60, 60, 60] },
+        styles: { fontSize: 10 },
+        margin: { left: 10, right: 10 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 10;
+    }
+
+    // ---------------------------
+    // Staff Performance Section
+    // ---------------------------
+    if (staffMetrics.length > 0) {
+      doc.setFontSize(14);
+      doc.text("Staff Performance", 10, currentY);
+      currentY += 5;
+
+      const staffData = staffMetrics.map((staff) => [
+        staff.name,
+        staff.transactionCount,
+        `$${staff.totalSales.toFixed(2)}`,
+        `$${staff.totalCommission.toFixed(2)}`,
+        staff.totalRefundCount,
+        `$${staff.totalRefundAmount.toFixed(2)}`,
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        head: [["Staff", "Transactions", "Total Sales", "Total Commission", "Total Refunds", "Total Refund Amount"]],
+        body: staffData,
+        theme: "grid",
+        headStyles: { fillColor: [60, 60, 60] },
+        styles: { fontSize: 10 },
+        margin: { left: 10, right: 10 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 10;
+    }
+
+    // Final footer on last page.
+    addFooter();
+    doc.save("transactions_report.pdf");
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
@@ -507,7 +562,7 @@ const exportToPdf = () => {
           </div>
         </div>
 
-        {/* Addons Performance Tables */}
+        {/* Addons Performance & Staff Commission Tables */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="overflow-x-auto">
             <h2 className="text-xl font-semibold mb-2">Addons Performance</h2>
@@ -534,6 +589,45 @@ const exportToPdf = () => {
                   </tr>
                 ))}
                 {!addOnsMetrics.length && (
+                  <tr>
+                    <td colSpan={3} className="text-center py-4">
+                      No services available.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="overflow-x-auto">
+            <h2 className="text-xl font-semibold mb-2">Staff</h2>
+            <table className="min-w-full divide-y divide-gray-700">
+              <thead className="bg-gray-800">
+                <tr>
+                  <th className="px-4 py-2">Staff Name</th>
+                  <th className="px-4 py-2">Total Transactions and Sales</th>
+                  <th className="px-4 py-2">Total Commission</th>
+                  <th className="px-4 py-2">Refund times</th>
+                  <th className="px-4 py-2">Total Refund Amount</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-900 divide-y divide-gray-800">
+                {staffMetrics.map((staff) => (
+                  <tr key={staff.id}>
+                    <td className="px-4 py-2">{staff.name}</td>
+                    <td className="px-4 py-2">
+                      {staff.transactionCount}x | ${staff.totalSales.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-2">
+                      ${staff.totalCommission.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-2">{staff.totalRefundCount}</td>
+                    <td className="px-4 py-2">
+                      ${staff.totalRefundAmount.toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+                {!staffMetrics.length && (
                   <tr>
                     <td colSpan={3} className="text-center py-4">
                       No services available.

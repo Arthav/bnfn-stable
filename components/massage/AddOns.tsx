@@ -21,6 +21,7 @@ export default function ManageAddOnsPage({
     price: 0,
     profit: 0,
     status: "Active" as "Active" | "Discontinued",
+    staffCommission: 0,
   });
 
   // Pagination state
@@ -41,7 +42,13 @@ export default function ManageAddOnsPage({
 
   const openAddModal = () => {
     setCurrentAddon(null);
-    setFormData({ name: "", price: 0, profit: 0, status: "Active" });
+    setFormData({
+      name: "",
+      price: 0,
+      profit: 0,
+      status: "Active",
+      staffCommission: 0,
+    });
     setModalType("add");
   };
 
@@ -52,6 +59,7 @@ export default function ManageAddOnsPage({
       price: addon.price,
       profit: addon.profit,
       status: addon.status,
+      staffCommission: addon.staffCommission || 0,
     });
     setModalType("edit");
   };
@@ -63,7 +71,9 @@ export default function ManageAddOnsPage({
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name === "price" || name === "profit" ? parseFloat(value) || 0 : value,
+        name === "price" || name === "profit" || name === "staffCommission"
+          ? parseFloat(value) || 0
+          : value,
     }));
   };
 
@@ -155,6 +165,9 @@ export default function ManageAddOnsPage({
                 Profit
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Staff Commission
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -166,8 +179,11 @@ export default function ManageAddOnsPage({
             {paginatedAddOns.map((addon) => (
               <tr key={addon.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{addon.name}</td>
-                <td className="px-6 py-4">{formatCurrency(addon.price)}</td>
-                <td className="px-6 py-4">{formatCurrency(addon.profit)}</td>
+                <td className="px-6 py-4">${addon.price.toFixed(2)}</td>
+                <td className="px-6 py-4">${addon.profit.toFixed(2)}</td>
+                <td className="px-6 py-4">
+                  ${addon.staffCommission || 0}
+                </td>
                 <td className="px-6 py-4">{addon.status}</td>
                 <td className="px-6 py-4">
                   <button
@@ -196,7 +212,7 @@ export default function ManageAddOnsPage({
             ))}
             {!addOns.length && (
               <tr>
-                <td colSpan={5} className="text-center py-4">
+                <td colSpan={6} className="text-center py-4">
                   No add-ons available. Please add add-ons.
                 </td>
               </tr>
@@ -301,6 +317,28 @@ export default function ManageAddOnsPage({
                   </div>
                   <div className="mb-4">
                     <label
+                      htmlFor="staffCommission"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Staff Commission:
+                    </label>
+                    <input
+                      id="staffCommission"
+                      name="staffCommission"
+                      type="number"
+                      value={formatNumber(formData.staffCommission)}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <p className="text-xs text-gray-400">
+                      {formData.staffCommission
+                        ? formatCurrency(formData.staffCommission)
+                        : "SGD 0,00"}
+                    </p>
+                  </div>
+                  <div className="mb-4">
+                    <label
                       htmlFor="status"
                       className="block text-sm font-medium mb-1"
                     >
@@ -386,6 +424,23 @@ export default function ManageAddOnsPage({
                       name="profit"
                       type="number"
                       value={formData.profit}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="staffCommission"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Staff Commission:
+                    </label>
+                    <input
+                      id="staffCommission"
+                      name="staffCommission"
+                      type="number"
+                      value={formData.staffCommission}
                       onChange={handleChange}
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"

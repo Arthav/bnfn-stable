@@ -35,6 +35,7 @@ export default function ManageServicePage({
   const [footTimeFormData, setFootTimeFormData] = useState<string>("");
   const [bodyTimeFormData, setBodyTimeFormData] = useState<string>("");
   const [commissionFormData, setCommissionFormData] = useState<string>("");
+  const [staffCommissionFormData, setStaffCommissionFormData] = useState<string>("");
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -108,6 +109,7 @@ export default function ManageServicePage({
       footTimeMin: parseFloat(footTimeFormData) || 0,
       bodyTimeMin: parseFloat(bodyTimeFormData) || 0,
       commission: parseFloat(commissionFormData) || 0,
+      staffCommission: parseFloat(staffCommissionFormData) || 0,
       createdBy: activeStaff,
     };
     setServices([...services, newService]);
@@ -131,6 +133,7 @@ export default function ManageServicePage({
               footTimeMin: parseFloat(footTimeFormData) || 0,
               bodyTimeMin: parseFloat(bodyTimeFormData) || 0,
               commission: parseFloat(commissionFormData) || 0,
+              staffCommission: parseFloat(staffCommissionFormData) || 0,
             }
           : service
       )
@@ -211,6 +214,9 @@ export default function ManageServicePage({
                 Commission
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Staff Commission
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -228,6 +234,7 @@ export default function ManageServicePage({
                 <td className="px-6 py-4">{service.footTimeMin}</td>
                 <td className="px-6 py-4">{service.bodyTimeMin}</td>
                 <td className="px-6 py-4">${service.commission.toFixed(2)}</td>
+                <td className="px-6 py-4">${service.staffCommission?.toFixed(2) || "-"}</td>
                 <td className="px-6 py-4">
                   <span
                     className={`px-2 py-1 rounded-full text-xs text-white ${statusClasses[service.status]}`}
@@ -263,7 +270,7 @@ export default function ManageServicePage({
             ))}
             {!services.length && (
               <tr>
-                <td colSpan={9} className="text-center py-4">
+                <td colSpan={10} className="text-center py-4">
                   No services available. Please add services.
                 </td>
               </tr>
@@ -435,6 +442,25 @@ export default function ManageServicePage({
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="staffCommission"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Staff Commission:
+                    </label>
+                    <input
+                      id="staffCommission"
+                      type="number"
+                      value={staffCommissionFormData}
+                      min={0}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setStaffCommissionFormData(e.target.value)
+                      }
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                   <div className="flex justify-end">
                     <button
                       type="button"
@@ -579,6 +605,24 @@ export default function ManageServicePage({
                       value={commissionFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setCommissionFormData(e.target.value)
+                      }
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="editStaffCommission"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Staff Commission:
+                    </label>
+                    <input
+                      id="editStaffCommission"
+                      type="number"
+                      value={staffCommissionFormData}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setStaffCommissionFormData(e.target.value)
                       }
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"

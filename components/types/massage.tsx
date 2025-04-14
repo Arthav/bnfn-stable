@@ -9,6 +9,7 @@ export interface Services {
   bodyTimeMin: number;
   commission: number;
   createdBy: Staff | null;
+  staffCommission: number | null;
 }
 
 export interface Worker {
@@ -33,6 +34,7 @@ export interface Transaction {
   endTime: string;
   sales: number;
   commission: number;
+  staffCommission: number | null;
   workerName?: string;
   serviceName?: string;
   footTime: number;
@@ -58,6 +60,7 @@ export interface AddOns {
   profit: number;
   status: "Active" | "Discontinued";
   createdBy: Staff | null;
+  staffCommission: number | null;
 }
 
 export interface Membership {
@@ -113,6 +116,14 @@ export interface Staff {
   name: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface StaffChangeLog {
+  id: number;
+  staffId: number;
+  changeFromId: number | null;
+  changeToId: number | null;
+  changeDate: string;
 }
 
 export interface Item {
