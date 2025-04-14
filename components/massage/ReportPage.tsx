@@ -95,11 +95,16 @@ export default function ReportPage({
 
   // Worker Performance Metrics using filtered transactions
   const workerMetrics = workers.map((worker) => {
-    const txs = filteredTransactions.filter((t) => t.workerId === worker.id);
+    const txs = filteredTransactions.filter(
+      (t) => t.workerId === worker.id && !t.isRefundTransaction
+    );
     return {
       ...worker,
       transactionCount: txs.length,
-      totalSales: txs.reduce((sum, t) => sum + t.sales, 0),
+      totalSales: txs.reduce(
+        (sum, t) => (t.isRefunded ? sum : sum + (t.sales || 0)),
+        0
+      ),
       totalCommission: txs.reduce((sum, t) => sum + t.commission, 0),
     };
   });
@@ -385,7 +390,16 @@ export default function ReportPage({
 
       autoTable(doc, {
         startY: currentY,
-        head: [["Staff", "Transactions", "Total Sales", "Total Commission", "Total Refunds", "Total Refund Amount"]],
+        head: [
+          [
+            "Staff",
+            "Transactions",
+            "Total Sales",
+            "Total Commission",
+            "Total Refunds",
+            "Total Refund Amount",
+          ],
+        ],
         body: staffData,
         theme: "grid",
         headStyles: { fillColor: [60, 60, 60] },
