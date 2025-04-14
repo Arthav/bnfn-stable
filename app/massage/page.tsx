@@ -281,7 +281,7 @@ May your commits be legendary, your debugging swift, and your journey through co
             >
               &#8203;
             </span>
-            <div className="inline-block align-middle bg-black rounded-lg shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+            <div className="inline-block align-middle bg-black rounded-lg shadow-xl sm:my-8 sm:max-w-lg sm:w-full">
               {/* Modal Header */}
               <div className="flex justify-between items-center border-b border-gray-200 px-4 py-3">
                 <h3
