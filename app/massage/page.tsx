@@ -271,7 +271,7 @@ May your commits be legendary, your debugging swift, and your journey through co
           <div className="flex items-center justify-center min-h-screen px-4 text-center">
             {/* Backdrop with click-to-close */}
             <div
-              className="fixed inset-0 bg-black bg-opacity-75 transition-opacity"
+              className="fixed inset-0 bg-black bg-opacity-75"
               onClick={() => setShowStaffChangeLog(false)}
             ></div>
             {/* This element is to center the modal contents */}
