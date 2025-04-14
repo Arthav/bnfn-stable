@@ -632,6 +632,7 @@ export default function MassageShift({
                   Input Working Time for {currentWorker.name}
                 </h2>
                 <form onSubmit={handleWorkTimeSubmit}>
+                  {/* Service */}
                   <div className="mb-4">
                     <label
                       htmlFor="selectService"
@@ -666,6 +667,37 @@ export default function MassageShift({
                         ))}
                     </select>
                   </div>
+                  {/* Add-ons */}
+                  <div className="mb-4">
+                    <label
+                      htmlFor="selectAddOns"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Select Add‑Ons:
+                    </label>
+                    <MultiSelectDropdown
+                      addOns={addOns}
+                      selectedAddOnIds={selectedAddOnIds}
+                      setSelectedAddOnIds={setSelectedAddOnIds}
+                    />
+                  </div>
+                  {/* Booked */}
+                  <div className="mb-4 flex items-center">
+                    <input
+                      id="bookedCheckbox"
+                      type="checkbox"
+                      checked={isBooked}
+                      onChange={(e) => setIsBooked(e.target.checked)}
+                      className="mr-2"
+                    />
+                    <label
+                      htmlFor="bookedCheckbox"
+                      className="text-sm font-medium"
+                    >
+                      Booked
+                    </label>
+                  </div>
+                  {/* Start Time */}
                   <div className="mb-4">
                     <label
                       htmlFor="startTime"
@@ -687,6 +719,7 @@ export default function MassageShift({
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
                   </div>
+                  {/* Service Time */}
                   <div className="mb-4">
                     <label
                       htmlFor="serviceTime"
@@ -710,34 +743,7 @@ export default function MassageShift({
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
                   </div>
-                  <div className="mb-4 flex items-center">
-                    <input
-                      id="bookedCheckbox"
-                      type="checkbox"
-                      checked={isBooked}
-                      onChange={(e) => setIsBooked(e.target.checked)}
-                      className="mr-2"
-                    />
-                    <label
-                      htmlFor="bookedCheckbox"
-                      className="text-sm font-medium"
-                    >
-                      Booked
-                    </label>
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="selectAddOns"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Select Add‑Ons:
-                    </label>
-                    <MultiSelectDropdown
-                      addOns={addOns}
-                      selectedAddOnIds={selectedAddOnIds}
-                      setSelectedAddOnIds={setSelectedAddOnIds}
-                    />
-                  </div>
+                  {/* Cust Name */}
                   <div className="mb-4">
                     <label
                       htmlFor="addCustomerName"
@@ -756,6 +762,7 @@ export default function MassageShift({
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
                   </div>
+                  {/* Cust Phone */}
                   <div className="mb-4">
                     <label
                       htmlFor="addCustomerPhone"
@@ -774,6 +781,7 @@ export default function MassageShift({
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
                   </div>
+                  {/* Action Button */}
                   <div className="flex justify-end">
                     <button
                       type="button"

@@ -35,7 +35,8 @@ export default function ManageServicePage({
   const [footTimeFormData, setFootTimeFormData] = useState<string>("");
   const [bodyTimeFormData, setBodyTimeFormData] = useState<string>("");
   const [commissionFormData, setCommissionFormData] = useState<string>("");
-  const [staffCommissionFormData, setStaffCommissionFormData] = useState<string>("");
+  const [staffCommissionFormData, setStaffCommissionFormData] =
+    useState<string>("");
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -211,10 +212,10 @@ export default function ManageServicePage({
                 Body Time (Min)
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Commission
+                Staff Commission
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Staff Commission
+                Worker Commission
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Status
@@ -234,7 +235,9 @@ export default function ManageServicePage({
                 <td className="px-6 py-4">{service.footTimeMin}</td>
                 <td className="px-6 py-4">{service.bodyTimeMin}</td>
                 <td className="px-6 py-4">${service.commission.toFixed(2)}</td>
-                <td className="px-6 py-4">${service.staffCommission?.toFixed(2) || "-"}</td>
+                <td className="px-6 py-4">
+                  ${service.staffCommission?.toFixed(2) || "-"}
+                </td>
                 <td className="px-6 py-4">
                   <span
                     className={`px-2 py-1 rounded-full text-xs text-white ${statusClasses[service.status]}`}
@@ -425,25 +428,6 @@ export default function ManageServicePage({
                   </div>
                   <div className="mb-4">
                     <label
-                      htmlFor="commission"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Commission:
-                    </label>
-                    <input
-                      id="commission"
-                      type="number"
-                      value={commissionFormData}
-                      min={0}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        setCommissionFormData(e.target.value)
-                      }
-                      required
-                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
                       htmlFor="staffCommission"
                       className="block text-sm font-medium mb-1"
                     >
@@ -456,6 +440,25 @@ export default function ManageServicePage({
                       min={0}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setStaffCommissionFormData(e.target.value)
+                      }
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="commission"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Worker Commission:
+                    </label>
+                    <input
+                      id="commission"
+                      type="number"
+                      value={commissionFormData}
+                      min={0}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setCommissionFormData(e.target.value)
                       }
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -594,24 +597,6 @@ export default function ManageServicePage({
                   </div>
                   <div className="mb-4">
                     <label
-                      htmlFor="editCommission"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Commission:
-                    </label>
-                    <input
-                      id="editCommission"
-                      type="number"
-                      value={commissionFormData}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        setCommissionFormData(e.target.value)
-                      }
-                      required
-                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
                       htmlFor="editStaffCommission"
                       className="block text-sm font-medium mb-1"
                     >
@@ -623,6 +608,24 @@ export default function ManageServicePage({
                       value={staffCommissionFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setStaffCommissionFormData(e.target.value)
+                      }
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="editCommission"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Worker Commission:
+                    </label>
+                    <input
+                      id="editCommission"
+                      type="number"
+                      value={commissionFormData}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setCommissionFormData(e.target.value)
                       }
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"

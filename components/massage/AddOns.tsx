@@ -174,6 +174,9 @@ export default function ManageAddOnsPage({
                 Staff Commission
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Worker Commission
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -460,8 +463,9 @@ export default function ManageAddOnsPage({
                     <label
                       htmlFor="staffCommission"
                       className="block text-sm font-medium mb-1"
+                      title="Change wont be applied to already placed transaction"
                     >
-                      Staff Commission:
+                      Staff Commission (ⓘ):
                     </label>
                     <input
                       id="staffCommission"
@@ -477,8 +481,9 @@ export default function ManageAddOnsPage({
                     <label
                       htmlFor="workerCommission"
                       className="block text-sm font-medium mb-1"
+                      title="Change wont be applied to already placed transaction"
                     >
-                      Worker Commission:
+                      Worker Commission (ⓘ):
                     </label>
                     <input
                       id="workerCommission"
