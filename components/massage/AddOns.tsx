@@ -22,6 +22,7 @@ export default function ManageAddOnsPage({
     profit: 0,
     status: "Active" as "Active" | "Discontinued",
     staffCommission: 0,
+    workerCommission: 0,
   });
 
   // Pagination state
@@ -48,6 +49,7 @@ export default function ManageAddOnsPage({
       profit: 0,
       status: "Active",
       staffCommission: 0,
+      workerCommission: 0,
     });
     setModalType("add");
   };
@@ -60,6 +62,7 @@ export default function ManageAddOnsPage({
       profit: addon.profit,
       status: addon.status,
       staffCommission: addon.staffCommission || 0,
+      workerCommission: addon.workerCommission || 0,
     });
     setModalType("edit");
   };
@@ -71,7 +74,10 @@ export default function ManageAddOnsPage({
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name === "price" || name === "profit" || name === "staffCommission"
+        name === "price" ||
+        name === "profit" ||
+        name === "staffCommission" ||
+        name === "workerCommission"
           ? parseFloat(value) || 0
           : value,
     }));
@@ -181,9 +187,8 @@ export default function ManageAddOnsPage({
                 <td className="px-6 py-4">{addon.name}</td>
                 <td className="px-6 py-4">${addon.price.toFixed(2)}</td>
                 <td className="px-6 py-4">${addon.profit.toFixed(2)}</td>
-                <td className="px-6 py-4">
-                  ${addon.staffCommission || 0}
-                </td>
+                <td className="px-6 py-4">${addon.staffCommission || 0}</td>
+                <td className="px-6 py-4">${addon.workerCommission || 0}</td>
                 <td className="px-6 py-4">{addon.status}</td>
                 <td className="px-6 py-4">
                   <button
@@ -339,6 +344,28 @@ export default function ManageAddOnsPage({
                   </div>
                   <div className="mb-4">
                     <label
+                      htmlFor="workerCommission"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Worker Commission:
+                    </label>
+                    <input
+                      id="workerCommission"
+                      name="workerCommission"
+                      type="number"
+                      value={formatNumber(formData.workerCommission)}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <p className="text-xs text-gray-400">
+                      {formData.workerCommission
+                        ? formatCurrency(formData.workerCommission)
+                        : "SGD 0,00"}
+                    </p>
+                  </div>
+                  <div className="mb-4">
+                    <label
                       htmlFor="status"
                       className="block text-sm font-medium mb-1"
                     >
@@ -440,7 +467,24 @@ export default function ManageAddOnsPage({
                       id="staffCommission"
                       name="staffCommission"
                       type="number"
-                      value={formData.staffCommission}
+                      value={formatNumber(formData.staffCommission)}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="workerCommission"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Worker Commission:
+                    </label>
+                    <input
+                      id="workerCommission"
+                      name="workerCommission"
+                      type="number"
+                      value={formatNumber(formData.workerCommission)}
                       onChange={handleChange}
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"

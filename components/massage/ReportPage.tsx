@@ -614,7 +614,7 @@ export default function ReportPage({
           </div>
 
           <div className="overflow-x-auto">
-            <h2 className="text-xl font-semibold mb-2">Staff</h2>
+            <h2 className="text-xl font-semibold mb-2">Staff Performance</h2>
             <table className="min-w-full divide-y divide-gray-700">
               <thead className="bg-gray-800">
                 <tr>

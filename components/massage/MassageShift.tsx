@@ -288,7 +288,12 @@ export default function MassageShift({
       serviceTime: serviceMins,
       endTime: formattedEnd,
       sales: selectedServiceObj.price,
-      commission: selectedServiceObj.commission,
+      commission:
+        (selectedServiceObj.commission || 0) +
+        selectedAddOns.reduce(
+          (acc, addon) => acc + (addon.workerCommission || 0),
+          0
+        ),
       workerName: currentWorker.name,
       serviceName: selectedServiceObj.name,
       footTime: selectedServiceObj.footTimeMin,
@@ -300,10 +305,10 @@ export default function MassageShift({
       createdBy: activeStaff,
       staffCommission:
         (selectedServiceObj.staffCommission || 0) +
-          selectedAddOns.reduce(
-            (acc, addon) => acc + (addon.staffCommission || 0),
-            0
-          ),
+        selectedAddOns.reduce(
+          (acc, addon) => acc + (addon.staffCommission || 0),
+          0
+        ),
     };
 
     setTransactions([...transactions, newTransaction]);

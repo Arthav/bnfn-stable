@@ -61,6 +61,7 @@ export interface AddOns {
   status: "Active" | "Discontinued";
   createdBy: Staff | null;
   staffCommission: number | null;
+  workerCommission: number | null;
 }
 
 export interface Membership {
