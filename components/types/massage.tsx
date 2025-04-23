@@ -44,7 +44,7 @@ export interface BookingListStruct {
   transactionDate: string;
   addOns?: AddOns[];
   createdBy: Staff | null;
-  status: "ACTIVE" | "DONE"
+  status: "ACTIVE" | "DONE" | "APPOINTMENT" | "APPOINTMENT DONE";
 }
 
 export interface Transaction {

@@ -290,6 +290,7 @@ export default function ManageAddOnsPage({
                       id="price"
                       name="price"
                       type="number"
+                      step=".01"
                       value={formatNumber(formData.price)}
                       onChange={handleChange}
                       required
@@ -312,6 +313,7 @@ export default function ManageAddOnsPage({
                       id="profit"
                       name="profit"
                       type="number"
+                      step=".01"
                       value={formatNumber(formData.profit)}
                       onChange={handleChange}
                       required
@@ -334,6 +336,7 @@ export default function ManageAddOnsPage({
                       id="staffCommission"
                       name="staffCommission"
                       type="number"
+                      step=".01"
                       value={formatNumber(formData.staffCommission)}
                       onChange={handleChange}
                       required
@@ -356,6 +359,7 @@ export default function ManageAddOnsPage({
                       id="workerCommission"
                       name="workerCommission"
                       type="number"
+                      step=".01"
                       value={formatNumber(formData.workerCommission)}
                       onChange={handleChange}
                       required
@@ -436,6 +440,7 @@ export default function ManageAddOnsPage({
                       id="price"
                       name="price"
                       type="number"
+                      step=".01"
                       value={formData.price}
                       onChange={handleChange}
                       required
@@ -453,6 +458,7 @@ export default function ManageAddOnsPage({
                       id="profit"
                       name="profit"
                       type="number"
+                      step=".01"
                       value={formData.profit}
                       onChange={handleChange}
                       required
@@ -471,6 +477,7 @@ export default function ManageAddOnsPage({
                       id="staffCommission"
                       name="staffCommission"
                       type="number"
+                      step=".01"
                       value={formatNumber(formData.staffCommission)}
                       onChange={handleChange}
                       required
@@ -489,6 +496,7 @@ export default function ManageAddOnsPage({
                       id="workerCommission"
                       name="workerCommission"
                       type="number"
+                      step=".01"
                       value={formatNumber(formData.workerCommission)}
                       onChange={handleChange}
                       required

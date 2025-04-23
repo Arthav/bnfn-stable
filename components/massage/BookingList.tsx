@@ -1,23 +1,129 @@
-import React, { useState } from "react";
-import { Worker, BookingListStruct } from "@/components/types/massage";
+import React, { useState, ChangeEvent } from "react";
+import { BookingListStruct, Worker, Staff } from "@/components/types/massage";
+
 
 type BookingListPageProps = {
+  workers: Worker[];
+  activeStaff: Staff | null;
   bookingList: BookingListStruct[];
+  setBookingList: React.Dispatch<React.SetStateAction<BookingListStruct[]>>;
 };
 
 export default function BookingListPage({
+  workers,
+  activeStaff,
   bookingList,
+  setBookingList,
 }: BookingListPageProps) {
-
   const [status, setStatus] = useState("ACTIVE");
+  const [modalOpen, setModalOpen] = useState(false); // To manage modal visibility
+  const [bookingFormData, setBookingFormData] = useState<BookingListStruct>({
+    id: 0,
+    workerId: 0,
+    serviceId: 0,
+    startTime: "",
+    serviceTime: 0,
+    endTime: "",
+    sales: 0,
+    commission: 0,
+    staffCommission: 0,
+    workerName: "",
+    serviceName: "",
+    footTime: 0,
+    bodyTime: 0,
+    customerName: "",
+    customerPhone: "",
+    transactionDate: "",
+    addOns: [],
+    createdBy: null,
+    status: "APPOINTMENT",
+  });
+
   // Filter workers to only include those with a "Booked" status.
-  const bookedWorkers = bookingList.filter((booking) => booking.status === status);
+  const bookedWorkers = bookingList
+    .filter((booking) => booking.status === status)
+    .sort((a, b) => {
+      if (status === "APPOINTMENT") {
+        const dateA = new Date(a.transactionDate).getTime();
+        const dateB = new Date(b.transactionDate).getTime();
+
+        if (dateA !== dateB) {
+          return dateA - dateB; // Sort by transactionDate
+        }
+
+        const timeA = new Date(a.startTime).getTime();
+        const timeB = new Date(b.startTime).getTime();
+        return timeA - timeB; // Sort by startTime
+      }
+
+      // Default return if status is not 'APPOINTMENT', no sorting applied
+      return 0;
+    });
+
+  const handleAddAppointment = () => {
+    const newAppointMentData: BookingListStruct = {
+      ...bookingFormData,
+      id: Date.now(),
+      transactionDate: new Date().toISOString().split("T")[0],
+      createdBy: activeStaff,
+      status: "APPOINTMENT",
+    };
+    setBookingList((prev) => [...prev, newAppointMentData]);
+    localStorage.setItem(
+      "bookingList",
+      JSON.stringify([...bookingList, newAppointMentData])
+    );
+    setModalOpen(false); // Close the modal after adding
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    // Explicitly define the type of prevData as BookingListStruct
+    setBookingFormData((prevData: BookingListStruct) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleWorkerChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const selectedWorkerId = parseInt(e.target.value, 10); // Get the worker's ID from the dropdown
+
+    // Find the selected worker by ID
+    const selectedWorker = workers.find((wrk) => wrk.id === selectedWorkerId);
+
+    if (selectedWorker) {
+      // Update the booking form data with the selected worker's details
+      setBookingFormData((prevData) => ({
+        ...prevData,
+        workerId: selectedWorker.id,
+        workerName: selectedWorker.name, // Set the worker's name
+      }));
+    }
+  };
+
+  const finishAppointment = (bookingId: number) => {
+    setBookingList((prev) =>
+      prev.map((booking) => {
+        if (booking.id === bookingId) {
+          return {
+            ...booking,
+            status: "APPOINTMENT DONE",
+          };
+        }
+        return booking;
+      })
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black p-4 text-white">
       <h1 className="text-2xl font-bold mb-4">Booking List</h1>
-      <div className="flex items-center justify-between mb-4">
-        <label htmlFor="status" className="block text-sm font-medium text-gray-200">
+      <div className="flex items-center space-between mb-4">
+        <label
+          htmlFor="status"
+          className="block text-sm font-medium text-gray-200 mr-2"
+        >
           Status
         </label>
         <select
@@ -29,16 +135,25 @@ export default function BookingListPage({
         >
           <option value="ACTIVE">Active Booking</option>
           <option value="DONE">Past Booking</option>
+          <option value="APPOINTMENT">Appointment</option>
+          <option value="APPOINTMENT DONE">Appointment Done</option>
         </select>
+        <button
+          onClick={() => setModalOpen(true)}
+          className="ml-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+        >
+          Add Appointment
+        </button>
       </div>
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
           <thead className="bg-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
-                ID
-              </th>
+              {status === "APPOINTMENT" && (
+                <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                </th>
+              )}
               <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
                 Name
               </th>
@@ -72,7 +187,17 @@ export default function BookingListPage({
             {bookedWorkers.length > 0 ? (
               bookedWorkers.map((booking) => (
                 <tr key={booking.id} className="hover:bg-gray-800">
-                  <td className="px-6 py-4">{booking.id}</td>
+                  {status === 'APPOINTMENT' && (
+                    <td className="px-6 py-4">
+                      <button
+                  type="button"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                        onClick={() => finishAppointment(booking.id)}
+                      >
+                        Done
+                      </button>
+                    </td>
+                  )}
                   <td className="px-6 py-4">{booking.workerName}</td>
                   <td className="px-6 py-4">{booking.startTime}</td>
                   <td className="px-6 py-4">{booking.endTime}</td>
@@ -81,7 +206,9 @@ export default function BookingListPage({
                   <td className="px-6 py-4">{booking.customerPhone || "-"}</td>
                   <td className="px-6 py-4">{booking.transactionDate}</td>
                   <td className="px-6 py-4">{booking.workerName}</td>
-                  <td className="px-6 py-4">{booking.createdBy?.name || "-"}</td>
+                  <td className="px-6 py-4">
+                    {booking.createdBy?.name || "-"}
+                  </td>
                 </tr>
               ))
             ) : (
@@ -94,6 +221,128 @@ export default function BookingListPage({
           </tbody>
         </table>
       </div>
+
+      {/* Add Appointment Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
+          <div className="bg-gray-800 p-6 rounded shadow-lg w-96 max-h-[80vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4">Add Appointment</h2>
+            <form onSubmit={handleAddAppointment}>
+              <div className="mb-4">
+                <label
+                  htmlFor="workerName"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Worker Name
+                </label>
+                <select
+                  id="workerName"
+                  name="workerName"
+                  value={bookingFormData.workerId} // Use workerId to control the selected option
+                  onChange={handleWorkerChange}
+                  required
+                  className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                >
+                  <option value="">Select a Worker</option>
+                  {workers?.map((wrk) => (
+                    <option key={wrk.id} value={wrk.id}>
+                      {wrk.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="customerName"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Customer Name
+                </label>
+                <input
+                  id="customerName"
+                  name="customerName"
+                  type="text"
+                  value={bookingFormData.customerName}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="customerPhone"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Customer Phone
+                </label>
+                <input
+                  id="customerPhone"
+                  name="customerPhone"
+                  type="text"
+                  value={bookingFormData.customerPhone}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="startTime"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Start Time
+                </label>
+                <input
+                  id="startTime"
+                  name="startTime"
+                  type="time"
+                  value={bookingFormData.startTime}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="endTime"
+                  className="block text-sm font-medium mb-1"
+                >
+                  End Time
+                </label>
+                <input
+                  id="endTime"
+                  name="endTime"
+                  type="time"
+                  value={bookingFormData.endTime}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded mr-2"
+                  onClick={() => setModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                >
+                  Add Appointment
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -361,6 +361,7 @@ export default function ManageServicePage({
                       id="servicePrice"
                       type="number"
                       min={0}
+                      step=".01"
                       value={priceFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setPriceFormData(e.target.value)
@@ -436,6 +437,7 @@ export default function ManageServicePage({
                     <input
                       id="staffCommission"
                       type="number"
+                      step=".01"
                       value={staffCommissionFormData}
                       min={0}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -455,6 +457,7 @@ export default function ManageServicePage({
                     <input
                       id="commission"
                       type="number"
+                      step=".01"
                       value={commissionFormData}
                       min={0}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -532,6 +535,7 @@ export default function ManageServicePage({
                     <input
                       id="editServicePrice"
                       type="number"
+                      step=".01"
                       min={0}
                       value={priceFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -605,6 +609,7 @@ export default function ManageServicePage({
                     <input
                       id="editStaffCommission"
                       type="number"
+                      step=".01"
                       value={staffCommissionFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setStaffCommissionFormData(e.target.value)
@@ -623,6 +628,7 @@ export default function ManageServicePage({
                     <input
                       id="editCommission"
                       type="number"
+                      step=".01"
                       value={commissionFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setCommissionFormData(e.target.value)

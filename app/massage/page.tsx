@@ -18,7 +18,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TransactionList from "@/components/massage/TransactionList";
 import ReportPage from "@/components/massage/ReportPage";
-import BookingList from "@/components/massage/BookingList";
+import BookingListPage from "@/components/massage/BookingList";
 import ManageAddOnsPage from "@/components/massage/AddOns";
 import StaffList from "@/components/massage/Staff";
 import {
@@ -67,7 +67,12 @@ export default function MassageShiftPage() {
       title: "Booking List",
       icon: <FaCalendarAlt />,
       component: (
-        <BookingList bookingList={bookingList} />
+        <BookingListPage
+          bookingList={bookingList}
+          setBookingList={setBookingList}
+          workers={workers}
+          activeStaff={activeStaff}
+        />
       ),
     },
     {
@@ -193,6 +198,11 @@ May your commits be legendary, your debugging swift, and your journey through co
   useEffect(() => {
     localStorage.setItem("staffChangeLog", JSON.stringify(staffChangeLog));
   }, [staffChangeLog]);
+
+  // Synchronize bookingList state with localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("bookingList", JSON.stringify(bookingList));
+  }, [bookingList]);
 
   // Handle active staff change
   const handleActiveStaffChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

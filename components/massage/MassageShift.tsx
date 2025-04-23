@@ -154,7 +154,7 @@ export default function MassageShift({
     // Update the bookingList state
     setBookingList((prev) =>
       prev.map((booking) => {
-        if (finishedWorkerIds.includes(booking.workerId)) {
+        if (finishedWorkerIds.includes(booking.workerId) && booking.status === 'ACTIVE') {
           return {
             ...booking,
             status: "DONE",
@@ -221,7 +221,7 @@ export default function MassageShift({
 
     setBookingList((prev) =>
       prev.map((booking) => {
-        if (booking.workerId === workerId) {
+        if (booking.workerId === workerId && booking.status === 'ACTIVE') {
           return {
             ...booking,
             status: "DONE",
