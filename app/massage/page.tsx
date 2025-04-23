@@ -9,6 +9,7 @@ import {
   Staff,
   StaffChangeLog,
   BookingListStruct,
+  Membership
   // Item,
 } from "@/components/types/massage";
 import MassageShift from "@/components/massage/MassageShift";
@@ -21,6 +22,7 @@ import ReportPage from "@/components/massage/ReportPage";
 import BookingListPage from "@/components/massage/BookingList";
 import ManageAddOnsPage from "@/components/massage/AddOns";
 import StaffList from "@/components/massage/Staff";
+import MemberShip from "@/components/massage/MemberShip";
 import {
   FaSpa,
   FaCalendarAlt,
@@ -42,6 +44,7 @@ export default function MassageShiftPage() {
   const [staffChangeLog, setStaffChangeLog] = useState<StaffChangeLog[]>([]);
   const [showStaffChangeLog, setShowStaffChangeLog] = useState(false);
   const [bookingList, setBookingList] = useState<BookingListStruct[]>([]);
+  const [memberships, setMemberships] = useState<Membership[]>([]);
 
   const tabs = [
     {
@@ -106,7 +109,7 @@ export default function MassageShiftPage() {
       key: "membership",
       title: "Membership",
       icon: <FaFileAlt />,
-      component: <ComingSoon />,
+      component: <MemberShip memberships={memberships} setMemberships={setMemberships} />,
     },
     {
       key: "transaction",
@@ -174,6 +177,11 @@ May your commits be legendary, your debugging swift, and your journey through co
     const storedAddOns = localStorage.getItem("addOns");
     if (storedAddOns) {
       setAddOns(JSON.parse(storedAddOns));
+    }
+
+    const storedMemberships = localStorage.getItem("memberships");
+    if (storedMemberships) {
+      setMemberships(JSON.parse(storedMemberships));
     }
 
     const storedStaff = localStorage.getItem("staffList");
