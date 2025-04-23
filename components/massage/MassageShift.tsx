@@ -6,6 +6,7 @@ import {
   Transaction,
   AddOns,
   Staff,
+  BookingListStruct
 } from "@/components/types/massage";
 import MultiSelectDropdown from "./MultiSelectDropDown";
 
@@ -25,7 +26,7 @@ const statusClasses: Record<Worker["status"], string> = {
 
 interface FormData {
   startTime: string;
-  serviceTime: number;
+  serviceTime: string;
 }
 
 type ModalType = "workTime" | "editWorker" | "addWorker" | null;
@@ -38,6 +39,8 @@ export default function MassageShift({
   setTransactions,
   addOns,
   activeStaff,
+  bookingList,
+  setBookingList
 }: {
   services: Services[];
   transactions: Transaction[];
@@ -46,12 +49,14 @@ export default function MassageShift({
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
   addOns: AddOns[];
   activeStaff: Staff | null;
+  bookingList: BookingListStruct[];
+  setBookingList: React.Dispatch<React.SetStateAction<BookingListStruct[]>>;
 }) {
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
   const [workTimeFormData, setWorkTimeFormData] = useState<FormData>({
     startTime: "",
-    serviceTime: 0,
+    serviceTime: "",
   });
   const [nameFormData, setNameFormData] = useState<string>("");
   const [customerNameFormData, setCustomerNameFormData] = useState<string>("");
@@ -78,6 +83,11 @@ export default function MassageShift({
     localStorage.setItem("workers", JSON.stringify(workers));
   }, [workers]);
 
+  useEffect(() => {
+    if (bookingList.length === 0) return;
+    localStorage.setItem("bookingList", JSON.stringify(bookingList));
+  }, [bookingList]);
+
   const parseEndTime = (endTime: string): Date => {
     const [hours, minutes, seconds] = endTime.split(":").map(Number);
     const now = new Date();
@@ -93,6 +103,7 @@ export default function MassageShift({
 
   const updateWorkersStatus = () => {
     let finishedWorkerNames: string[] = [];
+    let finishedWorkerIds: number[] = [];
     setWorkers((prev) => {
       const updatedWorkers = prev.map((worker) => {
         if (
@@ -103,6 +114,7 @@ export default function MassageShift({
           // Check if the current time is past the end time
           if (new Date() > endDate) {
             finishedWorkerNames.push(worker.name);
+            finishedWorkerIds.push(worker.id);
             const updatedWorker: Worker = {
               ...worker,
               status: "Available",
@@ -138,6 +150,19 @@ export default function MassageShift({
       // Combine the updated workers, placing the moved ones at the end
       return [...updatedWorkersInPlace, ...movedWorkers];
     });
+
+    // Update the bookingList state
+    setBookingList((prev) =>
+      prev.map((booking) => {
+        if (finishedWorkerIds.includes(booking.workerId)) {
+          return {
+            ...booking,
+            status: "DONE",
+          };
+        }
+        return booking;
+      })
+    );
 
     // Show toast notifications for finished workers
     finishedWorkerNames.forEach((name) => {
@@ -194,6 +219,18 @@ export default function MassageShift({
       }
     });
 
+    setBookingList((prev) =>
+      prev.map((booking) => {
+        if (booking.workerId === workerId) {
+          return {
+            ...booking,
+            status: "DONE",
+          };
+        }
+        return booking;
+      })
+    );
+
     const currentW = workers.find((w) => w.id === workerId);
     toast.success(`${currentW?.name} has done working`, {
       position: "top-center",
@@ -203,7 +240,7 @@ export default function MassageShift({
 
   const openWorkTimeModal = (worker: Worker) => {
     setCurrentWorker(worker);
-    setWorkTimeFormData({ startTime: "", serviceTime: 0 });
+    setWorkTimeFormData({ startTime: "", serviceTime: "" });
     setIsBooked(false);
     setSelectedService(services[0]?.id ?? 0);
     setSelectedAddOnIds([]); // reset add‑On selection
@@ -244,7 +281,7 @@ export default function MassageShift({
       minutes
     );
     const serviceMins = workTimeFormData.serviceTime;
-    const end = new Date(start.getTime() + serviceMins * 60000);
+    const end = new Date(start.getTime() + Number(serviceMins) * 60000);
     const padZero = (num: number) => num.toString().padStart(2, "0");
     const formattedEnd = `${padZero(end.getHours())}:${padZero(
       end.getMinutes()
@@ -269,7 +306,7 @@ export default function MassageShift({
           ? {
               ...worker,
               startTime: start.toLocaleTimeString("en-GB"),
-              serviceTime: serviceMins,
+              serviceTime: parseFloat(serviceMins) || 0,
               endTime: formattedEnd,
               status: newStatus,
               serviceId: selectedServiceObj.id,
@@ -280,12 +317,48 @@ export default function MassageShift({
       )
     );
 
+    if (newStatus === "Booked") {
+      const newBooking: BookingListStruct = {
+        id: Date.now(),
+        workerId: currentWorker.id,
+        serviceId: selectedServiceObj.id,
+        startTime: start.toLocaleTimeString("en-GB"),
+        serviceTime: parseFloat(serviceMins) || 0,
+        endTime: formattedEnd,
+        sales: selectedServiceObj.price,
+        commission:
+          (selectedServiceObj.commission || 0) +
+          selectedAddOns.reduce(
+            (acc, addon) => acc + (addon.workerCommission || 0),
+            0
+          ),
+        staffCommission:
+          (selectedServiceObj.staffCommission || 0) +
+          selectedAddOns.reduce(
+            (acc, addon) => acc + (addon.staffCommission || 0),
+            0
+          ),
+        workerName: currentWorker.name,
+        serviceName: selectedServiceObj.name,
+        footTime: selectedServiceObj.footTimeMin,
+        bodyTime: selectedServiceObj.bodyTimeMin,
+        customerName: customerNameFormData,
+        customerPhone: customerPhoneFormData,
+        transactionDate: new Date().toISOString(),
+        addOns: selectedAddOns,
+        createdBy: activeStaff,
+        status: "ACTIVE",
+      };
+      setBookingList((prev) => [...prev, newBooking]);
+      localStorage.setItem("bookingList", JSON.stringify([...bookingList, newBooking]));
+    }
+
     const newTransaction: Transaction = {
       id: Date.now(),
       workerId: currentWorker.id,
       serviceId: selectedServiceObj.id,
       startTime: start.toLocaleTimeString("en-GB"),
-      serviceTime: serviceMins,
+      serviceTime: Number(serviceMins),
       endTime: formattedEnd,
       sales: selectedServiceObj.price,
       commission:
@@ -648,9 +721,9 @@ export default function MassageShift({
                         setWorkTimeFormData({
                           ...workTimeFormData,
                           serviceTime:
-                            services.find(
-                              (s) => s.id === Number(e.target.value)
-                            )?.serviceTimeMin || 0,
+                            services
+                              .find((s) => s.id === Number(e.target.value))
+                              ?.serviceTimeMin?.toString() || "",
                         });
                       }}
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
@@ -736,7 +809,7 @@ export default function MassageShift({
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setWorkTimeFormData({
                           ...workTimeFormData,
-                          serviceTime: Number(e.target.value),
+                          serviceTime: e.target.value,
                         })
                       }
                       required

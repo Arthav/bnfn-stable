@@ -167,9 +167,9 @@ export default function ManageAddOnsPage({
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Price
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              {/* <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Profit
-              </th>
+              </th> */}
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Staff Commission
               </th>
@@ -189,7 +189,7 @@ export default function ManageAddOnsPage({
               <tr key={addon.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{addon.name}</td>
                 <td className="px-6 py-4">${addon.price.toFixed(2)}</td>
-                <td className="px-6 py-4">${addon.profit.toFixed(2)}</td>
+                {/* <td className="px-6 py-4">${addon.profit.toFixed(2)}</td> */}
                 <td className="px-6 py-4">${addon.staffCommission || 0}</td>
                 <td className="px-6 py-4">${addon.workerCommission || 0}</td>
                 <td className="px-6 py-4">{addon.status}</td>

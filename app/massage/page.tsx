@@ -8,6 +8,7 @@ import {
   AddOns,
   Staff,
   StaffChangeLog,
+  BookingListStruct,
   // Item,
 } from "@/components/types/massage";
 import MassageShift from "@/components/massage/MassageShift";
@@ -40,6 +41,7 @@ export default function MassageShiftPage() {
   const [activeStaff, setActiveStaff] = useState<Staff | null>(null);
   const [staffChangeLog, setStaffChangeLog] = useState<StaffChangeLog[]>([]);
   const [showStaffChangeLog, setShowStaffChangeLog] = useState(false);
+  const [bookingList, setBookingList] = useState<BookingListStruct[]>([]);
 
   const tabs = [
     {
@@ -55,6 +57,8 @@ export default function MassageShiftPage() {
           setTransactions={setTransactions}
           addOns={addOns}
           activeStaff={activeStaff}
+          bookingList={bookingList}
+          setBookingList={setBookingList}
         />
       ),
     },
@@ -62,7 +66,9 @@ export default function MassageShiftPage() {
       key: "booking",
       title: "Booking List",
       icon: <FaCalendarAlt />,
-      component: <BookingList workers={workers} />,
+      component: (
+        <BookingList bookingList={bookingList} />
+      ),
     },
     {
       key: "manage-service",
@@ -148,6 +154,11 @@ May your commits be legendary, your debugging swift, and your journey through co
     const storedWorkers = localStorage.getItem("workers");
     if (storedWorkers) {
       setWorkers(JSON.parse(storedWorkers));
+    }
+
+    const storedBookingList = localStorage.getItem("bookingList");
+    if (storedBookingList) {
+      setBookingList(JSON.parse(storedBookingList));
     }
 
     const storedTransactions = localStorage.getItem("transactions");

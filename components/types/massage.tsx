@@ -25,6 +25,28 @@ export interface Worker {
   addOns?: AddOns[];
 }
 
+export interface BookingListStruct {
+  id: number;
+  workerId: number;
+  serviceId: number;
+  startTime: string;
+  serviceTime: number;
+  endTime: string;
+  sales: number;
+  commission: number;
+  staffCommission: number | null;
+  workerName?: string;
+  serviceName?: string;
+  footTime: number;
+  bodyTime: number;
+  customerName?: string;
+  customerPhone?: string;
+  transactionDate: string;
+  addOns?: AddOns[];
+  createdBy: Staff | null;
+  status: "ACTIVE" | "DONE"
+}
+
 export interface Transaction {
   id: number;
   workerId: number;
