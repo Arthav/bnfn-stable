@@ -1,4 +1,10 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  FormEvent,
+  ChangeEvent,
+  useMemo,
+} from "react";
 import { Membership } from "@/components/types/massage";
 import { toast } from "react-toastify";
 
@@ -41,6 +47,26 @@ export default function MembershipMasterPage({
     if (memberships.length === 0) return;
     localStorage.setItem("memberships", JSON.stringify(memberships));
   }, [memberships]);
+
+  // Filter memberships based on search query.
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const filterMemberships = useMemo(
+    () =>
+      memberships.filter(
+        (membership) =>
+          membership.firstName
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          membership.lastName
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          membership.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          membership.phoneNumber
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())
+      ),
+    [memberships, searchQuery]
+  );
 
   // Opens modal to add a new membership.
   const openAddModal = () => {
@@ -148,12 +174,20 @@ export default function MembershipMasterPage({
       {/* Header */}
       <div className="mb-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Membership Master Page</h1>
-        <button
-          onClick={openAddModal}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
-        >
-          Add Membership
-        </button>
+        <div className="flex items-center">
+          <button onClick={openAddModal} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded ml-2">
+            Add Membership
+          </button>
+          <div className="flex items-center ml-3">
+            <input
+              type="text"
+              placeholder="Search memberships"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-1/2 px-4 py-2 border rounded"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Table */}
@@ -188,7 +222,7 @@ export default function MembershipMasterPage({
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
-            {memberships.map((membership) => (
+            {filterMemberships?.map((membership) => (
               <tr key={membership.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{membership.id}</td>
                 <td className="px-6 py-4">
@@ -217,7 +251,7 @@ export default function MembershipMasterPage({
                 </td>
               </tr>
             ))}
-            {!memberships.length && (
+            {!filterMemberships.length && (
               <tr>
                 <td colSpan={8} className="text-center py-4">
                   No memberships available. Please add a membership.

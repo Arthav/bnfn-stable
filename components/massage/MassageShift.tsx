@@ -6,7 +6,8 @@ import {
   Transaction,
   AddOns,
   Staff,
-  BookingListStruct
+  Membership,
+  BookingListStruct,
 } from "@/components/types/massage";
 import MultiSelectDropdown from "./MultiSelectDropDown";
 
@@ -40,7 +41,8 @@ export default function MassageShift({
   addOns,
   activeStaff,
   bookingList,
-  setBookingList
+  setBookingList,
+  memberships,
 }: {
   services: Services[];
   transactions: Transaction[];
@@ -51,6 +53,7 @@ export default function MassageShift({
   activeStaff: Staff | null;
   bookingList: BookingListStruct[];
   setBookingList: React.Dispatch<React.SetStateAction<BookingListStruct[]>>;
+  memberships: Membership[];
 }) {
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
@@ -59,6 +62,7 @@ export default function MassageShift({
     serviceTime: "",
   });
   const [nameFormData, setNameFormData] = useState<string>("");
+  const [membershipIdFormData, setMembershipIdFormData] = useState<number>(0);
   const [customerNameFormData, setCustomerNameFormData] = useState<string>("");
   const [customerPhoneFormData, setCustomerPhoneFormData] =
     useState<string>("");
@@ -87,99 +91,6 @@ export default function MassageShift({
     if (bookingList.length === 0) return;
     localStorage.setItem("bookingList", JSON.stringify(bookingList));
   }, [bookingList]);
-
-  const parseEndTime = (endTime: string): Date => {
-    const [hours, minutes, seconds] = endTime.split(":").map(Number);
-    const now = new Date();
-    return new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      hours,
-      minutes,
-      seconds || 0
-    );
-  };
-
-  const updateWorkersStatus = () => {
-    let finishedWorkerNames: string[] = [];
-    let finishedWorkerIds: number[] = [];
-    setWorkers((prev) => {
-      const updatedWorkers = prev.map((worker) => {
-        if (
-          (worker.status === "Busy" || worker.status === "Booked") &&
-          worker.endTime
-        ) {
-          const endDate = parseEndTime(worker.endTime);
-          // Check if the current time is past the end time
-          if (new Date() > endDate) {
-            finishedWorkerNames.push(worker.name);
-            finishedWorkerIds.push(worker.id);
-            const updatedWorker: Worker = {
-              ...worker,
-              status: "Available",
-              startTime: "",
-              serviceTime: 0,
-              endTime: "",
-              availableSince: undefined,
-              serviceId: undefined,
-              serviceName: undefined,
-              addOns: [],
-            };
-
-            // If the status was "Busy", move the worker to the end of the array
-            if (worker.status === "Busy") {
-              return { updatedWorker, isMovedToEnd: true };
-            }
-
-            // If the status was "Booked", update the worker in place
-            return { updatedWorker, isMovedToEnd: false };
-          }
-        }
-        return { updatedWorker: worker, isMovedToEnd: false }; // No change
-      });
-
-      // Separate the workers that need to be moved to the end
-      const movedWorkers = updatedWorkers
-        .filter((w) => w.isMovedToEnd)
-        .map((w) => w.updatedWorker);
-      const updatedWorkersInPlace = updatedWorkers
-        .filter((w) => !w.isMovedToEnd)
-        .map((w) => w.updatedWorker);
-
-      // Combine the updated workers, placing the moved ones at the end
-      return [...updatedWorkersInPlace, ...movedWorkers];
-    });
-
-    // Update the bookingList state
-    setBookingList((prev) =>
-      prev.map((booking) => {
-        if (finishedWorkerIds.includes(booking.workerId) && booking.status === 'ACTIVE') {
-          return {
-            ...booking,
-            status: "DONE",
-          };
-        }
-        return booking;
-      })
-    );
-
-    // Show toast notifications for finished workers
-    finishedWorkerNames.forEach((name) => {
-      toast.success(`${name} has done working`, {
-        position: "top-center",
-        autoClose: 5000,
-      });
-    });
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updateWorkersStatus();
-    }, 20000); // Runs every 20 seconds
-
-    return () => clearInterval(interval);
-  }, []);
 
   const finishWorker = (workerId: number) => {
     setWorkers((prev) => {
@@ -221,7 +132,7 @@ export default function MassageShift({
 
     setBookingList((prev) =>
       prev.map((booking) => {
-        if (booking.workerId === workerId && booking.status === 'ACTIVE') {
+        if (booking.workerId === workerId && booking.status === "ACTIVE") {
           return {
             ...booking,
             status: "DONE",
@@ -350,7 +261,10 @@ export default function MassageShift({
         status: "ACTIVE",
       };
       setBookingList((prev) => [...prev, newBooking]);
-      localStorage.setItem("bookingList", JSON.stringify([...bookingList, newBooking]));
+      localStorage.setItem(
+        "bookingList",
+        JSON.stringify([...bookingList, newBooking])
+      );
     }
 
     const newTransaction: Transaction = {
@@ -816,6 +730,47 @@ export default function MassageShift({
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     />
                   </div>
+
+                  {/* Cust Membership */}
+                  <div className="mb-4">
+                    <label
+                      htmlFor="selectMembership"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Select from Membership:
+                    </label>
+                    <select
+                      id="selectMembership"
+                      value={membershipIdFormData || ""} // Set value to empty string or null as the initial state
+                      onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                        const selectedMembership =
+                          memberships.find(
+                            (m) => m.id === Number(e.target.value)
+                          ) || null;
+                        setMembershipIdFormData(Number(e.target.value));
+                        setCustomerNameFormData(
+                          (selectedMembership?.firstName || "") +
+                            " " +
+                            (selectedMembership?.lastName || "")
+                        );
+                        setCustomerPhoneFormData(
+                          selectedMembership?.phoneNumber || ""
+                        );
+                      }}
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                    >
+                      <option value="" disabled>
+                        Select a Member
+                      </option>{" "}
+                      {/* Use empty string value */}
+                      {memberships.map((membership) => (
+                        <option key={membership.id} value={membership.id}>
+                          {membership.firstName} {membership.phoneNumber}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   {/* Cust Name */}
                   <div className="mb-4">
                     <label

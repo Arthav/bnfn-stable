@@ -27,7 +27,7 @@ export interface Worker {
 
 export interface BookingListStruct {
   id: number;
-  workerId: number;
+  workerId?: number;
   serviceId: number;
   startTime: string;
   serviceTime: number;

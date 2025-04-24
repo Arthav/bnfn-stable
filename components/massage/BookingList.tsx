@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import { BookingListStruct, Worker, Staff } from "@/components/types/massage";
 
 
@@ -17,7 +17,7 @@ export default function BookingListPage({
 }: BookingListPageProps) {
   const [status, setStatus] = useState("ACTIVE");
   const [modalOpen, setModalOpen] = useState(false); // To manage modal visibility
-  const [bookingFormData, setBookingFormData] = useState<BookingListStruct>({
+  const emptyFormState: BookingListStruct = {
     id: 0,
     workerId: 0,
     serviceId: 0,
@@ -37,13 +37,19 @@ export default function BookingListPage({
     addOns: [],
     createdBy: null,
     status: "APPOINTMENT",
-  });
+  };
+  const [bookingFormData, setBookingFormData] = useState<BookingListStruct>(emptyFormState);
+
+  useEffect(() => {
+    if (bookingList.length === 0) return;
+    localStorage.setItem("bookingList", JSON.stringify(bookingList));
+  }, [bookingList]);
 
   // Filter workers to only include those with a "Booked" status.
   const bookedWorkers = bookingList
     .filter((booking) => booking.status === status)
     .sort((a, b) => {
-      if (status === "APPOINTMENT") {
+      if (status === "APPOINTMENT" || status === "APPOINTMENT DONE") {
         const dateA = new Date(a.transactionDate).getTime();
         const dateB = new Date(b.transactionDate).getTime();
 
@@ -56,7 +62,6 @@ export default function BookingListPage({
         return timeA - timeB; // Sort by startTime
       }
 
-      // Default return if status is not 'APPOINTMENT', no sorting applied
       return 0;
     });
 
@@ -64,16 +69,12 @@ export default function BookingListPage({
     const newAppointMentData: BookingListStruct = {
       ...bookingFormData,
       id: Date.now(),
-      transactionDate: new Date().toISOString().split("T")[0],
       createdBy: activeStaff,
       status: "APPOINTMENT",
     };
     setBookingList((prev) => [...prev, newAppointMentData]);
-    localStorage.setItem(
-      "bookingList",
-      JSON.stringify([...bookingList, newAppointMentData])
-    );
-    setModalOpen(false); // Close the modal after adding
+    setModalOpen(false); 
+    setBookingFormData(emptyFormState);
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -238,9 +239,8 @@ export default function BookingListPage({
                 <select
                   id="workerName"
                   name="workerName"
-                  value={bookingFormData.workerId} // Use workerId to control the selected option
+                  value={bookingFormData.workerId}
                   onChange={handleWorkerChange}
-                  required
                   className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                 >
                   <option value="">Select a Worker</option>
@@ -323,6 +323,24 @@ export default function BookingListPage({
                   className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                 />
               </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="transactionDate"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Booking Date
+                </label>
+                <input
+                  id="transactionDate"
+                  name="transactionDate"
+                  type="date"
+                  value={bookingFormData.transactionDate}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                />
+              </div>
+
 
               <div className="flex justify-end">
                 <button

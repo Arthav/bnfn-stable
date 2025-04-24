@@ -9,13 +9,12 @@ import {
   Staff,
   StaffChangeLog,
   BookingListStruct,
-  Membership
+  Membership,
   // Item,
 } from "@/components/types/massage";
 import MassageShift from "@/components/massage/MassageShift";
 import ManageService from "@/components/massage/ManageService";
-import ComingSoon from "@/components/comingsoon";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TransactionList from "@/components/massage/TransactionList";
 import ReportPage from "@/components/massage/ReportPage";
@@ -62,6 +61,7 @@ export default function MassageShiftPage() {
           activeStaff={activeStaff}
           bookingList={bookingList}
           setBookingList={setBookingList}
+          memberships={memberships}
         />
       ),
     },
@@ -109,7 +109,9 @@ export default function MassageShiftPage() {
       key: "membership",
       title: "Membership",
       icon: <FaFileAlt />,
-      component: <MemberShip memberships={memberships} setMemberships={setMemberships} />,
+      component: (
+        <MemberShip memberships={memberships} setMemberships={setMemberships} />
+      ),
     },
     {
       key: "transaction",
@@ -138,6 +140,102 @@ export default function MassageShiftPage() {
       ),
     },
   ];
+
+  const parseEndTime = (endTime: string): Date => {
+    const [hours, minutes, seconds] = endTime.split(":").map(Number);
+    const now = new Date();
+    return new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      hours,
+      minutes,
+      seconds || 0
+    );
+  };
+
+  const updateWorkersStatus = () => {
+    let finishedWorkerNames: string[] = [];
+    let finishedWorkerIds: number[] = [];
+    setWorkers((prev) => {
+      const updatedWorkers = prev.map((worker) => {
+        if (
+          (worker.status === "Busy" || worker.status === "Booked") &&
+          worker.endTime
+        ) {
+          const endDate = parseEndTime(worker.endTime);
+          // Check if the current time is past the end time
+          if (new Date() > endDate) {
+            finishedWorkerNames.push(worker.name);
+            finishedWorkerIds.push(worker.id);
+            const updatedWorker: Worker = {
+              ...worker,
+              status: "Available",
+              startTime: "",
+              serviceTime: 0,
+              endTime: "",
+              availableSince: undefined,
+              serviceId: undefined,
+              serviceName: undefined,
+              addOns: [],
+            };
+
+            // If the status was "Busy", move the worker to the end of the array
+            if (worker.status === "Busy") {
+              return { updatedWorker, isMovedToEnd: true };
+            }
+
+            // If the status was "Booked", update the worker in place
+            return { updatedWorker, isMovedToEnd: false };
+          }
+        }
+        return { updatedWorker: worker, isMovedToEnd: false }; // No change
+      });
+
+      // Separate the workers that need to be moved to the end
+      const movedWorkers = updatedWorkers
+        .filter((w) => w.isMovedToEnd)
+        .map((w) => w.updatedWorker);
+      const updatedWorkersInPlace = updatedWorkers
+        .filter((w) => !w.isMovedToEnd)
+        .map((w) => w.updatedWorker);
+
+      // Combine the updated workers, placing the moved ones at the end
+      return [...updatedWorkersInPlace, ...movedWorkers];
+    });
+
+    // Update the bookingList state
+    setBookingList((prev) =>
+      prev.map((booking) => {
+        if (
+          finishedWorkerIds.includes(booking.workerId ?? 0) &&
+          booking.status === "ACTIVE"
+        ) {
+          return {
+            ...booking,
+            status: "DONE",
+          };
+        }
+        return booking;
+      })
+    );
+
+    // Show toast notifications for finished workers
+    finishedWorkerNames.forEach((name) => {
+      toast.success(`${name} has done working`, {
+        position: "top-center",
+        autoClose: 5000,
+      });
+    });
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateWorkersStatus();
+    }, 20000); // Runs every 20 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Load from localStorage on component mount
   useEffect(() => {
@@ -208,9 +306,9 @@ May your commits be legendary, your debugging swift, and your journey through co
   }, [staffChangeLog]);
 
   // Synchronize bookingList state with localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("bookingList", JSON.stringify(bookingList));
-  }, [bookingList]);
+  // useEffect(() => {
+  //   localStorage.setItem("bookingList", JSON.stringify(bookingList));
+  // }, [bookingList]);
 
   // Handle active staff change
   const handleActiveStaffChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
