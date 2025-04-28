@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import {
   Membership,
   MembershipTypesStruct,
-  RedeemPointHistoryStruct
+  RedeemPointHistoryStruct,
+  CustomerEntryStruct
   // Item,
 } from "@/components/types/massage";
 import { ToastContainer } from "react-toastify";
@@ -12,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import MemberShip from "@/components/massage/memberships/MemberShip";
 import MemberShipTypes from "@/components/massage/memberships/MembershipTypesPage";
 import RedeemHistoryPage from "@/components/massage/memberships/RedeemHistoryPage";
+import CustomerEntryPage from "@/components/massage/memberships/CustomerEntryPage";
 
 export default function MassageShiftPage({
   memberships,
@@ -19,7 +21,8 @@ export default function MassageShiftPage({
   membershipTypes,
   setMembershipTypes,
   redeemHistory,
-  setRedeemHistory
+  setRedeemHistory,
+  customerEntry
 }: {
   memberships: Membership[];
   setMemberships: React.Dispatch<React.SetStateAction<Membership[]>>;
@@ -31,6 +34,7 @@ export default function MassageShiftPage({
   setRedeemHistory: React.Dispatch<
     React.SetStateAction<RedeemPointHistoryStruct[]>
   >;
+  customerEntry: CustomerEntryStruct[];
 }) {
   const [activeTab, setActiveTab] = useState("membership");
 
@@ -64,6 +68,15 @@ export default function MassageShiftPage({
       component: (
         <RedeemHistoryPage
           redeemHistory={redeemHistory}
+        />
+      ),
+    },
+    {
+      key: "customer-entry",
+      title: "Customer Entry",
+      component: (
+        <CustomerEntryPage
+          customerEntry={customerEntry}
         />
       ),
     },

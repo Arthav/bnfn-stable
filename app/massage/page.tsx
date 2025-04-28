@@ -128,6 +128,7 @@ export default function MassageShiftPage() {
           setMembershipTypes={setMembershipTypes}
           redeemHistory={redeemHistory}
           setRedeemHistory={setRedeemHistory}
+          customerEntry={customerEntry}
         />
       ),
     },
