@@ -118,7 +118,7 @@ export default function ReportPage({
       ...addOn,
       transactionCount: txs.length,
       totalSales: txs.length * addOn.price,
-      totalProfit: txs.length * addOn.profit,
+      totalProfit: txs.length * (addOn.profit || 0),
     };
   });
 

@@ -59,7 +59,7 @@ export default function ManageAddOnsPage({
     setFormData({
       name: addon.name,
       price: addon.price,
-      profit: addon.profit,
+      profit: addon.profit || 0,
       status: addon.status,
       staffCommission: addon.staffCommission || 0,
       workerCommission: addon.workerCommission || 0,
@@ -171,10 +171,10 @@ export default function ManageAddOnsPage({
                 Profit
               </th> */}
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Staff Commission
+                Worker Commission
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Worker Commission
+                Staff Commission
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Status
@@ -190,8 +190,8 @@ export default function ManageAddOnsPage({
                 <td className="px-6 py-4">{addon.name}</td>
                 <td className="px-6 py-4">${addon.price.toFixed(2)}</td>
                 {/* <td className="px-6 py-4">${addon.profit.toFixed(2)}</td> */}
-                <td className="px-6 py-4">${addon.staffCommission || 0}</td>
                 <td className="px-6 py-4">${addon.workerCommission || 0}</td>
+                <td className="px-6 py-4">${addon.staffCommission || 0}</td>
                 <td className="px-6 py-4">{addon.status}</td>
                 <td className="px-6 py-4">
                   <button
@@ -302,7 +302,7 @@ export default function ManageAddOnsPage({
                         : "SGD 0,00"}
                     </p>
                   </div>
-                  <div className="mb-4">
+                  {/* <div className="mb-4">
                     <label
                       htmlFor="profit"
                       className="block text-sm font-medium mb-1"
@@ -324,7 +324,7 @@ export default function ManageAddOnsPage({
                         ? formatCurrency(formData.profit)
                         : "SGD 0,00"}
                     </p>
-                  </div>
+                  </div> */}
                   <div className="mb-4">
                     <label
                       htmlFor="staffCommission"
@@ -447,7 +447,7 @@ export default function ManageAddOnsPage({
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  <div className="mb-4">
+                  {/* <div className="mb-4">
                     <label
                       htmlFor="profit"
                       className="block text-sm font-medium mb-1"
@@ -460,6 +460,25 @@ export default function ManageAddOnsPage({
                       type="number"
                       step=".01"
                       value={formData.profit}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div> */}
+                  <div className="mb-4">
+                    <label
+                      htmlFor="workerCommission"
+                      className="block text-sm font-medium mb-1"
+                      title="Change wont be applied to already placed transaction"
+                    >
+                      Worker Commission (ⓘ):
+                    </label>
+                    <input
+                      id="workerCommission"
+                      name="workerCommission"
+                      type="number"
+                      step=".01"
+                      value={formatNumber(formData.workerCommission)}
                       onChange={handleChange}
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -479,25 +498,6 @@ export default function ManageAddOnsPage({
                       type="number"
                       step=".01"
                       value={formatNumber(formData.staffCommission)}
-                      onChange={handleChange}
-                      required
-                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="workerCommission"
-                      className="block text-sm font-medium mb-1"
-                      title="Change wont be applied to already placed transaction"
-                    >
-                      Worker Commission (ⓘ):
-                    </label>
-                    <input
-                      id="workerCommission"
-                      name="workerCommission"
-                      type="number"
-                      step=".01"
-                      value={formatNumber(formData.workerCommission)}
                       onChange={handleChange}
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"

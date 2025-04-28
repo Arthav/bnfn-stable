@@ -5,17 +5,29 @@ import React, {
   ChangeEvent,
   useMemo,
 } from "react";
-import { Membership } from "@/components/types/massage";
+import {
+  Membership,
+  MembershipTypesStruct,
+  RedeemPointHistoryStruct,
+} from "@/components/types/massage";
 import { toast } from "react-toastify";
 
-type ModalType = "add" | "edit" | null;
+type ModalType = "add" | "edit" | "redeem" | null;
 
 export default function MembershipMasterPage({
   memberships,
   setMemberships,
+  membershipTypes,
+  redeemHistory,
+  setRedeemHistory,
 }: {
   memberships: Membership[];
   setMemberships: React.Dispatch<React.SetStateAction<Membership[]>>;
+  membershipTypes: MembershipTypesStruct[];
+  redeemHistory: RedeemPointHistoryStruct[];
+  setRedeemHistory: React.Dispatch<
+    React.SetStateAction<RedeemPointHistoryStruct[]>
+  >;
 }) {
   // Modal management state.
   const [modalType, setModalType] = useState<ModalType>(null);
@@ -25,15 +37,22 @@ export default function MembershipMasterPage({
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [nationality, setNationality] = useState<string>("");
+  const [identityNumber, setIdentityNumber] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [membershipType, setMembershipType] = useState<
-    "Basic" | "Premium" | "VIP" | string
-  >("Basic");
+  const [membershipTypeId, setMembershipTypeId] = useState<number>(0);
   const [membershipStartDate, setMembershipStartDate] = useState<string>("");
   const [membershipEndDate, setMembershipEndDate] = useState<string>("");
   const [isActive, setIsActive] = useState<boolean>(true);
   const [points, setPoints] = useState<number>(0);
+  const [redeemPoints, setRedeemPoints] = useState<number>(0);
+  const [showDetailModal, setShowDetailModal] = useState<Membership | null>(
+    null
+  );
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   // Load memberships from localStorage on mount.
   useEffect(() => {
     const storedMemberships = localStorage.getItem("memberships");
@@ -48,7 +67,12 @@ export default function MembershipMasterPage({
     localStorage.setItem("memberships", JSON.stringify(memberships));
   }, [memberships]);
 
-  // Filter memberships based on search query.
+  useEffect(() => {
+    if (redeemHistory.length === 0) return;
+    localStorage.setItem("redeemHistory", JSON.stringify(redeemHistory));
+  }, [redeemHistory]);
+
+  // Filter memberships based on search query
   const [searchQuery, setSearchQuery] = useState<string>("");
   const filterMemberships = useMemo(
     () =>
@@ -68,14 +92,42 @@ export default function MembershipMasterPage({
     [memberships, searchQuery]
   );
 
+  // Pagination calculations
+  const totalPages = Math.ceil(filterMemberships.length / itemsPerPage);
+  const paginatedMemberships = filterMemberships.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Load memberships from localStorage on mount.
+  useEffect(() => {
+    const storedMemberships = localStorage.getItem("memberships");
+    if (storedMemberships) {
+      setMemberships(JSON.parse(storedMemberships));
+    }
+  }, []);
+
+  // Save memberships to localStorage whenever they change (skip if empty).
+  useEffect(() => {
+    if (memberships.length === 0) return;
+    localStorage.setItem("memberships", JSON.stringify(memberships));
+  }, [memberships]);
+
+  useEffect(() => {
+    if (redeemHistory.length === 0) return;
+    localStorage.setItem("redeemHistory", JSON.stringify(redeemHistory));
+  }, [redeemHistory]);
+
   // Opens modal to add a new membership.
   const openAddModal = () => {
     setCurrentMembership(null);
     setFirstName("");
     setLastName("");
     setEmail("");
+    setNationality("");
+    setIdentityNumber("");
     setPhoneNumber("");
-    setMembershipType("Basic");
+    setMembershipTypeId(0);
     setMembershipStartDate("");
     setMembershipEndDate("");
     setIsActive(true);
@@ -89,13 +141,26 @@ export default function MembershipMasterPage({
     setFirstName(membership.firstName);
     setLastName(membership.lastName);
     setEmail(membership.email);
+    setNationality(membership.nationality);
+    setIdentityNumber(membership.identityNumber);
     setPhoneNumber(membership.phoneNumber);
-    setMembershipType(membership.membershipType);
+    setMembershipTypeId(membership.membershipTypeId);
     setMembershipStartDate(membership.membershipStartDate);
     setMembershipEndDate(membership.membershipEndDate || "");
     setIsActive(membership.isActive);
     setPoints(membership.points);
     setModalType("edit");
+  };
+
+  // Opens modal to redeem points.
+  const openRedeemModal = (membership: Membership) => {
+    setCurrentMembership(membership);
+    setRedeemPoints(0);
+    setModalType("redeem");
+  };
+
+  const openDetailModal = (membership: Membership) => {
+    setShowDetailModal(membership);
   };
 
   // Handles add membership form submission.
@@ -110,7 +175,9 @@ export default function MembershipMasterPage({
       lastName,
       email,
       phoneNumber,
-      membershipType,
+      nationality,
+      identityNumber,
+      membershipTypeId,
       membershipStartDate,
       membershipEndDate,
       isActive,
@@ -139,7 +206,9 @@ export default function MembershipMasterPage({
               lastName,
               email,
               phoneNumber,
-              membershipType,
+              nationality,
+              identityNumber,
+              membershipTypeId,
               membershipStartDate,
               membershipEndDate,
               isActive,
@@ -169,13 +238,81 @@ export default function MembershipMasterPage({
     }
   };
 
+  const handleRedeemSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (
+      !currentMembership ||
+      redeemPoints <= 0 ||
+      redeemPoints > currentMembership.points
+    ) {
+      toast.error("Invalid points to redeem", {
+        position: "top-center",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    // Update the membership points
+    const updatedMembership = {
+      ...currentMembership,
+      points: currentMembership.points - redeemPoints,
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Update memberships state
+    setMemberships((prev) =>
+      prev.map((membership) =>
+        membership.id === currentMembership.id ? updatedMembership : membership
+      )
+    );
+
+    // Add to redeem history
+    const newRedeemHistory: RedeemPointHistoryStruct = {
+      id: Math.max(...memberships.map((m) => m.id)) + 1, // Generate new ID for redemption
+      membershipId: currentMembership.id,
+      points: redeemPoints,
+      redeemDate: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    };
+
+    setRedeemHistory((prev) => [...prev, newRedeemHistory]);
+
+    toast.success("Points redeemed successfully", {
+      position: "top-center",
+      autoClose: 5000,
+    });
+    setModalType(null);
+  };
+
   return (
     <div className="min-h-screen bg-black p-4 text-white">
       {/* Header */}
       <div className="mb-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Membership Master Page</h1>
+        <div className="flex items-center justify-end">
+          <label htmlFor="perPage" className="mr-2">
+            Show
+          </label>
+          <select
+            id="perPage"
+            className="bg-gray-700 text-white px-2 py-1 rounded"
+            value={itemsPerPage}
+            onChange={(e) => setItemsPerPage(parseInt(e.target.value, 10))}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+          <span className="ml-2">per page</span>
+        </div>
+
         <div className="flex items-center">
-          <button onClick={openAddModal} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded ml-2">
+          <button
+            onClick={openAddModal}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded ml-2"
+          >
             Add Membership
           </button>
           <div className="flex items-center ml-3">
@@ -202,12 +339,6 @@ export default function MembershipMasterPage({
                 Name
               </th>
               <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
-                Email
-              </th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
-                Phone
-              </th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
                 Type
               </th>
               <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
@@ -222,15 +353,17 @@ export default function MembershipMasterPage({
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
-            {filterMemberships?.map((membership) => (
+            {paginatedMemberships?.map((membership) => (
               <tr key={membership.id} className="hover:bg-gray-800">
                 <td className="px-6 py-4">{membership.id}</td>
                 <td className="px-6 py-4">
                   {membership.firstName} {membership.lastName}
                 </td>
-                <td className="px-6 py-4">{membership.email}</td>
-                <td className="px-6 py-4">{membership.phoneNumber}</td>
-                <td className="px-6 py-4">{membership.membershipType}</td>
+                <td className="px-6 py-4">
+                  {membershipTypes.find(
+                    (t) => t.id === membership.membershipTypeId
+                  )?.name || "-"}
+                </td>
                 <td className="px-6 py-4">
                   {membership.isActive ? "Active" : "Inactive"}
                 </td>
@@ -244,16 +377,28 @@ export default function MembershipMasterPage({
                   </button>
                   <button
                     onClick={() => handleDelete(membership.id)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded mr-2"
                   >
                     Delete
+                  </button>
+                  <button
+                    onClick={() => openRedeemModal(membership)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded mr-2"
+                  >
+                    Redeem Points
+                  </button>
+                  <button
+                    onClick={() => openDetailModal(membership)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded mr-2"
+                  >
+                    Show Details
                   </button>
                 </td>
               </tr>
             ))}
-            {!filterMemberships.length && (
+            {!paginatedMemberships.length && (
               <tr>
-                <td colSpan={8} className="text-center py-4">
+                <td colSpan={10} className="text-center py-4">
                   No memberships available. Please add a membership.
                 </td>
               </tr>
@@ -262,10 +407,72 @@ export default function MembershipMasterPage({
         </table>
       </div>
 
+      {/* Pagination Controls */}
+      {filterMemberships.length > itemsPerPage && (
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {showDetailModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
+          <div className="bg-gray-800 p-6 rounded shadow-lg w-96 max-h-[80vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4">Membership Details</h2>
+            <div className="mb-4">
+              <p>
+                <strong>Name:</strong> {showDetailModal.firstName}{" "}
+                {showDetailModal.lastName}
+              </p>
+              <p>
+                <strong>Email:</strong> {showDetailModal.email}
+              </p>
+              <p>
+                <strong>Phone:</strong> {showDetailModal.phoneNumber}
+              </p>
+              <p>
+                <strong>Nationality:</strong> {showDetailModal.nationality}
+              </p>
+              <p>
+                <strong>Identity Number:</strong>{" "}
+                {showDetailModal.identityNumber}
+              </p>
+            </div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowDetailModal(null)}
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded mr-2"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal */}
       {modalType && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 ">
-          <div className="bg-gray-800 p-6 rounded shadow-lg w-96  max-h-[80vh] overflow-y-auto">
+          <div className="bg-gray-800 p-6 rounded shadow-lg w-96 max-h-[80vh] overflow-y-auto">
+            {/* Modal content */}
             {modalType === "add" && (
               <>
                 <h2 className="text-xl font-semibold mb-4">
@@ -346,6 +553,42 @@ export default function MembershipMasterPage({
                   </div>
                   <div className="mb-4">
                     <label
+                      htmlFor="nationality"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Nationality:
+                    </label>
+                    <input
+                      id="nationality"
+                      type="text"
+                      value={nationality}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setNationality(e.target.value)
+                      }
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="identityNumber"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Identity Number:
+                    </label>
+                    <input
+                      id="identityNumber"
+                      type="text"
+                      value={identityNumber}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setIdentityNumber(e.target.value)
+                      }
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
                       htmlFor="membershipType"
                       className="block text-sm font-medium mb-1"
                     >
@@ -353,16 +596,22 @@ export default function MembershipMasterPage({
                     </label>
                     <select
                       id="membershipType"
-                      value={membershipType}
+                      value={membershipTypeId}
                       onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                        setMembershipType(e.target.value)
+                        setMembershipTypeId(Number(e.target.value))
                       }
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     >
-                      <option value="Basic">Basic</option>
-                      <option value="Premium">Premium</option>
-                      <option value="VIP">VIP</option>
+                      <option value="">Select Membership Type</option>
+                      {membershipTypes.map((membershipType) => (
+                        <option
+                          key={membershipType.id}
+                          value={membershipType.id}
+                        >
+                          {membershipType.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div className="mb-4">
@@ -515,6 +764,42 @@ export default function MembershipMasterPage({
                   </div>
                   <div className="mb-4">
                     <label
+                      htmlFor="nationality"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Nationality:
+                    </label>
+                    <input
+                      id="nationality"
+                      type="text"
+                      value={nationality}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setNationality(e.target.value)
+                      }
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="identityNumber"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Identity Number:
+                    </label>
+                    <input
+                      id="identityNumber"
+                      type="text"
+                      value={identityNumber}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setIdentityNumber(e.target.value)
+                      }
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
                       htmlFor="membershipType"
                       className="block text-sm font-medium mb-1"
                     >
@@ -522,16 +807,22 @@ export default function MembershipMasterPage({
                     </label>
                     <select
                       id="membershipType"
-                      value={membershipType}
+                      value={membershipTypeId}
                       onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                        setMembershipType(e.target.value)
+                        setMembershipTypeId(Number(e.target.value))
                       }
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     >
-                      <option value="Basic">Basic</option>
-                      <option value="Premium">Premium</option>
-                      <option value="VIP">VIP</option>
+                      <option value="">Select Membership Type</option>
+                      {membershipTypes.map((membershipType) => (
+                        <option
+                          key={membershipType.id}
+                          value={membershipType.id}
+                        >
+                          {membershipType.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div className="mb-4">
@@ -604,6 +895,48 @@ export default function MembershipMasterPage({
                   </div>
                 </form>
               </>
+            )}
+            {modalType === "redeem" && currentMembership && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
+                <div className="bg-gray-800 p-6 rounded shadow-lg w-96 max-h-[80vh] overflow-y-auto">
+                  <h2 className="text-xl font-semibold mb-4">Redeem Points</h2>
+                  <form onSubmit={handleRedeemSubmit}>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="redeemPoints"
+                        className="block text-sm font-medium mb-1"
+                      >
+                        Points to Redeem:
+                      </label>
+                      <input
+                        id="redeemPoints"
+                        type="number"
+                        value={redeemPoints}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          setRedeemPoints(Number(e.target.value))
+                        }
+                        required
+                        className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setModalType(null)}
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded mr-2"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded"
+                      >
+                        Redeem
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             )}
           </div>
         </div>

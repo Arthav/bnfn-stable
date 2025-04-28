@@ -1,7 +1,6 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { BookingListStruct, Worker, Staff } from "@/components/types/massage";
 
-
 type BookingListPageProps = {
   workers: Worker[];
   activeStaff: Staff | null;
@@ -23,7 +22,6 @@ export default function BookingListPage({
     serviceId: 0,
     startTime: "",
     serviceTime: 0,
-    endTime: "",
     sales: 0,
     commission: 0,
     staffCommission: 0,
@@ -38,7 +36,8 @@ export default function BookingListPage({
     createdBy: null,
     status: "APPOINTMENT",
   };
-  const [bookingFormData, setBookingFormData] = useState<BookingListStruct>(emptyFormState);
+  const [bookingFormData, setBookingFormData] =
+    useState<BookingListStruct>(emptyFormState);
 
   useEffect(() => {
     if (bookingList.length === 0) return;
@@ -73,7 +72,7 @@ export default function BookingListPage({
       status: "APPOINTMENT",
     };
     setBookingList((prev) => [...prev, newAppointMentData]);
-    setModalOpen(false); 
+    setModalOpen(false);
     setBookingFormData(emptyFormState);
   };
 
@@ -115,7 +114,7 @@ export default function BookingListPage({
         return booking;
       })
     );
-  }
+  };
 
   return (
     <div className="min-h-screen bg-black p-4 text-white">
@@ -152,17 +151,13 @@ export default function BookingListPage({
           <thead className="bg-gray-800">
             <tr>
               {status === "APPOINTMENT" && (
-                <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
-                </th>
+                <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider"></th>
               )}
               <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
                 Name
               </th>
               <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
                 Start Time
-              </th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
-                End Time
               </th>
               <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
                 Service
@@ -188,11 +183,11 @@ export default function BookingListPage({
             {bookedWorkers.length > 0 ? (
               bookedWorkers.map((booking) => (
                 <tr key={booking.id} className="hover:bg-gray-800">
-                  {status === 'APPOINTMENT' && (
+                  {status === "APPOINTMENT" && (
                     <td className="px-6 py-4">
                       <button
-                  type="button"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                        type="button"
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
                         onClick={() => finishAppointment(booking.id)}
                       >
                         Done
@@ -201,7 +196,6 @@ export default function BookingListPage({
                   )}
                   <td className="px-6 py-4">{booking.workerName}</td>
                   <td className="px-6 py-4">{booking.startTime}</td>
-                  <td className="px-6 py-4">{booking.endTime}</td>
                   <td className="px-6 py-4">{booking.serviceName || "-"}</td>
                   <td className="px-6 py-4">{booking.customerName || "-"}</td>
                   <td className="px-6 py-4">{booking.customerPhone || "-"}</td>
@@ -305,24 +299,6 @@ export default function BookingListPage({
                   className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                 />
               </div>
-
-              <div className="mb-4">
-                <label
-                  htmlFor="endTime"
-                  className="block text-sm font-medium mb-1"
-                >
-                  End Time
-                </label>
-                <input
-                  id="endTime"
-                  name="endTime"
-                  type="time"
-                  value={bookingFormData.endTime}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
-                />
-              </div>
               <div className="mb-4">
                 <label
                   htmlFor="transactionDate"
@@ -340,7 +316,6 @@ export default function BookingListPage({
                   className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                 />
               </div>
-
 
               <div className="flex justify-end">
                 <button

@@ -8,6 +8,7 @@ import {
   Staff,
   Membership,
   BookingListStruct,
+  CustomerEntryStruct,
 } from "@/components/types/massage";
 import MultiSelectDropdown from "./MultiSelectDropDown";
 
@@ -43,6 +44,8 @@ export default function MassageShift({
   bookingList,
   setBookingList,
   memberships,
+  customerEntry,
+  setCustomerEntry,
 }: {
   services: Services[];
   transactions: Transaction[];
@@ -54,6 +57,8 @@ export default function MassageShift({
   bookingList: BookingListStruct[];
   setBookingList: React.Dispatch<React.SetStateAction<BookingListStruct[]>>;
   memberships: Membership[];
+  customerEntry: CustomerEntryStruct[];
+  setCustomerEntry: React.Dispatch<React.SetStateAction<CustomerEntryStruct[]>>;
 }) {
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
@@ -66,6 +71,9 @@ export default function MassageShift({
   const [customerNameFormData, setCustomerNameFormData] = useState<string>("");
   const [customerPhoneFormData, setCustomerPhoneFormData] =
     useState<string>("");
+  const [customerNationalityFormData, setCustomerNationalityFormData] =
+    useState<string>("");
+  const [customerIdFormData, setCustomerIdFormData] = useState<string>("");
   const [actionMenuOpenId, setActionMenuOpenId] = useState<number | null>(null);
   const [isBooked, setIsBooked] = useState(false);
   const [selectedService, setSelectedService] = useState<number>(0);
@@ -235,7 +243,6 @@ export default function MassageShift({
         serviceId: selectedServiceObj.id,
         startTime: start.toLocaleTimeString("en-GB"),
         serviceTime: parseFloat(serviceMins) || 0,
-        endTime: formattedEnd,
         sales: selectedServiceObj.price,
         commission:
           (selectedServiceObj.commission || 0) +
@@ -302,6 +309,23 @@ export default function MassageShift({
     localStorage.setItem(
       "transactions",
       JSON.stringify([...transactions, newTransaction])
+    );
+
+    // Add new customer to customerEntry
+    const newCustomer: CustomerEntryStruct = {
+      id: Date.now(),
+      name: customerNameFormData,
+      nationality: customerNationalityFormData,
+      identityNumber: customerIdFormData,
+      timeIn: start.toLocaleTimeString("en-GB"),
+      timeOut: formattedEnd,
+      phone: customerPhoneFormData,
+      createdAt: new Date().toISOString(),
+    };
+    setCustomerEntry([...customerEntry, newCustomer]);
+    localStorage.setItem(
+      "customerEntry",
+      JSON.stringify([...customerEntry, newCustomer])
     );
 
     toast.success(`${currentWorker.name} is set to work`, {
@@ -756,6 +780,12 @@ export default function MassageShift({
                         setCustomerPhoneFormData(
                           selectedMembership?.phoneNumber || ""
                         );
+                        setCustomerNationalityFormData(
+                          selectedMembership?.nationality || ""
+                        );
+                        setCustomerIdFormData(
+                          selectedMembership?.identityNumber || ""
+                        );
                       }}
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
                     >
@@ -804,6 +834,44 @@ export default function MassageShift({
                       value={customerPhoneFormData}
                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setCustomerPhoneFormData(e.target.value)
+                      }
+                      placeholder="Optional"
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                    />
+                  </div>
+                  {/* Nationality */}
+                  <div className="mb-4">
+                    <label
+                      htmlFor="addCustomerNationality"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Nationality:
+                    </label>
+                    <input
+                      id="addCustomerNationality"
+                      type="text"
+                      value={customerNationalityFormData}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setCustomerNationalityFormData(e.target.value)
+                      }
+                      placeholder="Optional"
+                      className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
+                    />
+                  </div>
+                  {/* Identity Number */}
+                  <div className="mb-4">
+                    <label
+                      htmlFor="addCustomerId"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Identity Number:
+                    </label>
+                    <input
+                      id="addCustomerId"
+                      type="text"
+                      value={customerIdFormData}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setCustomerIdFormData(e.target.value)
                       }
                       placeholder="Optional"
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"

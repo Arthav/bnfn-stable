@@ -25,13 +25,22 @@ export interface Worker {
   addOns?: AddOns[];
 }
 
+export interface CustomerEntryStruct {
+  id: number;
+  name: string;
+  phone: string;
+  nationality: string;
+  identityNumber: string;
+  timeIn: string;
+  timeOut?: string
+  createdAt: string;
+}
 export interface BookingListStruct {
   id: number;
   workerId?: number;
   serviceId: number;
   startTime: string;
   serviceTime: number;
-  endTime: string;
   sales: number;
   commission: number;
   staffCommission: number | null;
@@ -41,6 +50,8 @@ export interface BookingListStruct {
   bodyTime: number;
   customerName?: string;
   customerPhone?: string;
+  nationality?: string;
+  identityNumber?: string;
   transactionDate: string;
   addOns?: AddOns[];
   createdBy: Staff | null;
@@ -80,7 +91,7 @@ export interface AddOns {
   id: number;
   name: string;
   price: number;
-  profit: number;
+  profit?: number;
   status: "Active" | "Discontinued";
   createdBy: Staff | null;
   staffCommission: number | null;
@@ -93,12 +104,33 @@ export interface Membership {
   lastName: string;
   email: string;
   phoneNumber: string;
+  nationality: string;
+  identityNumber: string;
   address?: string;
-  membershipType: "Basic" | "Premium" | "VIP" | string;
+  membershipTypeId: number;
   membershipStartDate: string;
   membershipEndDate?: string;
   isActive: boolean;
   points: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface MembershipTypesStruct {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  duration: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface RedeemPointHistoryStruct {
+  id: number;
+  membershipId: number;
+  points: number;
+  redeemDate: string;
   createdAt: string;
   updatedAt?: string;
 }

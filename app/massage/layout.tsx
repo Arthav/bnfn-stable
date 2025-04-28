@@ -16,7 +16,7 @@ export default function MassageLayout({
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "klauzin111") {
+    if (password === "111") {
       setIsPasswordCorrect(true);
       setShowModal(false); // Close the modal
     } else {

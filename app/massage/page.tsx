@@ -10,7 +10,9 @@ import {
   StaffChangeLog,
   BookingListStruct,
   Membership,
-  // Item,
+  MembershipTypesStruct,
+  RedeemPointHistoryStruct,
+  CustomerEntryStruct,
 } from "@/components/types/massage";
 import MassageShift from "@/components/massage/MassageShift";
 import ManageService from "@/components/massage/ManageService";
@@ -21,7 +23,7 @@ import ReportPage from "@/components/massage/ReportPage";
 import BookingListPage from "@/components/massage/BookingList";
 import ManageAddOnsPage from "@/components/massage/AddOns";
 import StaffList from "@/components/massage/Staff";
-import MemberShip from "@/components/massage/MemberShip";
+import MembershipLayout from "@/components/massage/memberships/MembershipLayout";
 import {
   FaSpa,
   FaCalendarAlt,
@@ -44,6 +46,13 @@ export default function MassageShiftPage() {
   const [showStaffChangeLog, setShowStaffChangeLog] = useState(false);
   const [bookingList, setBookingList] = useState<BookingListStruct[]>([]);
   const [memberships, setMemberships] = useState<Membership[]>([]);
+  const [membershipTypes, setMembershipTypes] = useState<
+    MembershipTypesStruct[]
+  >([]);
+  const [redeemHistory, setRedeemHistory] = useState<
+    RedeemPointHistoryStruct[]
+  >([]);
+  const [customerEntry, setCustomerEntry] = useState<CustomerEntryStruct[]>([]);
 
   const tabs = [
     {
@@ -62,6 +71,8 @@ export default function MassageShiftPage() {
           bookingList={bookingList}
           setBookingList={setBookingList}
           memberships={memberships}
+          customerEntry={customerEntry}
+          setCustomerEntry={setCustomerEntry}
         />
       ),
     },
@@ -110,7 +121,14 @@ export default function MassageShiftPage() {
       title: "Membership",
       icon: <FaFileAlt />,
       component: (
-        <MemberShip memberships={memberships} setMemberships={setMemberships} />
+        <MembershipLayout
+          memberships={memberships}
+          setMemberships={setMemberships}
+          membershipTypes={membershipTypes}
+          setMembershipTypes={setMembershipTypes}
+          redeemHistory={redeemHistory}
+          setRedeemHistory={setRedeemHistory}
+        />
       ),
     },
     {
@@ -262,6 +280,11 @@ May your commits be legendary, your debugging swift, and your journey through co
       setWorkers(JSON.parse(storedWorkers));
     }
 
+    const storedCustomerEntry = localStorage.getItem("customerEntry");
+    if (storedCustomerEntry) {
+      setCustomerEntry(JSON.parse(storedCustomerEntry));
+    }
+
     const storedBookingList = localStorage.getItem("bookingList");
     if (storedBookingList) {
       setBookingList(JSON.parse(storedBookingList));
@@ -280,6 +303,16 @@ May your commits be legendary, your debugging swift, and your journey through co
     const storedMemberships = localStorage.getItem("memberships");
     if (storedMemberships) {
       setMemberships(JSON.parse(storedMemberships));
+    }
+
+    const storedMembershipTypes = localStorage.getItem("membershipTypes");
+    if (storedMembershipTypes) {
+      setMembershipTypes(JSON.parse(storedMembershipTypes));
+    }
+
+    const storedRedeemHistory = localStorage.getItem("redeemHistory");
+    if (storedRedeemHistory) {
+      setRedeemHistory(JSON.parse(storedRedeemHistory));
     }
 
     const storedStaff = localStorage.getItem("staffList");
@@ -304,11 +337,6 @@ May your commits be legendary, your debugging swift, and your journey through co
   useEffect(() => {
     localStorage.setItem("staffChangeLog", JSON.stringify(staffChangeLog));
   }, [staffChangeLog]);
-
-  // Synchronize bookingList state with localStorage whenever it changes
-  // useEffect(() => {
-  //   localStorage.setItem("bookingList", JSON.stringify(bookingList));
-  // }, [bookingList]);
 
   // Handle active staff change
   const handleActiveStaffChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
