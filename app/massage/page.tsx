@@ -23,7 +23,7 @@ import ReportPage from "@/components/massage/ReportPage";
 import BookingListPage from "@/components/massage/BookingList";
 import ManageAddOnsPage from "@/components/massage/AddOns";
 import StaffList from "@/components/massage/Staff";
-import MembershipLayout from "@/components/massage/memberships/MembershipLayout";
+import MembershipLayout from "@/components/massage/memberships/MembershipLayouts";
 import {
   FaSpa,
   FaCalendarAlt,
