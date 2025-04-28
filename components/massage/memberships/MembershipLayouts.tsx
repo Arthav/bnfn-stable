@@ -11,7 +11,7 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MemberShip from "@/components/massage/memberships/MemberShip";
-import MemberShipTypes from "@/components/massage/memberships/MembershipTypesPage";
+import MemberShipTypes from "@/components/massage/memberships/MembershipTypePage";
 import RedeemHistoryPage from "@/components/massage/memberships/RedeemHistoryPage";
 import CustomerEntryPage from "@/components/massage/memberships/CustomerEntryPage";
 
