@@ -4,17 +4,17 @@ import { CustomerEntryStruct } from "@/components/types/massage";
 export default function CustomerEntryPage({
   customerEntry,
 }: {
-    customerEntry: CustomerEntryStruct[];
+  customerEntry: CustomerEntryStruct[];
 }) {
   // Filter customer entry based on search query
   const [searchQuery, setSearchQuery] = useState<string>("");
   const filterCustomerEntry = useMemo(
     () =>
-        customerEntry.filter(
+      customerEntry.filter(
         (entry) =>
           entry.id.toString().includes(searchQuery) ||
-          entry.phone.includes(searchQuery) || 
-          entry.identityNumber.includes(searchQuery) || 
+          entry.phone.includes(searchQuery) ||
+          entry.identityNumber.includes(searchQuery) ||
           entry.nationality.includes(searchQuery)
       ),
     [customerEntry, searchQuery]
@@ -41,14 +41,30 @@ export default function CustomerEntryPage({
         <table className="min-w-full divide-y divide-gray-700">
           <thead className="bg-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">Phone</th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">Nationality</th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">Identity Number</th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">Time In</th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">Time Out</th>
-              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">Date</th>
+              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                ID
+              </th>
+              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                Phone
+              </th>
+              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                Nationality
+              </th>
+              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                Identity Number
+              </th>
+              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                Time In
+              </th>
+              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                Time Out
+              </th>
+              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                Date
+              </th>
             </tr>
           </thead>
           <tbody className="bg-gray-900 divide-y divide-gray-800">
@@ -61,12 +77,18 @@ export default function CustomerEntryPage({
                 <td className="px-6 py-4">{entry.identityNumber}</td>
                 <td className="px-6 py-4">{entry.timeIn}</td>
                 <td className="px-6 py-4">{entry.timeOut}</td>
-                <td className="px-6 py-4">{entry.createdAt}</td>
+                <td className="px-6 py-4">
+                  {new Date(entry.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </td>
               </tr>
             ))}
             {!filterCustomerEntry.length && (
               <tr>
-                <td colSpan={7} className="text-center py-4">
+                <td colSpan={8} className="text-center py-4">
                   No Customer Entry available. Please add a record.
                 </td>
               </tr>
