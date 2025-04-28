@@ -433,12 +433,12 @@ const TransactionList: React.FC<TransactionListProps> = ({
                         .reduce((total, addon) => total + addon.price, 0)
                         .toFixed(2)}
                     </p>
-                    <p>
+                    {/* <p>
                       <span className="font-semibold">Total Profit:</span> $
                       {selectedTransactionDetails.addOns
                         .reduce((total, addon) => total + addon.profit, 0)
                         .toFixed(2)}
-                    </p>
+                    </p> */}
                     <ul className="list-disc list-inside mt-1">
                       {selectedTransactionDetails.addOns.map((addon) => (
                         <li key={addon.id}>
