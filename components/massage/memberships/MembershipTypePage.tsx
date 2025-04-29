@@ -113,6 +113,11 @@ export default function MembershipTypePage({
     }
   };
 
+  function formatNumber(num: number): string {
+    const safeNumber = Math.max(num, 0);
+    return safeNumber.toString();
+  }
+
   return (
     <div className="min-h-screen bg-black p-4 text-white">
       {/* Header */}
@@ -226,7 +231,7 @@ export default function MembershipTypePage({
                     <input
                       id="price"
                       type="number"
-                      value={price}
+                      value={formatNumber(price)}
                       step=".01"
                       onChange={(e: ChangeEvent<HTMLInputElement>) => setPrice(Number(e.target.value))}
                       required
@@ -240,7 +245,7 @@ export default function MembershipTypePage({
                     <input
                       id="duration"
                       type="number"
-                      value={duration}
+                      value={formatNumber(duration)}
                       onChange={(e: ChangeEvent<HTMLInputElement>) => setDuration(Number(e.target.value))}
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
@@ -302,7 +307,7 @@ export default function MembershipTypePage({
                     <input
                       id="price"
                       type="number"
-                      value={price}
+                      value={formatNumber(price)}
                       onChange={(e: ChangeEvent<HTMLInputElement>) => setPrice(Number(e.target.value))}
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
@@ -315,7 +320,7 @@ export default function MembershipTypePage({
                     <input
                       id="duration"
                       type="number"
-                      value={duration}
+                      value={formatNumber(duration)}
                       onChange={(e: ChangeEvent<HTMLInputElement>) => setDuration(Number(e.target.value))}
                       required
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"

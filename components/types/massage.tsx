@@ -103,7 +103,7 @@ export interface Membership {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: string;
+  phoneNumber: string; // unique
   nationality: string;
   identityNumber: string;
   address?: string;

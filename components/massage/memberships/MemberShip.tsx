@@ -11,6 +11,9 @@ import {
   RedeemPointHistoryStruct,
 } from "@/components/types/massage";
 import { toast } from "react-toastify";
+import {
+  FaWhatsapp,
+} from "react-icons/fa";
 
 type ModalType = "add" | "edit" | "redeem" | null;
 
@@ -169,6 +172,17 @@ export default function MembershipMasterPage({
     const newId = memberships.length
       ? Math.max(...memberships.map((m) => m.id)) + 1
       : 1;
+    const existingMembership = memberships.find(
+      (m) => m.phoneNumber === phoneNumber
+    );
+    if (existingMembership) {
+      toast.error("Phone number already exist", {
+        position: "top-center",
+        autoClose: 5000,
+      });
+      return;
+    }
+
     const newMembership: Membership = {
       id: newId,
       firstName,
@@ -268,7 +282,7 @@ export default function MembershipMasterPage({
 
     // Add to redeem history
     const newRedeemHistory: RedeemPointHistoryStruct = {
-      id: Math.max(...memberships.map((m) => m.id)) + 1, // Generate new ID for redemption
+      id: Date.now(),
       membershipId: currentMembership.id,
       points: redeemPoints,
       redeemDate: new Date().toISOString(),
@@ -283,6 +297,57 @@ export default function MembershipMasterPage({
     });
     setModalType(null);
   };
+
+  const handleSendWa = (membership: Membership) => {
+    const phoneNumber = membership.phoneNumber;
+  
+    // Get user redeem history
+    const redeemHistoryReceived = redeemHistory.filter(
+      (history) => history.membershipId === membership.id
+    );
+  
+    // Format redeem history as a list of points
+    let redeemHistoryMessage = '';
+    if (redeemHistoryReceived.length > 0) {
+      redeemHistoryMessage = '\n\nYour redeem history:\n';
+      redeemHistoryReceived.forEach((history, index) => {
+        redeemHistoryMessage += `${index + 1}. Points: ${history.points} | Date: ${formatDate(history.redeemDate)}\n`;
+      });
+    } else {
+      redeemHistoryMessage = '\n\nYou have no redeem history yet.';
+    }
+
+    // Check if membership has time limit
+    let timeLimitMessage = '';
+    if (membership.membershipEndDate) {
+      timeLimitMessage = `\n\nYour membership will be active until ${membership.membershipEndDate}.`;
+    }
+  
+    // Format the full message
+    const message = `Hello ${membership.firstName} ${membership.lastName}, your remaining point is ${membership.points}. ${timeLimitMessage} ${redeemHistoryMessage}`;
+    
+    // Create the WhatsApp URL
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  
+    // Open the WhatsApp link
+    window.open(url, '_blank');
+  };
+  
+
+  
+  function formatNumber(num: number): string {
+    const safeNumber = Math.max(num, 0);
+    return safeNumber.toString();
+  }
+
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
 
   return (
     <div className="min-h-screen bg-black p-4 text-white">
@@ -339,6 +404,9 @@ export default function MembershipMasterPage({
                 Name
               </th>
               <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
+                Phone
+              </th>
+              <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
                 Type
               </th>
               <th className="px-6 py-3 text-left uppercase text-xs font-medium tracking-wider">
@@ -359,6 +427,7 @@ export default function MembershipMasterPage({
                 <td className="px-6 py-4">
                   {membership.firstName} {membership.lastName}
                 </td>
+                <td className="px-6 py-4">{membership.phoneNumber}</td>
                 <td className="px-6 py-4">
                   {membershipTypes.find(
                     (t) => t.id === membership.membershipTypeId
@@ -371,28 +440,36 @@ export default function MembershipMasterPage({
                 <td className="px-6 py-4">
                   <button
                     onClick={() => openEditModal(membership)}
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded mr-2"
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded mr-2 mb-2"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(membership.id)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded mr-2"
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded mr-2 mb-2"
                   >
                     Delete
                   </button>
                   <button
                     onClick={() => openRedeemModal(membership)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded mr-2"
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded mr-2 mb-2"
                   >
                     Redeem Points
                   </button>
                   <button
                     onClick={() => openDetailModal(membership)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded mr-2"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded mr-2 mb-2"
                   >
                     Show Details
                   </button>
+                  <button
+                    onClick={() => handleSendWa(membership)}
+                    className="bg-lime-600 hover:bg-lime-700 text-white px-3 py-1 rounded mr-2 mb-2 flex items-center"
+                  >
+                    <FaWhatsapp className="mr-1" />
+                    Send to WA
+                  </button>
+                  
                 </td>
               </tr>
             ))}
@@ -538,7 +615,7 @@ export default function MembershipMasterPage({
                       htmlFor="phoneNumber"
                       className="block text-sm font-medium mb-1"
                     >
-                      Phone Number:
+                      Phone Number (use country code, example: 6581234567):
                     </label>
                     <input
                       id="phoneNumber"
@@ -749,7 +826,7 @@ export default function MembershipMasterPage({
                       htmlFor="phoneNumber"
                       className="block text-sm font-medium mb-1"
                     >
-                      Phone Number:
+                      Phone Number (use country code, example: 6581234567):
                     </label>
                     <input
                       id="phoneNumber"
@@ -911,9 +988,9 @@ export default function MembershipMasterPage({
                       <input
                         id="redeemPoints"
                         type="number"
-                        value={redeemPoints}
+                        value={formatNumber(redeemPoints)}
                         onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                          setRedeemPoints(Number(e.target.value))
+                          (setRedeemPoints)(Number(e.target.value))
                         }
                         required
                         className="w-full bg-gray-700 border border-gray-600 text-white rounded px-2 py-1"
