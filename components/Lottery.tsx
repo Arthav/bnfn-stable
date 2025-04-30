@@ -28,6 +28,7 @@ const LotteryPage: React.FC = () => {
     null
   );
   const [clapAudio, setClapAudio] = useState<HTMLAudioElement | null>(null);
+  const [isListVisible, setIsListVisible] = useState<boolean>(false);
 
   // Load names from localStorage
   useEffect(() => {
@@ -81,9 +82,7 @@ const LotteryPage: React.FC = () => {
       .map((name, index) => `${index + 1}. ${name}`)
       .join("\n");
 
-    navigator.clipboard.writeText(formattedNames).then(() => {
-      setIsModalVisible(false);
-    });
+    navigator.clipboard.writeText(formattedNames);
   };
 
   const handleRoll = () => {
@@ -172,17 +171,18 @@ const LotteryPage: React.FC = () => {
   const selectWinners = () => {
     // Randomly select winners
     const shuffledNames = [...names].sort(() => 0.5 - Math.random());
-    const selectedWinners = shuffledNames.slice(0, winnersCount);
-
-    // Remove the selected winners from the participants list
-    const remainingNames = names.filter(
-      (name) => !selectedWinners.includes(name)
-    );
-    setNames(remainingNames); // Update participants list
+    const selectedWinners = shuffledNames.slice(0, winnersCount); // Update participants list
 
     setWinners(selectedWinners); // Set winners
     setIsModalVisible(true); // Show winner modal
     setIsRolling(false); // Reset rolling state after the roll is complete
+  };
+
+  const handleRemoveWinner = () => {
+    // Remove the selected winners from the participants list
+    const remainingNames = names.filter((name) => !winners.includes(name));
+    setNames(remainingNames);
+    setIsModalVisible(false);
   };
 
   const handleClearAll = () => {
@@ -209,7 +209,7 @@ const LotteryPage: React.FC = () => {
             onChange={(e) => setCurrentName(e.target.value)}
             placeholder="Enter Name"
             onKeyDown={handleKeyPress}
-            className="w-full rounded-1xl h-24 p-2 resize-none"
+            className="w-full rounded-1xl h-12 p-2 resize-none"
           />
           <Button onPress={addNameToList} className="h-12 flex-1 md:flex-none">
             Add Name
@@ -264,22 +264,31 @@ const LotteryPage: React.FC = () => {
             : ""}
         </div>
 
-        <Listbox aria-label="Name list">
-          {names.map((name, index) => (
-            <ListboxItem key={index} textValue={name}>
-              <div className="flex justify-between items-center p-4 bg-black-100 rounded mb-2">
-                <div>{name}</div>
-                <Button
-                  size="sm"
-                  color="danger"
-                  onPress={() => handleDeleteName(name)}
-                >
-                  Delete
-                </Button>
-              </div>
-            </ListboxItem>
-          ))}
-        </Listbox>
+        <Button
+          className={isListVisible ? "bg-gray-500 text-white w-full mb-4" : "bg-green-500 text-white w-full mb-4"}
+          onPress={() => setIsListVisible(!isListVisible)}
+        >
+          {isListVisible ? `Hide List (${names.length} participants)` : `Show List (${names.length} participants)`}
+        </Button>
+
+        {isListVisible && (
+          <Listbox aria-label="Name list">
+            {names.map((name, index) => (
+              <ListboxItem key={index} textValue={name}>
+                <div className="flex justify-between items-center p-4 bg-black-100 rounded mb-2">
+                  <div>{name}</div>
+                  <Button
+                    size="sm"
+                    color="danger"
+                    onPress={() => handleDeleteName(name)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </ListboxItem>
+            ))}
+          </Listbox>
+        )}
       </div>
 
       {/* Winner Modal */}
@@ -313,6 +322,9 @@ const LotteryPage: React.FC = () => {
               Copy to Clipboard
             </Button>
             <Button onPress={() => setIsModalVisible(false)}>Close</Button>
+            <Button color="danger" onClick={() => handleRemoveWinner()}>
+              Remove Winner From List
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

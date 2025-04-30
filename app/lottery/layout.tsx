@@ -4,10 +4,10 @@ export default function LotteryLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col items-center justify-center">
-      <div className="inline-block max-w-lg text-center justify-start">
+    <section className="flex flex-col items-center justify-center gap-4">
+      <main className="container mx-auto max-w-3xl px-6 flex-grow">
         {children}
-      </div>
+      </main>
     </section>
   );
 }
