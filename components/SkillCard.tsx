@@ -40,7 +40,7 @@ const SkillCard = ({
       <Icon className="w-14 h-14 p-3 bg-black rounded-full shadow-lg" />
 
       {/* Skill name */}
-      <span className="flex-grow text-2xl font-semibold text-white">
+      <span className="flex-grow text-2xl font-semibold">
         {name}
       </span>
 
