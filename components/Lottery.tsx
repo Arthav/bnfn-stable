@@ -23,7 +23,9 @@ const LotteryPage: React.FC = () => {
   const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false); // Track if roll is in progress
   const [countdown, setCountdown] = useState<number>(0); // Countdown state
-  const [drumrollAudio, setDrumrollAudio] = useState<HTMLAudioElement | null>(null);
+  const [drumrollAudio, setDrumrollAudio] = useState<HTMLAudioElement | null>(
+    null
+  );
   const [clapAudio, setClapAudio] = useState<HTMLAudioElement | null>(null);
 
   // Load names from localStorage
@@ -105,32 +107,32 @@ const LotteryPage: React.FC = () => {
           drumrollAudio.pause();
           drumrollAudio.currentTime = 0;
         }
-        
+
         if (clapAudio) {
           clapAudio.currentTime = 0;
           clapAudio.play();
+
+          // Set an interval to decrease the volume over the last 2 seconds
+          const fadeDuration = 5; // The duration to fade the volume (in seconds)
+          const fadeInterval = 50; // The interval to update the volume (in ms)
+
+          const fadeOut = setInterval(() => {
+            // Calculate the remaining time of the audio
+            const remainingTime = clapAudio?.duration - clapAudio?.currentTime;
+
+            if (remainingTime && remainingTime <= fadeDuration) {
+              // Gradually reduce the volume
+              const volume = remainingTime / fadeDuration;
+              if (clapAudio) clapAudio.volume = volume;
+            }
+
+            // Stop the fade out and pause the audio when the time is over
+            if (clapAudio?.currentTime >= clapAudio?.duration) {
+              clearInterval(fadeOut);
+              clapAudio?.pause();
+            }
+          }, fadeInterval);
         }
-
-        // Set an interval to decrease the volume over the last 2 seconds
-        const fadeDuration = 2; // The duration to fade the volume (in seconds)
-        const fadeInterval = 50; // The interval to update the volume (in ms)
-
-        const fadeOut = setInterval(() => {
-          // Calculate the remaining time of the audio
-          const remainingTime = clapAudio?.duration - clapAudio?.currentTime;
-
-          if (remainingTime && remainingTime <= fadeDuration) {
-            // Gradually reduce the volume
-            const volume = remainingTime / fadeDuration;
-            if (clapAudio) clapAudio.volume = volume;
-          }
-
-          // Stop the fade out and pause the audio when the time is over
-          if (clapAudio?.currentTime >= clapAudio?.duration) {
-            clearInterval(fadeOut);
-            clapAudio?.pause();
-          }
-        }, fadeInterval);
 
         // Trigger the confetti effect during the roll
         confetti({
