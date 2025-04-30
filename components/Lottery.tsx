@@ -21,8 +21,9 @@ const LotteryPage: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [winners, setWinners] = useState<string[]>([]);
   const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
-  const [isRolling, setIsRolling] = useState<boolean>(false); // Track if roll is in progress
-  const [countdown, setCountdown] = useState<number>(0); // Countdown state
+  const [isRolling, setIsRolling] = useState<boolean>(false); 
+  const [countdown, setCountdown] = useState<number>(0); 
+  const [currentRollingName, setCurrentRollingName] = useState<string>("");
   const [drumrollAudio, setDrumrollAudio] = useState<HTMLAudioElement | null>(
     null
   );
@@ -70,6 +71,16 @@ const LotteryPage: React.FC = () => {
     }
   };
 
+  const copyToClipboard = () => {
+    const formattedNames = winners
+      .map((name, index) => `${index + 1}. ${name}`)
+      .join("\n");
+
+    navigator.clipboard.writeText(formattedNames).then(() => {
+      setIsModalVisible(false);
+    });
+  };
+
   const handleRoll = () => {
     if (winnersCount > names.length) {
       toast.error("Not enough names to pick that many winners", {
@@ -96,6 +107,12 @@ const LotteryPage: React.FC = () => {
       drumrollAudio.loop = true; // Set loop to true if drumrollAudio is not null
       drumrollAudio.play(); // Play the audio if drumrollAudio is not null
     }
+    
+    // Display random name every 100ms while rolling
+    const randomNameInterval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * names.length);
+      setCurrentRollingName(names[randomIndex]); // Update the current random name
+    }, 300);
 
     const countdownInterval = setInterval(() => {
       count -= 1;
@@ -228,6 +245,22 @@ const LotteryPage: React.FC = () => {
           <div className="text-4xl font-bold text-center mb-4">{countdown}</div>
         )}
 
+        {/* <div className="text-center text-lg font-bold mb-4">
+          {isRolling ? `${currentRollingName}` : ""}
+        </div> */}
+
+        <div className="text-center text-lg font-bold mb-4">
+          {isRolling && names.length > 0
+            ? names
+                .slice(0, winnersCount)
+                .map(
+                  (_, i) =>
+                    names[Math.floor(Math.random() * names.length + i)]
+                )
+                .join(", ")
+            : ""}
+        </div>
+
         <Listbox aria-label="Name list">
           {names.map((name, index) => (
             <ListboxItem key={index} textValue={name}>
@@ -268,6 +301,14 @@ const LotteryPage: React.FC = () => {
             </div>
           </ModalBody>
           <ModalFooter>
+            <Button
+              color="secondary"
+              variant="light"
+              onClick={copyToClipboard}
+              className="mr-auto"
+            >
+              Copy to Clipboard
+            </Button>
             <Button onPress={() => setIsModalVisible(false)}>Close</Button>
           </ModalFooter>
         </ModalContent>
