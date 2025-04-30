@@ -14,6 +14,11 @@ import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import confetti from "canvas-confetti"; // Import confetti for dramatic effect
 
+interface PastWinner {
+  date: string;
+  winners: string[];
+}
+
 const LotteryPage: React.FC = () => {
   const [names, setNames] = useState<string[]>([]);
   const [currentName, setCurrentName] = useState<string>("");
@@ -29,6 +34,9 @@ const LotteryPage: React.FC = () => {
   );
   const [clapAudio, setClapAudio] = useState<HTMLAudioElement | null>(null);
   const [isListVisible, setIsListVisible] = useState<boolean>(false);
+  const [pastWinner, setPastWinner] = useState<PastWinner[]>([]);
+  const [isPastWinnerModalOpen, setIsPastWinnerModalOpen] =
+    useState<boolean>(false);
 
   // Load names from localStorage
   useEffect(() => {
@@ -45,6 +53,10 @@ const LotteryPage: React.FC = () => {
   useEffect(() => {
     localStorage.setItem("lotteryNames", JSON.stringify(names));
   }, [names]);
+
+  useEffect(() => {
+    localStorage.setItem("lotteryPastWinner", JSON.stringify(pastWinner));
+  }, [pastWinner]);
 
   const addNameToList = () => {
     const newNames = currentName
@@ -182,6 +194,11 @@ const LotteryPage: React.FC = () => {
     // Remove the selected winners from the participants list
     const remainingNames = names.filter((name) => !winners.includes(name));
     setNames(remainingNames);
+    const newPastWinner = {
+      date: new Date().toISOString(),
+      winners: winners,
+    };
+    setPastWinner([...pastWinner, newPastWinner]);
     setIsModalVisible(false);
   };
 
@@ -213,6 +230,14 @@ const LotteryPage: React.FC = () => {
           />
           <Button onPress={addNameToList} className="h-12 flex-1 md:flex-none">
             Add Name
+          </Button>
+          <Button
+            onPress={() => setIsPastWinnerModalOpen(true)}
+            className="h-12 flex-1 md:flex-none"
+            color="secondary"
+            variant="light"
+          >
+            View Past Winners
           </Button>
         </div>
 
@@ -265,10 +290,16 @@ const LotteryPage: React.FC = () => {
         </div>
 
         <Button
-          className={isListVisible ? "bg-gray-500 text-white w-full mb-4" : "bg-green-500 text-white w-full mb-4"}
+          className={
+            isListVisible
+              ? "bg-gray-500 text-white w-full mb-4"
+              : "bg-green-500 text-white w-full mb-4"
+          }
           onPress={() => setIsListVisible(!isListVisible)}
         >
-          {isListVisible ? `Hide List (${names.length} participants)` : `Show List (${names.length} participants)`}
+          {isListVisible
+            ? `Hide List (${names.length} participants)`
+            : `Show List (${names.length} participants)`}
         </Button>
 
         {isListVisible && (
@@ -347,6 +378,110 @@ const LotteryPage: React.FC = () => {
               Yes, Clear All
             </Button>
             <Button onPress={() => setIsClearModalOpen(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Past Winners Modal */}
+      <Modal
+        isOpen={isPastWinnerModalOpen}
+        onClose={() => setIsPastWinnerModalOpen(false)}
+        aria-labelledby="past-winner-modal-title"
+      >
+        <ModalContent>
+          <ModalHeader>
+            <h3 id="past-winner-modal-title">Past Winners</h3>
+          </ModalHeader>
+          <ModalBody>
+            <div
+              className="space-y-2"
+              style={{
+                maxHeight: "60vh",
+                overflowY: "scroll",
+                backgroundColor: "#1A202C", // Dark background for better contrast
+                borderRadius: "8px", // Rounded corners for a polished look
+              }}
+            >
+              {pastWinner.map((winner, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col justify-between items-start space-y-4 p-4 bg-gray-800 rounded-lg shadow-md mb-4"
+                >
+                  {/* Round Info */}
+                  <div className="flex-1 text-lg font-semibold text-center text-white">
+                    {new Intl.DateTimeFormat("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }).format(new Date(winner.date))}
+                  </div>
+
+                  {/* Winners List */}
+                  <div className="flex-1 text-lg font-bold text-center text-white">
+                    Winners: {winner.winners.join(", ")}
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex justify-end gap-4 items-center w-full">
+                    {/* Copy Winners Button */}
+                    <Button
+                      color="secondary"
+                      variant="light"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          winner.winners.join(", ")
+                        );
+                        toast.success("Copied winners to clipboard", {
+                          position: "top-right",
+                          autoClose: 2000,
+                          hideProgressBar: false,
+                          closeOnClick: true,
+                          pauseOnHover: true,
+                          draggable: true,
+                          progress: undefined,
+                          theme: "light",
+                        });
+                      }}
+                      aria-label="Copy all winners"
+                      className="w-auto"
+                    >
+                      Copy Winners
+                    </Button>
+
+                    <Button
+                      color="secondary"
+                      variant="light"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          winner.winners.map((winner, index) => `${winner}`).join("\n")
+                        );
+                        toast.success("Copied winner to clipboard", {
+                          position: "top-right",
+                          autoClose: 2000,
+                          hideProgressBar: false,
+                          closeOnClick: true,
+                          pauseOnHover: true,
+                          draggable: true,
+                          progress: undefined,
+                          theme: "light",
+                        });
+                      }}
+                      aria-label={`Copy winner ${index + 1}`}
+                      className="w-auto"
+                    >
+                      Copy Winner As List
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button onPress={() => setIsPastWinnerModalOpen(false)}>
+              Close
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
