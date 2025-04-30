@@ -23,8 +23,8 @@ const LotteryPage: React.FC = () => {
   const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false); // Track if roll is in progress
   const [countdown, setCountdown] = useState<number>(0); // Countdown state
-  const [drumrollAudio] = useState(new Audio("/sound/drum-roll.mp3"));
-  const [clapAudio] = useState(new Audio("/sound/clap.wav"));
+  const [drumrollAudio, setDrumrollAudio] = useState(null);
+  const [clapAudio, setClapAudio] = useState(null);
 
   // Load names from localStorage
   useEffect(() => {
@@ -32,6 +32,10 @@ const LotteryPage: React.FC = () => {
     if (storedNames) {
       setNames(JSON.parse(storedNames));
     }
+    const drumrollAudio = new Audio("/sound/drum-roll.mp3");
+    const clapAudio = new Audio("/sound/clap.wav");
+    setDrumrollAudio(drumrollAudio);
+    setClapAudio(clapAudio);
   }, []);
 
   useEffect(() => {
