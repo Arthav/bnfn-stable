@@ -23,8 +23,8 @@ const LotteryPage: React.FC = () => {
   const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false); // Track if roll is in progress
   const [countdown, setCountdown] = useState<number>(0); // Countdown state
-  const [drumrollAudio] = useState(new Audio('/sound/drum-roll.mp3'));
-  const [clapAudio] = useState(new Audio('/sound/clap.wav'));
+  const [drumrollAudio] = useState(new Audio("/sound/drum-roll.mp3"));
+  const [clapAudio] = useState(new Audio("/sound/clap.wav"));
 
   // Load names from localStorage
   useEffect(() => {
@@ -97,10 +97,30 @@ const LotteryPage: React.FC = () => {
         drumrollAudio.loop = false;
         drumrollAudio.pause();
         drumrollAudio.currentTime = 0;
-
+        
         clapAudio.currentTime = 0;
         clapAudio.play();
-        setTimeout(() => clapAudio.pause(), 5000);
+
+        // Set an interval to decrease the volume over the last 2 seconds
+        const fadeDuration = 2; // The duration to fade the volume (in seconds)
+        const fadeInterval = 50; // The interval to update the volume (in ms)
+
+        const fadeOut = setInterval(() => {
+          // Calculate the remaining time of the audio
+          const remainingTime = clapAudio.duration - clapAudio.currentTime;
+
+          if (remainingTime <= fadeDuration) {
+            // Gradually reduce the volume
+            const volume = remainingTime / fadeDuration;
+            clapAudio.volume = volume;
+          }
+
+          // Stop the fade out and pause the audio when the time is over
+          if (clapAudio.currentTime >= clapAudio.duration) {
+            clearInterval(fadeOut);
+            clapAudio.pause();
+          }
+        }, fadeInterval);
 
         // Trigger the confetti effect during the roll
         confetti({
@@ -121,7 +141,9 @@ const LotteryPage: React.FC = () => {
     const selectedWinners = shuffledNames.slice(0, winnersCount);
 
     // Remove the selected winners from the participants list
-    const remainingNames = names.filter((name) => !selectedWinners.includes(name));
+    const remainingNames = names.filter(
+      (name) => !selectedWinners.includes(name)
+    );
     setNames(remainingNames); // Update participants list
 
     setWinners(selectedWinners); // Set winners
@@ -174,7 +196,7 @@ const LotteryPage: React.FC = () => {
           />
           <Button
             onPress={handleRoll}
-            className={`h-12 flex-1 md:flex-none ${isRolling ? 'animate-pulse bg-gradient-to-br from-blue-500 to-purple-600' : 'bg-blue-500'}`}
+            className={`h-12 flex-1 md:flex-none ${isRolling ? "animate-pulse bg-gradient-to-br from-blue-500 to-purple-600" : "bg-blue-500"}`}
             disabled={isRolling} // Disable the button during roll
           >
             {isRolling ? "Rolling..." : "Roll"}
@@ -191,9 +213,7 @@ const LotteryPage: React.FC = () => {
 
         {/* Countdown Display */}
         {countdown > 0 && (
-          <div className="text-4xl font-bold text-center mb-4">
-            {countdown}
-          </div>
+          <div className="text-4xl font-bold text-center mb-4">{countdown}</div>
         )}
 
         <Listbox aria-label="Name list">
