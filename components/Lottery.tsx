@@ -329,6 +329,7 @@ const LotteryPage: React.FC = () => {
         isOpen={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         aria-labelledby="modal-title"
+        style={{ maxHeight: "70vh", overflowY: "auto" }}
       >
         <ModalContent>
           <ModalHeader>
@@ -356,7 +357,7 @@ const LotteryPage: React.FC = () => {
             </Button>
             <Button onPress={() => setIsModalVisible(false)}>Close</Button>
             <Button color="danger" onClick={() => handleRemoveWinner()}>
-              Remove Winner From List
+              Exclude Winner
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -400,7 +401,6 @@ const LotteryPage: React.FC = () => {
               style={{
                 maxHeight: "60vh",
                 overflowY: "scroll",
-                backgroundColor: "#1A202C", // Dark background for better contrast
                 borderRadius: "8px", // Rounded corners for a polished look
               }}
             >
@@ -413,10 +413,10 @@ const LotteryPage: React.FC = () => {
                 .map((winner, index) => (
                   <div
                     key={index}
-                    className="flex flex-col justify-between items-start space-y-4 p-4 bg-gray-800 rounded-lg shadow-md mb-4"
+                    className="flex flex-col justify-between items-start space-y-4 p-4rounded-lg shadow-md mb-4"
                   >
                     {/* Round Info */}
-                    <div className="flex-1 text-lg font-semibold text-center text-white">
+                    <div className="flex-1 text-lg font-semibold text-cente">
                       {new Intl.DateTimeFormat("en-US", {
                         year: "numeric",
                         month: "long",
@@ -427,7 +427,7 @@ const LotteryPage: React.FC = () => {
                     </div>
 
                     {/* Winners List */}
-                    <div className="flex-1 text-lg font-bold text-center text-white">
+                    <div className="flex-1 text-lg font-bold text-cente">
                       Winners: {winner.winners.join(", ")}
                     </div>
 
