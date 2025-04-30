@@ -402,7 +402,10 @@ const LotteryPage: React.FC = () => {
                 borderRadius: "8px", // Rounded corners for a polished look
               }}
             >
-              {pastWinner.map((winner, index) => (
+              {pastWinner
+                .slice()
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .map((winner, index) => (
                 <div
                   key={index}
                   className="flex flex-col justify-between items-start space-y-4 p-4 bg-gray-800 rounded-lg shadow-md mb-4"
