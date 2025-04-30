@@ -24,6 +24,10 @@ export const siteConfig = {
       label: "Massage",
       href: "/massage",
     },
+    {
+      label: "Lottery",
+      href: "/lottery",
+    },
   ],
   navMenuItems: [
     {
@@ -45,6 +49,10 @@ export const siteConfig = {
     {
       label: "Massage",
       href: "/massage",
+    },
+    {
+      label: "Lottery",
+      href: "/lottery",
     },
   ],
   links: {

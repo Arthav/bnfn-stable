@@ -1,9 +1,9 @@
-import TodoList from "@/components/TodoList";
+import Lottery from "@/components/Lottery";
 
 export default function NextDo() {
   return (
     <div>
-      <TodoList />
+      <Lottery />
     </div>
   );
 }
