@@ -12,6 +12,7 @@ import {
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import confetti from "canvas-confetti"; // Import confetti for dramatic effect
 
 const LotteryPage: React.FC = () => {
   const [names, setNames] = useState<string[]>([]);
@@ -20,6 +21,8 @@ const LotteryPage: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [winners, setWinners] = useState<string[]>([]);
   const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
+  const [isRolling, setIsRolling] = useState<boolean>(false); // Track if roll is in progress
+  const [countdown, setCountdown] = useState<number>(0); // Countdown state
 
   // Load names from localStorage
   useEffect(() => {
@@ -75,10 +78,45 @@ const LotteryPage: React.FC = () => {
       return;
     }
 
+    setIsRolling(true); // Set rolling state to true
+
+
+    // Start countdown (3, 2, 1)
+    let count = 3;
+    setCountdown(count); // Show 3 initially
+
+    const countdownInterval = setInterval(() => {
+      count -= 1;
+      setCountdown(count); // Update countdown
+      if (count <= 0) {
+        // Trigger the confetti effect during the roll
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+        clearInterval(countdownInterval); // Stop countdown when it reaches 0
+        selectWinners(); // Select winners after countdown finishes
+      }
+    }, 1000);
+  };
+
+  const selectWinners = () => {
+    // Randomly select winners
     const shuffledNames = [...names].sort(() => 0.5 - Math.random());
     const selectedWinners = shuffledNames.slice(0, winnersCount);
-    setWinners(selectedWinners);
-    setIsModalVisible(true);
+
+    // Remove the selected winners from the participants list
+    const remainingNames = names.filter((name) => !selectedWinners.includes(name));
+    setNames(remainingNames); // Update participants list
+
+    setWinners(selectedWinners); // Set winners
+    setIsModalVisible(true); // Show winner modal
+    setIsRolling(false); // Reset rolling state after the roll is complete
+  };
+
+  const handleRemoveWinner = (index: number) => {
+    setWinners((prevWinners) => prevWinners.filter((_, i) => i !== index));
   };
 
   const handleClearAll = () => {
@@ -124,8 +162,12 @@ const LotteryPage: React.FC = () => {
             placeholder="Number of Winners"
             className="border-2 border-gray-300 p-2 rounded w-full"
           />
-          <Button onPress={handleRoll} className="h-12 flex-1 md:flex-none">
-            Roll
+          <Button
+            onPress={handleRoll}
+            className={`h-12 flex-1 md:flex-none ${isRolling ? 'animate-pulse bg-gradient-to-br from-blue-500 to-purple-600' : 'bg-blue-500'}`}
+            disabled={isRolling} // Disable the button during roll
+          >
+            {isRolling ? "Rolling..." : "Roll"}
           </Button>
 
           {/* Clear Button */}
@@ -136,6 +178,13 @@ const LotteryPage: React.FC = () => {
             Clear
           </Button>
         </div>
+
+        {/* Countdown Display */}
+        {countdown > 0 && (
+          <div className="text-4xl font-bold text-center mb-4">
+            {countdown}
+          </div>
+        )}
 
         <Listbox aria-label="Name list">
           {names.map((name, index) => (
@@ -168,8 +217,10 @@ const LotteryPage: React.FC = () => {
           <ModalBody>
             <div className="space-y-2">
               {winners.map((winner, index) => (
-                <div key={index} className="text-lg font-bold text-center">
-                  Winner {index + 1}: {winner}
+                <div key={index} className="flex justify-between items-center">
+                  <div className="text-lg font-bold text-center">
+                    Winner {index + 1}: {winner}
+                  </div>
                 </div>
               ))}
             </div>
