@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@nextui-org/button";
 import {
@@ -90,20 +88,26 @@ const LotteryPage: React.FC = () => {
     let count = 4;
     setCountdown(count); // Show 3 initially
 
-    drumrollAudio?.loop = true; // Loop the drumroll audio for the countdown
-    drumrollAudio?.play(); // Start playing the drumroll sound
+    if (drumrollAudio) {
+      drumrollAudio.loop = true; // Set loop to true if drumrollAudio is not null
+      drumrollAudio.play(); // Play the audio if drumrollAudio is not null
+    }
 
     const countdownInterval = setInterval(() => {
       count -= 1;
       setCountdown(count); // Update countdown
       if (count <= 0) {
         // Stop the drumroll sound once countdown reaches 0
-        drumrollAudio?.loop = false;
-        drumrollAudio?.pause();
-        drumrollAudio?.currentTime = 0;
+        if (drumrollAudio) {
+          drumrollAudio.loop = false;
+          drumrollAudio.pause();
+          drumrollAudio.currentTime = 0;
+        }
         
-        clapAudio?.currentTime = 0;
-        clapAudio?.play();
+        if (clapAudio) {
+          clapAudio.currentTime = 0;
+          clapAudio.play();
+        }
 
         // Set an interval to decrease the volume over the last 2 seconds
         const fadeDuration = 2; // The duration to fade the volume (in seconds)
@@ -113,10 +117,10 @@ const LotteryPage: React.FC = () => {
           // Calculate the remaining time of the audio
           const remainingTime = clapAudio?.duration - clapAudio?.currentTime;
 
-          if (remainingTime <= fadeDuration) {
+          if (remainingTime && remainingTime <= fadeDuration) {
             // Gradually reduce the volume
             const volume = remainingTime / fadeDuration;
-            clapAudio?.volume = volume;
+            if (clapAudio) clapAudio.volume = volume;
           }
 
           // Stop the fade out and pause the audio when the time is over
