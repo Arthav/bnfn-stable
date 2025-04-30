@@ -320,7 +320,7 @@ export default function MembershipMasterPage({
     // Check if membership has time limit
     let timeLimitMessage = '';
     if (membership.membershipEndDate) {
-      timeLimitMessage = `\n\nYour membership will be active until ${membership.membershipEndDate}.`;
+      timeLimitMessage = `\n\nYour membership will be active until ${formatDate(membership.membershipEndDate)}.`;
     }
   
     // Format the full message

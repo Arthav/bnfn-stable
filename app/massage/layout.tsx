@@ -9,20 +9,43 @@ export default function MassageLayout({
   const [password, setPassword] = useState("");
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [showModal, setShowModal] = useState(true); // Initially show the modal
+  const [isLoadingPass, setIsLoadingPass] = useState(false);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "111") {
-      setIsPasswordCorrect(true);
-      setShowModal(false); // Close the modal
-    } else {
-      alert("Incorrect password, please try again.");
+
+    try {
+      setIsLoadingPass(true);
+        // Make the POST request to check the password
+        const response = await fetch('https://api-bnfn.vercel.app/api/zstf/checkPassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ password })
+        });
+
+        // Parse the JSON response
+        const data = await response.json();
+
+        if (data.success) {
+            setIsPasswordCorrect(true);
+            setShowModal(false);
+        } else {
+            alert("Incorrect password, please try again.");
+        }
+    } catch (error) {
+        console.error('Error checking password:', error);
+        alert("An error occurred. Please try again.");
     }
-  };
+    finally {
+      setIsLoadingPass(false);
+    }
+};
 
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-2 md:py-2">
@@ -50,8 +73,9 @@ export default function MassageLayout({
                   <button
                     type="submit"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                    disabled={isLoadingPass}
                   >
-                    Submit
+                    {isLoadingPass ? "Verifying..." : "Submit"}
                   </button>
                 </div>
               </form>
