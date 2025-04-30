@@ -21,8 +21,8 @@ const LotteryPage: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [winners, setWinners] = useState<string[]>([]);
   const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
-  const [isRolling, setIsRolling] = useState<boolean>(false); 
-  const [countdown, setCountdown] = useState<number>(0); 
+  const [isRolling, setIsRolling] = useState<boolean>(false);
+  const [countdown, setCountdown] = useState<number>(0);
   const [currentRollingName, setCurrentRollingName] = useState<string>("");
   const [drumrollAudio, setDrumrollAudio] = useState<HTMLAudioElement | null>(
     null
@@ -46,8 +46,13 @@ const LotteryPage: React.FC = () => {
   }, [names]);
 
   const addNameToList = () => {
-    if (currentName.trim() && !names.includes(currentName)) {
-      setNames([...names, currentName]);
+    const newNames = currentName
+      .trim()
+      .split("\n")
+      .filter((name) => name && !names.includes(name));
+
+    if (newNames.length) {
+      setNames([...names, ...newNames]);
       setCurrentName(""); // clear input field
     } else {
       toast.error("Please enter a valid and unique name", {
@@ -107,7 +112,7 @@ const LotteryPage: React.FC = () => {
       drumrollAudio.loop = true; // Set loop to true if drumrollAudio is not null
       drumrollAudio.play(); // Play the audio if drumrollAudio is not null
     }
-    
+
     // Display random name every 100ms while rolling
     const randomNameInterval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * names.length);
@@ -199,13 +204,12 @@ const LotteryPage: React.FC = () => {
 
         {/* Name Input and List */}
         <div className="flex gap-2 mb-4">
-          <input
-            type="text"
+          <textarea
             value={currentName}
             onChange={(e) => setCurrentName(e.target.value)}
             placeholder="Enter Name"
             onKeyDown={handleKeyPress}
-            className="border-2 border-gray-300 p-2 rounded w-full"
+            className="w-full rounded-1xl h-24 p-2 resize-none"
           />
           <Button onPress={addNameToList} className="h-12 flex-1 md:flex-none">
             Add Name
@@ -254,8 +258,7 @@ const LotteryPage: React.FC = () => {
             ? names
                 .slice(0, winnersCount)
                 .map(
-                  (_, i) =>
-                    names[Math.floor(Math.random() * names.length + i)]
+                  (_, i) => names[Math.floor(Math.random() * names.length + i)]
                 )
                 .join(", ")
             : ""}
