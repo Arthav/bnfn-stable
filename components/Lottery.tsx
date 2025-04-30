@@ -37,11 +37,11 @@ const LotteryPage: React.FC = () => {
   }, [names]);
 
   const addNameToList = () => {
-    if (currentName.trim()) {
+    if (currentName.trim() && !names.includes(currentName)) {
       setNames([...names, currentName]);
       setCurrentName(""); // clear input field
     } else {
-      toast.error("Please enter a valid name", {
+      toast.error("Please enter a valid and unique name", {
         position: "bottom-center",
         autoClose: 3000,
         hideProgressBar: false,
@@ -113,10 +113,6 @@ const LotteryPage: React.FC = () => {
     setWinners(selectedWinners); // Set winners
     setIsModalVisible(true); // Show winner modal
     setIsRolling(false); // Reset rolling state after the roll is complete
-  };
-
-  const handleRemoveWinner = (index: number) => {
-    setWinners((prevWinners) => prevWinners.filter((_, i) => i !== index));
   };
 
   const handleClearAll = () => {
