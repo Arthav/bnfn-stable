@@ -238,8 +238,6 @@ const LotteryPage: React.FC = () => {
           <Button
             onPress={() => setIsPastWinnerModalOpen(true)}
             className="h-12 flex-1 md:flex-none"
-            color="secondary"
-            variant="light"
           >
             View Past Winners
           </Button>
@@ -266,7 +264,7 @@ const LotteryPage: React.FC = () => {
 
           {/* Clear Button */}
           <Button
-            className="bg-red-500 text-white h-12"
+            className="bg-red-500 h-12"
             onPress={() => setIsClearModalOpen(true)}
           >
             Clear
@@ -296,8 +294,8 @@ const LotteryPage: React.FC = () => {
         <Button
           className={
             isListVisible
-              ? "bg-gray-500 text-white w-full mb-4"
-              : "bg-green-500 text-white w-full mb-4"
+              ? "bg-gray-500 w-full mb-4"
+              : "bg-green-500 w-full mb-4"
           }
           onPress={() => setIsListVisible(!isListVisible)}
         >
@@ -408,81 +406,86 @@ const LotteryPage: React.FC = () => {
             >
               {pastWinner
                 .slice()
-                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .sort(
+                  (a, b) =>
+                    new Date(b.date).getTime() - new Date(a.date).getTime()
+                )
                 .map((winner, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col justify-between items-start space-y-4 p-4 bg-gray-800 rounded-lg shadow-md mb-4"
-                >
-                  {/* Round Info */}
-                  <div className="flex-1 text-lg font-semibold text-center text-white">
-                    {new Intl.DateTimeFormat("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }).format(new Date(winner.date))}
-                  </div>
+                  <div
+                    key={index}
+                    className="flex flex-col justify-between items-start space-y-4 p-4 bg-gray-800 rounded-lg shadow-md mb-4"
+                  >
+                    {/* Round Info */}
+                    <div className="flex-1 text-lg font-semibold text-center text-white">
+                      {new Intl.DateTimeFormat("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }).format(new Date(winner.date))}
+                    </div>
 
-                  {/* Winners List */}
-                  <div className="flex-1 text-lg font-bold text-center text-white">
-                    Winners: {winner.winners.join(", ")}
-                  </div>
+                    {/* Winners List */}
+                    <div className="flex-1 text-lg font-bold text-center text-white">
+                      Winners: {winner.winners.join(", ")}
+                    </div>
 
-                  {/* Buttons */}
-                  <div className="flex justify-end gap-4 items-center w-full">
-                    {/* Copy Winners Button */}
-                    <Button
-                      color="secondary"
-                      variant="light"
-                      onClick={() => {
-                        navigator.clipboard.writeText(
-                          winner.winners.join(", ")
-                        );
-                        toast.success("Copied winners to clipboard", {
-                          position: "top-right",
-                          autoClose: 2000,
-                          hideProgressBar: false,
-                          closeOnClick: true,
-                          pauseOnHover: true,
-                          draggable: true,
-                          progress: undefined,
-                          theme: "light",
-                        });
-                      }}
-                      aria-label="Copy all winners"
-                      className="w-auto"
-                    >
-                      Copy Winners
-                    </Button>
+                    {/* Buttons */}
+                    <div className="flex justify-end gap-4 items-center w-full">
+                      {/* Copy Winners Button */}
+                      <Button
+                        color="secondary"
+                        variant="light"
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            winner.winners.join(", ")
+                          );
+                          toast.success("Copied winners to clipboard", {
+                            position: "top-right",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                          });
+                        }}
+                        aria-label="Copy all winners"
+                        className="w-auto"
+                      >
+                        Copy Winners
+                      </Button>
 
-                    <Button
-                      color="secondary"
-                      variant="light"
-                      onClick={() => {
-                        navigator.clipboard.writeText(
-                          winner.winners.map((winner, index) => `${winner}`).join("\n")
-                        );
-                        toast.success("Copied winner to clipboard", {
-                          position: "top-right",
-                          autoClose: 2000,
-                          hideProgressBar: false,
-                          closeOnClick: true,
-                          pauseOnHover: true,
-                          draggable: true,
-                          progress: undefined,
-                          theme: "light",
-                        });
-                      }}
-                      aria-label={`Copy winner ${index + 1}`}
-                      className="w-auto"
-                    >
-                      Copy Winner As List
-                    </Button>
+                      <Button
+                        color="secondary"
+                        variant="light"
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            winner.winners
+                              .map((winner, index) => `${winner}`)
+                              .join("\n")
+                          );
+                          toast.success("Copied winner to clipboard", {
+                            position: "top-right",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                          });
+                        }}
+                        aria-label={`Copy winner ${index + 1}`}
+                        className="w-auto"
+                      >
+                        Copy Winner As List
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </ModalBody>
           <ModalFooter>
