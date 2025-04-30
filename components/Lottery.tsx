@@ -44,6 +44,10 @@ const LotteryPage: React.FC = () => {
     if (storedNames) {
       setNames(JSON.parse(storedNames));
     }
+    const storedPastWinner = localStorage.getItem("lotteryPastWinner");
+    if (storedPastWinner) {
+      setPastWinner(JSON.parse(storedPastWinner));
+    }
     const drumrollAudio = new Audio("/sound/drum-roll.mp3");
     const clapAudio = new Audio("/sound/clap.wav");
     setDrumrollAudio(drumrollAudio);
@@ -226,7 +230,7 @@ const LotteryPage: React.FC = () => {
             onChange={(e) => setCurrentName(e.target.value)}
             placeholder="Enter Name"
             onKeyDown={handleKeyPress}
-            className="w-full rounded-1xl h-12 p-2 resize-none"
+            className="w-full rounded-1xl h-12 p-2 resize-none border-solid border-black border-2"
           />
           <Button onPress={addNameToList} className="h-12 flex-1 md:flex-none">
             Add Name
