@@ -23,8 +23,8 @@ const LotteryPage: React.FC = () => {
   const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false); // Track if roll is in progress
   const [countdown, setCountdown] = useState<number>(0); // Countdown state
-  const [drumrollAudio, setDrumrollAudio] = useState(null);
-  const [clapAudio, setClapAudio] = useState(null);
+  const [drumrollAudio, setDrumrollAudio] = useState<HTMLAudioElement | null>(null);
+  const [clapAudio, setClapAudio] = useState<HTMLAudioElement | null>(null);
 
   // Load names from localStorage
   useEffect(() => {
