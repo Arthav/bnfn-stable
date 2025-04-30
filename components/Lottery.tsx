@@ -23,6 +23,8 @@ const LotteryPage: React.FC = () => {
   const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false); // Track if roll is in progress
   const [countdown, setCountdown] = useState<number>(0); // Countdown state
+  const [drumrollAudio] = useState(new Audio('/sound/drum-roll.mp3'));
+  const [clapAudio] = useState(new Audio('/sound/clap.wav'));
 
   // Load names from localStorage
   useEffect(() => {
@@ -80,21 +82,33 @@ const LotteryPage: React.FC = () => {
 
     setIsRolling(true); // Set rolling state to true
 
-
     // Start countdown (3, 2, 1)
-    let count = 3;
+    let count = 4;
     setCountdown(count); // Show 3 initially
+
+    drumrollAudio.loop = true; // Loop the drumroll audio for the countdown
+    drumrollAudio.play(); // Start playing the drumroll sound
 
     const countdownInterval = setInterval(() => {
       count -= 1;
       setCountdown(count); // Update countdown
       if (count <= 0) {
+        // Stop the drumroll sound once countdown reaches 0
+        drumrollAudio.loop = false;
+        drumrollAudio.pause();
+        drumrollAudio.currentTime = 0;
+
+        clapAudio.currentTime = 0;
+        clapAudio.play();
+        setTimeout(() => clapAudio.pause(), 5000);
+
         // Trigger the confetti effect during the roll
         confetti({
           particleCount: 100,
           spread: 70,
           origin: { y: 0.6 },
         });
+
         clearInterval(countdownInterval); // Stop countdown when it reaches 0
         selectWinners(); // Select winners after countdown finishes
       }
