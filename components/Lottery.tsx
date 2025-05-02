@@ -304,6 +304,75 @@ const LotteryPage: React.FC = () => {
             : `Show List (${names.length} participants)`}
         </Button>
 
+        {/* Copy Winners Button */}
+        <Button
+          color="secondary"
+          variant="light"
+          onClick={() => {
+            navigator.clipboard.writeText(names.join(", "));
+            toast.success("Copied Participant to clipboard", {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          }}
+          aria-label="Copy all participants"
+          className="w-auto"
+        >
+          Copy All Participants
+        </Button>
+        <Button
+          color="secondary"
+          variant="light"
+          onClick={() => {
+            navigator.clipboard.writeText(names.join("\n"));
+            toast.success("Copied Participant to clipboard", {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          }}
+          aria-label="Copy all participants"
+          className="w-auto"
+        >
+          Copy All Participants as List
+        </Button>
+        <Button
+          color="secondary"
+          variant="light"
+          onClick={() => {
+            navigator.clipboard.writeText(
+              names
+                .map((name, index) => `${index + 1}. ${name}`)
+                .join("\n")
+            );
+            toast.success("Copied Participant to clipboard", {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          }}
+          aria-label="Copy all participants"
+          className="w-auto"
+        >
+          Copy All Participants as Numbered List
+        </Button>
+
         {isListVisible && (
           <Listbox aria-label="Name list">
             {names.map((name, index) => (
