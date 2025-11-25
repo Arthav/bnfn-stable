@@ -639,8 +639,9 @@ export default function LotteryPage() {
                             {activeTab === 'settings' && (
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-semibold text-gray-300">Visualization Mode</label>
+                                        <label htmlFor="mode-select" className="block text-sm font-semibold text-gray-300">Visualization Mode</label>
                                         <select 
+                                            id="mode-select"
                                             value={settings.mode}
                                             onChange={(e) => setSettings({...settings, mode: e.target.value as any})}
                                             className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-sm"
@@ -651,8 +652,8 @@ export default function LotteryPage() {
                                     </div>
 
                                     <div className="flex items-center justify-between p-3 bg-slate-800 rounded">
-                                        <span className="text-sm">Remove Winner</span>
-                                        <label className="relative inline-flex items-center cursor-pointer">
+                                        <span className="text-sm" id="remove-winner-label">Remove Winner</span>
+                                        <label className="relative inline-flex items-center cursor-pointer" aria-labelledby="remove-winner-label">
                                             <input 
                                                 type="checkbox" 
                                                 checked={settings.removeWinner}
@@ -719,7 +720,14 @@ export default function LotteryPage() {
             {/* Winner Modal */}
             {showModal && winner && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-auto">
-                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onClick={() => setShowModal(false)} />
+                    <div 
+                        className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity" 
+                        onClick={() => setShowModal(false)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowModal(false); }}
+                        aria-label="Close modal"
+                    />
                     <div className="bg-slate-900 border-2 border-yellow-500 rounded-xl p-8 max-w-md w-full text-center shadow-[0_0_50px_rgba(234,179,8,0.3)] transform scale-100 transition-all z-10">
                         <div className="text-6xl text-yellow-500 mb-4 flex justify-center"><FaTrophy /></div>
                         <h2 className="text-2xl font-bold text-white mb-1">WINNER!</h2>
