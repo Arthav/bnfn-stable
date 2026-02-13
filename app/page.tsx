@@ -13,6 +13,10 @@ import {
 } from "react-icons/si";
 import SkillCardComponent from "@/components/SkillCard";
 import BioSection from "@/components/portoSection/bio";
+import StatsSection from "@/components/portoSection/StatsSection";
+import ExperienceTimeline from "@/components/portoSection/ExperienceTimeline";
+import ProjectsShowcase from "@/components/portoSection/ProjectsShowcase";
+import ContactFooter from "@/components/portoSection/ContactFooter";
 
 
 export default function Home() {
@@ -66,12 +70,17 @@ export default function Home() {
       {/* Bio section */}
       <BioSection />
 
-      {/* Showcase section */}
-      {/* {showcaseSection} */}
+      {/* Stats section */}
+      <StatsSection />
 
-      {/* Contact section */}
+      {/* Experience section */}
+      <ExperienceTimeline />
 
-      {/* Footer section */}
+      {/* Projects section */}
+      <ProjectsShowcase />
+
+      {/* Contact & Footer */}
+      <ContactFooter />
     </section>
   );
 }
