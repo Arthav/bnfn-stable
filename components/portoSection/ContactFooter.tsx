@@ -130,7 +130,7 @@ export default function ContactFooter() {
                     {/* Right — back to top */}
                     <button
                         onClick={scrollToTop}
-                        className="flex items-center gap-2 text-sm text-gray-500 hover:text-purple-400 transition-colors duration-300"
+                        className="flex items-center gap-2 text-sm text-white-500 hover:text-purple-400 transition-colors duration-300"
                     >
                         Back to top
                         <FaArrowUp className="text-xs" />
