@@ -40,10 +40,10 @@ export default function Home() {
   }, []);
 
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 w-full">
+    <section className="flex flex-col items-center justify-center gap-4 w-full">
       {/* Hero section */}
       {/* Hero section */}
-      <div className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[calc(100vh-64px)] flex flex-col items-center justify-center overflow-hidden">
         <Marquee />
         <spline-viewer
           style={{
