@@ -130,7 +130,7 @@ const heroSection = (
           className="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-black text-lg font-bold rounded-full overflow-hidden transition-all hover:bg-gray-200"
         >
           <span className="relative z-10 group-hover:text-black transition-colors">
-            Let's Connect
+            Let&apos;s Connect
           </span>
           <div className="absolute inset-0 bg-white rounded-full scale-0 group-hover:scale-150 transition-transform duration-500 ease-out origin-center opacity-10" />
         </a>
@@ -154,83 +154,4 @@ const heroSection = (
   </div>
 );
 
-const showcaseSection = (
-  <div id="showcase" className="flex flex-col gap-6 w-full mt-12">
-    <h2 className="text-4xl font-bold dark:text-white">Projects</h2>
-    <p className="text-lg text-gray-600 dark:text-gray-300">
-      Here are some of the projects I&apos;ve worked on. Click on each project
-      to learn more.
-    </p>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      {/* Project 1 */}
-      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
-        <img
-          src="https://via.placeholder.com/300"
-          alt="Project 1"
-          className="w-full h-48 object-cover"
-        />
-        <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Project Title 1
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            A brief description of the project, highlighting what it does and
-            the technologies used.
-          </p>
-          <a
-            href="/"
-            className="mt-4 inline-block text-blue-500 hover:text-blue-700 transition-colors"
-          >
-            View Project
-          </a>
-        </div>
-      </div>
-      {/* Project 2 */}
-      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
-        <img
-          src="https://via.placeholder.com/300" // Replace with your project image
-          alt="Project 2"
-          className="w-full h-48 object-cover"
-        />
-        <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Project Title 2
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            A brief description of the project, highlighting what it does and
-            the technologies used.
-          </p>
-          <a
-            href="/"
-            className="mt-4 inline-block text-blue-500 hover:text-blue-700 transition-colors"
-          >
-            View Project
-          </a>
-        </div>
-      </div>
-      {/* Project 3 */}
-      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
-        <img
-          src="https://via.placeholder.com/300" // Replace with your project image
-          alt="Project 3"
-          className="w-full h-48 object-cover"
-        />
-        <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Project Title 3
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            A brief description of the project, highlighting what it does and
-            the technologies used.
-          </p>
-          <a
-            href="/"
-            className="mt-4 inline-block text-blue-500 hover:text-blue-700 transition-colors"
-          >
-            View Project
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+
