@@ -9,22 +9,6 @@ export const siteConfig = {
       href: "/",
     },
     {
-      label: "AI Chat",
-      href: "/aichat",
-    },
-    {
-      label: "Next Do",
-      href: "/nextdo",
-    },
-    {
-      label: "Langlern",
-      href: "https://mulmod.vercel.app/",
-    },
-    {
-      label: "Massage",
-      href: "/massage",
-    },
-    {
       label: "Lottery",
       href: "/lottery",
     },
@@ -33,22 +17,6 @@ export const siteConfig = {
     {
       label: "Home",
       href: "/",
-    },
-    {
-      label: "AI Chat",
-      href: "/aichat",
-    },
-    {
-      label: "Next Do",
-      href: "/nextdo",
-    },
-    {
-      label: "Langlern",
-      href: "https://mulmod.vercel.app/",
-    },
-    {
-      label: "Massage",
-      href: "/massage",
     },
     {
       label: "Lottery",
