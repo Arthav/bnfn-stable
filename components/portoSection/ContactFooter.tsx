@@ -21,13 +21,13 @@ const socials = [
     {
         icon: FaGithub,
         label: "GitHub",
-        href: "https://github.com/",
+        href: "https://github.com/Arthav",
         color: "hover:text-gray-300",
     },
     {
         icon: FaEnvelope,
         label: "Email",
-        href: "mailto:hello@bonafena.dev",
+        href: "mailto:christianbonafena7@gmail.com",
         color: "hover:text-pink-400",
     },
 ];
