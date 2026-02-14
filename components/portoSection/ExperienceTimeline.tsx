@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import { motion } from "framer-motion";
 
 interface Experience {
@@ -52,22 +52,6 @@ const experiences: Experience[] = [
 
 export default function ExperienceTimeline() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const [typedCommand, setTypedCommand] = useState("");
-    const command = "git log --graph --pretty=format:'%h - %an, %ar : %s'";
-
-    useEffect(() => {
-        let i = 0;
-        const interval = setInterval(() => {
-            if (i < command.length) {
-                setTypedCommand((prev) => prev + command.charAt(i));
-                i++;
-            } else {
-                clearInterval(interval);
-            }
-        }, 50);
-
-        return () => clearInterval(interval);
-    }, []);
 
     return (
         <div
@@ -76,103 +60,101 @@ export default function ExperienceTimeline() {
             className="w-full mt-24 px-4 sm:px-8 md:px-16 flex flex-col items-center"
         >
             <h2 className="text-4xl font-bold dark:text-white mb-2">Experience</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl text-center mb-10">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl text-center mb-16">
                 A detailed log of my professional journey.
             </p>
 
-            {/* Terminal Window */}
-            <div className="w-full max-w-4xl bg-[#1e1e1e] rounded-xl shadow-2xl overflow-hidden border border-gray-800 font-mono text-sm md:text-base">
-                {/* Terminal Header */}
-                <div className="bg-[#2d2d2d] px-4 py-2 flex items-center justify-between border-b border-gray-800">
-                    <div className="flex gap-2">
-                        <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-                        <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-                        <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
-                    </div>
-                    <div className="text-gray-400 text-xs">cbonz@dev: ~/experience</div>
-                    <div className="w-10" /> {/* Spacer for centering */}
-                </div>
+            <div className="w-full max-w-4xl flex flex-col pb-24">
+                {experiences.map((exp, index) => {
+                    // Create a "path" for the terminal header based on company name
+                    const path = `~/experience/${exp.company
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}`;
 
-                {/* Terminal Body */}
-                <div className="p-6 text-gray-300">
-                    {/* Command Line */}
-                    <div className="flex mb-6">
-                        <span className="text-[#87d441] mr-2">➜</span>
-                        <span className="text-[#27c93f] mr-2">~/experience</span>
-                        <span className="text-gray-100">{typedCommand}</span>
-                        <motion.span
-                            animate={{ opacity: [0, 1, 0] }}
-                            transition={{ repeat: Infinity, duration: 0.8 }}
-                            className="w-2 h-5 bg-gray-400 ml-1 block"
-                        />
-                    </div>
-
-                    {/* Git Log Output */}
-                    <div className="flex flex-col gap-8">
-                        {experiences.map((exp, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, x: -10 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true, margin: "-50px" }}
-                                transition={{ duration: 0.5, delay: index * 0.2 }}
-                                className="flex gap-4 relative"
-                            >
-                                {/* Git Graph Visuals */}
-                                <div className="flex flex-col items-center min-w-[20px]">
-                                    <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5" />
-                                    {index !== experiences.length - 1 && (
-                                        <div className="w-0.5 bg-gray-700 h-full mt-1" />
-                                    )}
+                    return (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                            className="sticky"
+                            style={{
+                                // Staggered sticky top position
+                                top: `${100 + index * 40}px`,
+                                zIndex: index + 1,
+                            }}
+                        >
+                            <div className="bg-[#1e1e1e] rounded-xl shadow-2xl overflow-hidden border border-gray-800 font-mono text-sm md:text-base mb-8 transform origin-top hover:scale-[1.01] transition-transform duration-300">
+                                {/* Terminal Header */}
+                                <div className="bg-[#2d2d2d] px-4 py-3 flex items-center justify-between border-b border-gray-800">
+                                    <div className="flex gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+                                        <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                                        <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+                                    </div>
+                                    <div className="text-gray-400 text-xs font-mono opacity-80">
+                                        cbonz@dev: {path}
+                                    </div>
+                                    <div className="w-10" />
                                 </div>
 
-                                {/* Commit Content */}
-                                <div className="flex-1 pb-4">
-                                    <div className="flex flex-wrap items-baseline gap-2 mb-1">
-                                        <span className="text-[#d7ba7d]">
-                                            commit {exp.hash}
-                                        </span>
-                                        <span className="text-gray-500 hidden sm:inline">
-                                            ({exp.period})
-                                        </span>
+                                {/* Terminal Body */}
+                                <div className="p-6 md:p-8 text-gray-300">
+                                    {/* Command Line */}
+                                    <div className="flex flex-wrap items-center gap-2 mb-6 border-b border-gray-800 pb-4">
+                                        <span className="text-[#87d441]">➜</span>
+                                        <span className="text-[#27c93f]">{path}</span>
+                                        <span className="text-white">git show {exp.hash}</span>
                                     </div>
 
-                                    <div className="mb-1">
-                                        Author: <span className="text-[#4ec9b0]">Christian Bonafena</span>{" "}
-                                        <span className="text-gray-500">&lt;cbonz@dev&gt;</span>
-                                    </div>
+                                    {/* Output Content */}
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-3 text-[#d7ba7d] mb-1">
+                                            <span>commit {exp.hash}</span>
+                                            <span className="px-2 py-0.5 rounded-full bg-[#d7ba7d]/10 text-xs border border-[#d7ba7d]/20">
+                                                HEAD
+                                            </span>
+                                        </div>
 
-                                    <div className="mb-2">
-                                        Date: <span className="text-[#ce9178]">{exp.period}</span>
-                                    </div>
+                                        <div className="mb-1">
+                                            <span className="text-gray-500">Author:</span>{" "}
+                                            <span className="text-[#4ec9b0]">Christian Bonafena</span>{" "}
+                                            <span className="text-gray-500">&lt;cbonz@dev&gt;</span>
+                                        </div>
 
-                                    <div className="mt-4 pl-4 border-l-2 border-gray-700/50">
-                                        <h3 className="text-xl font-bold text-white mb-1">
-                                            {exp.title} <span className="text-gray-400">@</span>{" "}
-                                            <span className="text-[#569cd6]">{exp.company}</span>
-                                        </h3>
-                                        <p className="text-gray-400 mb-3 leading-relaxed">
-                                            {exp.description}
-                                        </p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {exp.tags.map((tag) => (
-                                                <span
-                                                    key={tag}
-                                                    className="px-2 py-0.5 text-xs rounded bg-[#2d2d2d] text-[#9cdcfe] border border-gray-700"
-                                                >
-                                                    {tag}
-                                                </span>
-                                            ))}
+                                        <div className="mb-6">
+                                            <span className="text-gray-500">Date:</span>{" "}
+                                            <span className="text-[#ce9178]">{exp.period}</span>
+                                        </div>
+
+                                        <div className="pl-4 border-l-2 border-gray-700/50">
+                                            <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
+                                                {exp.title} <span className="text-gray-500">@</span>{" "}
+                                                <span className="text-[#569cd6]">{exp.company}</span>
+                                            </h3>
+
+                                            <p className="text-gray-400 mb-6 leading-relaxed">
+                                                {exp.description}
+                                            </p>
+
+                                            <div className="flex flex-wrap gap-2">
+                                                {exp.tags.map((tag) => (
+                                                    <span
+                                                        key={tag}
+                                                        className="px-3 py-1 text-xs rounded bg-[#2d2d2d] text-[#9cdcfe] border border-gray-700 hover:bg-[#3d3d3d] transition-colors cursor-default"
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </motion.div>
-                        ))}
-                        <div className="flex items-center gap-2 mt-4 opacity-50 text-sm">
-                            <span className="text-[#d7ba7d]">(END)</span>
-                        </div>
-                    </div>
-                </div>
+                            </div>
+                        </motion.div>
+                    );
+                })}
             </div>
         </div>
     );
