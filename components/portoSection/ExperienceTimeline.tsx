@@ -8,6 +8,7 @@ interface Experience {
     period: string;
     description: string;
     tags: string[];
+    hash: string;
 }
 
 const experiences: Experience[] = [
@@ -18,6 +19,7 @@ const experiences: Experience[] = [
         description:
             "Building end-to-end solutions with scalability and security focus. Developing Internal Audit App and Superapp Bhakta (ERP). Managed backend with PHP and frontend with Gatsby.js.",
         tags: ["PHP", "Gatsby.js", "Scalability", "Security", "Mentorship"],
+        hash: "a1b2c3d",
     },
     {
         title: "Backend Engineer",
@@ -26,6 +28,7 @@ const experiences: Experience[] = [
         description:
             "Worked on TujuhLive streaming platform using PHP and ThinkPHP. Designed WebSocket for real-time data to improve engagement. Optimized performance and collaborated with cross-functional teams.",
         tags: ["PHP", "ThinkPHP", "WebSocket", "Real-time", "Optimization"],
+        hash: "e4f5g6h",
     },
     {
         title: "Fullstack Engineer",
@@ -34,6 +37,7 @@ const experiences: Experience[] = [
         description:
             "Developed Alta.id, SKCBD (Nuxt + Express.js), and Talent Dashboard. Integrated AWS CI/CD, implemented Google Analytics, and set up Strapi on GCP.",
         tags: ["Nuxt.js", "Express.js", "AWS CI/CD", "GCP", "Strapi"],
+        hash: "i7j8k9l",
     },
     {
         title: "Fullstack Engineer",
@@ -42,6 +46,7 @@ const experiences: Experience[] = [
         description:
             "Built Reconciliation Engine (Vue + Node + MongoDB) and PDAM Budgeting (Next.js + Node + GraphQL). Implemented unit testing with Jest and caching via GraphQL.",
         tags: ["Vue.js", "Node.js", "MongoDB", "GraphQL", "Jest"],
+        hash: "m0n1o2p",
     },
 ];
 
@@ -125,7 +130,7 @@ export default function ExperienceTimeline() {
                                 <div className="flex-1 pb-4">
                                     <div className="flex flex-wrap items-baseline gap-2 mb-1">
                                         <span className="text-[#d7ba7d]">
-                                            commit {Math.random().toString(16).substring(2, 9)}
+                                            commit {exp.hash}
                                         </span>
                                         <span className="text-gray-500 hidden sm:inline">
                                             ({exp.period})
