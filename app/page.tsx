@@ -1,17 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
-import { FaReact, FaNodeJs, FaDocker, FaGitAlt } from "react-icons/fa";
-import {
-  SiNextdotjs,
-  SiJavascript,
-  SiTypescript,
-  SiMongodb,
-  SiPostgresql,
-  SiGraphql,
-  SiHtml5,
-  SiCss3,
-} from "react-icons/si";
-import SkillCardComponent from "@/components/SkillCard";
+import Skills from "@/components/portoSection/Skills";
+
 import BioSection from "@/components/portoSection/bio";
 import StatsSection from "@/components/portoSection/StatsSection";
 import ExperienceTimeline from "@/components/portoSection/ExperienceTimeline";
@@ -74,7 +64,7 @@ export default function Home() {
       </div>
 
       {/* Skills section */}
-      {skillsSection}
+      <Skills />
 
       {/* Bio section */}
       {/* <BioSection /> */}
@@ -163,81 +153,7 @@ const heroSection = (
     </motion.div>
   </div>
 );
-const skillsSection = (
-  <div id="skills" className="flex flex-col gap-10 w-full">
-    <div className="h-16"></div>
-    <h2 className="text-4xl font-bold dark:text-white">My Skills</h2>
-    <p className="text-lg text-gray-600 dark:text-gray-300">
-      I specialize in web development, working with both frontend and backend
-      technologies.
-    </p>
-    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6 w-full">
-      <ul className="flex flex-col gap-4 w-full">
-        <SkillCardComponent
-          icon={SiNextdotjs}
-          name="Next.js"
-          description="A popular React framework for building server-side rendered and statically generated websites."
-        />
-        <SkillCardComponent
-          icon={FaReact}
-          name="React"
-          description="A JavaScript library for building user interfaces."
-        />
-        <SkillCardComponent
-          icon={SiJavascript}
-          name="JavaScript"
-          description="A high-level, dynamic, and interpreted programming language."
-        />
-        <SkillCardComponent
-          icon={SiTypescript}
-          name="TypeScript"
-          description="A superset of JavaScript that adds optional static typing and other features."
-        />
-        <SkillCardComponent
-          icon={SiHtml5}
-          name="HTML"
-          description="A markup language used for structuring and presenting content on the web."
-        />
-        <SkillCardComponent
-          icon={SiCss3}
-          name="CSS"
-          description="A styling language used for describing the presentation of web pages."
-        />
-        <SkillCardComponent
-          icon={FaNodeJs}
-          name="Nodejs"
-          description="A JavaScript runtime built on Chrome's V8 JavaScript engine."
-        />
-        <SkillCardComponent
-          icon={FaGitAlt}
-          name="Git"
-          description="A version control system for tracking changes in source code."
-        />
-        <SkillCardComponent
-          icon={SiMongodb}
-          name="MongoDB"
-          description="A document-oriented NoSQL database."
-        />
-        <SkillCardComponent
-          icon={SiPostgresql}
-          name="PostgreSQL"
-          description="A powerful, open-source relational database management system."
-        />
-        <SkillCardComponent
-          icon={SiGraphql}
-          name="GraphQL"
-          description="A query language for APIs and a runtime for fulfilling those queries."
-        />
-        <SkillCardComponent
-          icon={FaDocker}
-          name="Docker"
-          description="A containerization platform for deploying and managing applications."
-        />
 
-      </ul>
-    </div>
-  </div>
-);
 const showcaseSection = (
   <div id="showcase" className="flex flex-col gap-6 w-full mt-12">
     <h2 className="text-4xl font-bold dark:text-white">Projects</h2>
