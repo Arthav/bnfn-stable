@@ -112,7 +112,7 @@ export default function ProjectsShowcase() {
             id="showcase"
             className="flex flex-col gap-8 w-full mt-16 px-4 sm:px-8 md:px-16"
         >
-            <h2 className="text-4xl font-bold dark:text-white">Small Works</h2>
+            <h2 className="text-4xl font-bold dark:text-white">What? i do small works too?</h2>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
                 A curated selection of small projects I&apos;ve built.
             </p>
