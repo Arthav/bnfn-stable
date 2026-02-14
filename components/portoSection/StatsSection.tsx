@@ -12,8 +12,8 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-    { value: 3, suffix: "+", label: "Years of Experience" },
-    { value: 20, suffix: "+", label: "Projects Completed" },
+    { value: 5, suffix: "+", label: "Years of Experience" },
+    { value: 20, suffix: "+", label: "Projects Held" },
     { value: 12, suffix: "+", label: "Technologies Mastered" },
     { value: 100, suffix: "%", label: "Passion for Code" },
 ];
