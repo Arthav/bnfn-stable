@@ -2,11 +2,8 @@
 
 import { useRef } from "react";
 import {
-    FaReact,
-    FaNodeJs,
     FaDocker,
-    FaGitAlt,
-    FaPython,
+    FaGithub,
 } from "react-icons/fa";
 import {
     SiNextdotjs,
@@ -17,28 +14,34 @@ import {
     SiGraphql,
     SiHtml5,
     SiCss3,
-    SiTailwindcss,
-    SiPrisma,
-    SiRedux,
+    SiVuedotjs,
+    SiReact,
+    SiPhp,
+    SiMysql,
+    SiJira,
+    SiSonarqube,
+    SiWordpress,
+    SiSocketdotio,
+    SiJest,
 } from "react-icons/si";
 
 const skills = [
-    { icon: SiNextdotjs, name: "Next.js" },
-    { icon: FaReact, name: "React" },
-    { icon: SiJavascript, name: "JavaScript" },
+    { icon: SiJavascript, name: "JavaScript (Node.js)" },
     { icon: SiTypescript, name: "TypeScript" },
-    { icon: SiHtml5, name: "HTML5" },
-    { icon: SiCss3, name: "CSS3" },
-    { icon: SiTailwindcss, name: "Tailwind CSS" },
-    { icon: FaNodeJs, name: "Node.js" },
+    { icon: SiVuedotjs, name: "Vue.js / Nuxt" },
+    { icon: SiReact, name: "React / Next.js" },
+    { icon: SiPhp, name: "PHP" },
+    { icon: SiMysql, name: "MySQL" },
     { icon: SiPostgresql, name: "PostgreSQL" },
     { icon: SiMongodb, name: "MongoDB" },
-    { icon: SiPrisma, name: "Prisma" },
     { icon: SiGraphql, name: "GraphQL" },
     { icon: FaDocker, name: "Docker" },
-    { icon: FaGitAlt, name: "Git" },
-    { icon: SiRedux, name: "Redux" },
-    { icon: FaPython, name: "Python" },
+    { icon: FaGithub, name: "GitHub" },
+    { icon: SiJira, name: "Jira" },
+    { icon: SiSonarqube, name: "Sonarqube" },
+    { icon: SiWordpress, name: "WordPress" },
+    { icon: SiSocketdotio, name: "WebSocket" },
+    { icon: SiJest, name: "Testing (Jest)" },
 ];
 
 const SkillBadge = ({ icon: Icon, name }: { icon: any; name: string }) => (

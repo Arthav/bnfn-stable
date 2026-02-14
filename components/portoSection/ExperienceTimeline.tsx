@@ -16,28 +16,36 @@ interface Experience {
 
 const experiences: Experience[] = [
     {
+        title: "Fullstack Senior Software Engineer",
+        company: "Harts Imagineering",
+        period: "Sep 2024 – Present",
+        description:
+            "Building end-to-end solutions with scalability and security focus. Developing Internal Audit App and Superapp Bhakta (ERP). Managed backend with PHP and frontend with Gatsby.js.",
+        tags: ["PHP", "Gatsby.js", "Scalability", "Security", "Mentorship"],
+    },
+    {
+        title: "Backend Engineer",
+        company: "Intimedia International",
+        period: "Aug 2023 – Mar 2024",
+        description:
+            "Worked on TujuhLive streaming platform using PHP and ThinkPHP. Designed WebSocket for real-time data to improve engagement. Optimized performance and collaborated with cross-functional teams.",
+        tags: ["PHP", "ThinkPHP", "WebSocket", "Real-time", "Optimization"],
+    },
+    {
         title: "Fullstack Engineer",
-        company: "Freelance / Personal Projects",
-        period: "2023 - Present",
+        company: "Alterra Academy",
+        period: "2021 – Nov 2022",
         description:
-            "Building scalable web applications using Next.js, React, and modern cloud infrastructure. Delivering end-to-end solutions from design to deployment.",
-        tags: ["Next.js", "React", "TypeScript", "Docker", "PostgreSQL"],
+            "Developed Alta.id, SKCBD (Nuxt + Express.js), and Talent Dashboard. Integrated AWS CI/CD, implemented Google Analytics, and set up Strapi on GCP.",
+        tags: ["Nuxt.js", "Express.js", "AWS CI/CD", "GCP", "Strapi"],
     },
     {
-        title: "Frontend Developer",
-        company: "Web Development Studio",
-        period: "2022 - 2023",
+        title: "Fullstack Engineer",
+        company: "Alterra",
+        period: "Jul 2019 – 2021",
         description:
-            "Developed responsive, high-performance user interfaces for client projects. Focused on component architecture, accessibility, and pixel-perfect designs.",
-        tags: ["React", "Tailwind CSS", "JavaScript", "Figma"],
-    },
-    {
-        title: "Software Engineering Learner",
-        company: "Self-Directed & Open Source",
-        period: "2021 - 2022",
-        description:
-            "Deep-dived into backend development, databases, and DevOps. Contributed to open-source projects and built a solid foundation in computer science fundamentals.",
-        tags: ["Node.js", "MongoDB", "Git", "REST APIs"],
+            "Built Reconciliation Engine (Vue + Node + MongoDB) and PDAM Budgeting (Next.js + Node + GraphQL). Implemented unit testing with Jest and caching via GraphQL.",
+        tags: ["Vue.js", "Node.js", "MongoDB", "GraphQL", "Jest"],
     },
 ];
 

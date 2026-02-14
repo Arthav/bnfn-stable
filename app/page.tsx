@@ -113,7 +113,7 @@ const heroSection = (
       transition={{ delay: 0.5, duration: 0.8 }}
       className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mt-8 font-light tracking-wide mix-blend-difference"
     >
-      Fullstack Engineer crafting digital experiences that matter.
+      Full Stack Engineer crafting digital experiences that matter.
     </motion.p>
 
     <motion.div

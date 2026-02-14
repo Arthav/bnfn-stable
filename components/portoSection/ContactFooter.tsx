@@ -89,12 +89,14 @@ export default function ContactFooter() {
                         Connect on LinkedIn
                     </a>
                     <a
-                        href="mailto:hello@bonafena.dev"
+                        href="mailto:christianbonafena7@gmail.com"
                         className="inline-flex items-center gap-2 border border-white/20 text-white font-semibold py-3 px-8 rounded-xl hover:bg-white/10 hover:scale-105 transition-all duration-300"
                     >
                         <FaEnvelope />
                         Send an Email
                     </a>
+                    {/* Phone - Optional, if you want to include it visually or as a tel link */}
+                    {/* <a href="tel:+6282233857510" ... > ... </a> */}
                 </div>
             </div>
 
