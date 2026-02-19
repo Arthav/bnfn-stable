@@ -12,6 +12,10 @@ export const siteConfig = {
       label: "Lottery",
       href: "/lottery",
     },
+    {
+      label: "SaaS Dashboard",
+      href: "/saasdashboard",
+    },
   ],
   navMenuItems: [
     {
@@ -21,6 +25,10 @@ export const siteConfig = {
     {
       label: "Lottery",
       href: "/lottery",
+    },
+    {
+      label: "SaaS Dashboard",
+      href: "/saasdashboard",
     },
   ],
   links: {
