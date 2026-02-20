@@ -11,9 +11,11 @@ import "react-toastify/dist/ReactToastify.css";
 export default function BrandBiblePage() {
     const [result, setResult] = useState<BrandResultType | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [lastInput, setLastInput] = useState<BrandInput | null>(null);
 
     const handleGenerate = async (data: BrandInput) => {
         setIsLoading(true);
+        setLastInput(data); // Store input for regeneration
         try {
             const generatedBrand = await generateBrand(data);
             setResult(generatedBrand);
@@ -26,8 +28,15 @@ export default function BrandBiblePage() {
         }
     };
 
+    const handleRegenerate = () => {
+        if (lastInput) {
+            handleGenerate(lastInput);
+        }
+    };
+
     const handleReset = () => {
         setResult(null);
+        setLastInput(null);
     };
 
     return (
@@ -44,7 +53,11 @@ export default function BrandBiblePage() {
 
             <div className="mt-8">
                 {result ? (
-                    <BrandResult result={result} onReset={handleReset} />
+                    <BrandResult
+                        result={result}
+                        onReset={handleReset}
+                        onRegenerate={handleRegenerate}
+                    />
                 ) : (
                     <BrandForm onSubmit={handleGenerate} isLoading={isLoading} />
                 )}

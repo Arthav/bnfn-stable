@@ -10,14 +10,17 @@ import { Tabs, Tab } from "@nextui-org/tabs"; // Assuming NextUI tabs exist
 import { BrandResult as BrandResultType } from "@/types/brand";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable"; // Ensure this is imported correctly
-import { DownloadIcon, Quote, Target, Users, Palette, BookOpen, ShieldAlert, Sparkles, Check as CheckIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { DownloadIcon, Quote, Target, Users, Palette, BookOpen, ShieldAlert, Sparkles, Check as CheckIcon, RefreshCw, Home } from "lucide-react";
 
 interface BrandResultProps {
     result: BrandResultType;
     onReset: () => void;
+    onRegenerate: () => void;
 }
 
-export function BrandResult({ result, onReset }: BrandResultProps) {
+export function BrandResult({ result, onReset, onRegenerate }: BrandResultProps) {
+    const router = useRouter();
     const downloadPDF = () => {
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
@@ -211,25 +214,44 @@ export function BrandResult({ result, onReset }: BrandResultProps) {
     return (
         <div className="flex flex-col gap-8 w-full max-w-5xl mx-auto animate-fade-in pb-10">
             {/* Header Section */}
-            <div className="text-center space-y-4">
-                <Chip color="secondary" variant="flat" className="uppercase font-bold tracking-widest text-xs">
-                    {result.audienceAnalysis.brandArchetype} Archetype
-                </Chip>
-                <h1 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-                    {result.businessName || "Your Brand"}
-                </h1>
-                <p className="text-xl md:text-2xl text-default-500 font-light italic">
-                    "{result.tagline}"
-                </p>
-                <div className="flex justify-center pt-4">
-                    <Button
-                        color="primary"
-                        variant="shadow"
-                        startContent={<DownloadIcon size={18} />}
-                        onPress={downloadPDF}
-                    >
-                        Download Full Brand Bible (PDF)
-                    </Button>
+            <div className="relative">
+                <Button
+                    isIconOnly
+                    variant="light"
+                    className="absolute left-0 top-0 text-default-400 hover:text-primary md:hidden"
+                    onPress={() => router.push('/')}
+                >
+                    <Home size={20} />
+                </Button>
+                <Button
+                    variant="light"
+                    className="absolute left-0 top-0 text-default-400 hover:text-primary hidden md:flex"
+                    startContent={<Home size={18} />}
+                    onPress={() => router.push('/')}
+                >
+                    Back to Home
+                </Button>
+
+                <div className="text-center space-y-4 pt-8 md:pt-0">
+                    <Chip color="secondary" variant="flat" className="uppercase font-bold tracking-widest text-xs">
+                        {result.audienceAnalysis.brandArchetype} Archetype
+                    </Chip>
+                    <h1 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                        {result.businessName || "Your Brand"}
+                    </h1>
+                    <p className="text-xl md:text-2xl text-default-500 font-light italic">
+                        "{result.tagline}"
+                    </p>
+                    <div className="flex justify-center pt-4">
+                        <Button
+                            color="primary"
+                            variant="shadow"
+                            startContent={<DownloadIcon size={18} />}
+                            onPress={downloadPDF}
+                        >
+                            Download Full Brand Bible (PDF)
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -361,6 +383,50 @@ export function BrandResult({ result, onReset }: BrandResultProps) {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </CardBody>
+                    </Card>
+
+                    {/* Typography */}
+                    <Card className="shadow-sm">
+                        <CardHeader className="pb-0 pt-4 px-4 flex-col items-start">
+                            <h4 className="font-bold text-large flex items-center gap-2">
+                                <BookOpen size={20} /> Typography
+                            </h4>
+                        </CardHeader>
+                        <CardBody className="py-4 gap-6">
+                            {/* Font Loader - Attempt to load fonts from Google */}
+                            <style>{`
+                                @import url('https://fonts.googleapis.com/css2?family=${result.typography.header.replace(/\s+/g, '+')}&family=${result.typography.body.replace(/\s+/g, '+')}&display=swap');
+                            `}</style>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <p className="text-tiny uppercase font-bold text-default-400 mb-2">Header Font</p>
+                                    <div className="p-4 bg-default-50 rounded-lg border border-default-100">
+                                        <p className="text-xl" style={{ fontFamily: result.typography.header }}>
+                                            {result.typography.header}
+                                        </p>
+                                        <p className="text-3xl mt-2" style={{ fontFamily: result.typography.header }}>
+                                            The quick brown fox jumps over the lazy dog. 0123456789
+                                        </p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p className="text-tiny uppercase font-bold text-default-400 mb-2">Body Font</p>
+                                    <div className="p-4 bg-default-50 rounded-lg border border-default-100">
+                                        <p className="text-xl" style={{ fontFamily: result.typography.body }}>
+                                            {result.typography.body}
+                                        </p>
+                                        <p className="text-base mt-2 opacity-80" style={{ fontFamily: result.typography.body }}>
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-tiny uppercase font-bold text-default-400 mb-1">Scale & Usage</p>
+                                <p className="text-small text-default-600">{result.typography.sizing}</p>
                             </div>
                         </CardBody>
                     </Card>
@@ -598,9 +664,18 @@ export function BrandResult({ result, onReset }: BrandResultProps) {
             </div>
 
 
-            <div className="flex justify-center mt-12 pb-20">
+            <div className="flex justify-center mt-12 pb-20 gap-4">
                 <Button variant="flat" color="default" onPress={onReset} size="lg">
                     Create Another Brand
+                </Button>
+                <Button
+                    color="secondary"
+                    variant="shadow"
+                    onPress={onRegenerate}
+                    size="lg"
+                    startContent={<RefreshCw size={18} />}
+                >
+                    Regenerate Brand
                 </Button>
             </div>
         </div>

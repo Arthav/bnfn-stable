@@ -6,7 +6,7 @@ import { Input, Textarea } from "@nextui-org/input";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { BrandInput, BrandMood, ThemeStyle } from "@/types/brand";
 import { Chip } from "@nextui-org/chip";
-import { CheckIcon, Sparkles } from "lucide-react";
+import { CheckIcon, Sparkles, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const INDUSTRIES = [
@@ -130,7 +130,15 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
 
     return (
         <Card className="max-w-4xl mx-auto shadow-2xl border-none bg-content1/50 backdrop-blur-lg">
-            <CardHeader className="flex flex-col gap-2 items-center text-center pt-8 pb-4">
+            <CardHeader className="flex flex-col gap-2 items-center text-center pt-8 pb-4 relative">
+                <Button
+                    isIconOnly
+                    variant="light"
+                    className="absolute left-4 top-4 text-default-400 hover:text-primary"
+                    onPress={() => window.location.href = '/'}
+                >
+                    <Home size={20} />
+                </Button>
                 <div className="p-3 bg-primary/10 rounded-full mb-2 text-primary">
                     <Sparkles size={32} />
                 </div>
