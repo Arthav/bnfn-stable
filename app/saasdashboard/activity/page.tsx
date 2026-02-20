@@ -62,45 +62,45 @@ const activities = [
 ];
 
 export default function ActivityPage() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-bold">Activity Log</h2>
-        <p className="text-default-500">Track all events and actions in your workspace.</p>
-      </div>
+    return (
+        <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+                <h2 className="text-2xl font-bold">Activity Log</h2>
+                <p className="text-default-500">Track all events and actions in your workspace.</p>
+            </div>
 
-      <div className="flex flex-col gap-4">
-        {activities.map((activity) => (
-            <Card key={activity.id} className="border-none bg-background/60 dark:bg-default-100/50 backdrop-blur-lg shadow-sm">
-                <CardBody className="flex flex-row items-center gap-4 p-4">
-                    <div className="p-2 rounded-full bg-default-100 dark:bg-default-200">
-                        {activity.icon}
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 flex-1">
-                        {activity.user.name !== "System" ? (
-                            <User
-                                name={activity.user.name}
-                                avatarProps={{ src: activity.user.avatar, size: "sm" }}
-                                className="justify-start min-w-[150px]"
-                            />
-                        ) : (
-                            <div className="flex items-center gap-2 min-w-[150px] font-semibold text-sm pl-2">
-                                System
+            <div className="flex flex-col gap-4">
+                {activities.map((activity) => (
+                    <Card key={activity.id} className="border-none bg-background/60 dark:bg-default-100/50 backdrop-blur-lg shadow-sm">
+                        <CardBody className="flex flex-row items-center gap-4 p-4">
+                            <div className="p-2 rounded-full bg-default-100 dark:bg-default-200">
+                                {activity.icon}
                             </div>
-                        )}
-                        
-                        <div className="flex flex-wrap items-center gap-1 text-sm text-default-600">
-                            <span>{activity.action}</span>
-                            <span className="font-semibold text-default-900 dark:text-default-100">{activity.target}</span>
-                        </div>
-                    </div>
-                    <div className="text-xs text-default-400 whitespace-nowrap">
-                        {activity.time}
-                    </div>
-                </CardBody>
-            </Card>
-        ))}
-      </div>
-    </div>
-  );
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 flex-1">
+                                {activity.user.name !== "System" ? (
+                                    <User
+                                        name={activity.user.name}
+                                        avatarProps={{ src: activity.user.avatar, size: "sm" }}
+                                        className="justify-start min-w-[150px]"
+                                    />
+                                ) : (
+                                    <div className="flex items-center gap-2 min-w-[150px] font-semibold text-sm pl-2">
+                                        System
+                                    </div>
+                                )}
+
+                                <div className="flex flex-wrap items-center gap-1 text-sm text-default-600">
+                                    <span>{activity.action}</span>
+                                    <span className="text-default-400">{activity.target}</span>
+                                </div>
+                            </div>
+                            <div className="text-xs text-default-400 whitespace-nowrap">
+                                {activity.time}
+                            </div>
+                        </CardBody>
+                    </Card>
+                ))}
+            </div>
+        </div>
+    );
 }

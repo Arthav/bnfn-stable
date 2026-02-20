@@ -23,41 +23,41 @@ const columns = [
 ];
 
 const transactions = [
-    {
-        id: "#TRX-9821",
-        user: { name: "Tony Reichert", email: "tony@example.com", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d" },
-        date: "Feb 19, 2026",
-        amount: "$450.00",
-        status: "completed"
-    },
-    {
-        id: "#TRX-9820",
-        user: { name: "Zoey Lang", email: "zoey@example.com", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
-        date: "Feb 18, 2026",
-        amount: "$59.00",
-        status: "failed"
-    },
-    {
-        id: "#TRX-9819",
-        user: { name: "Jane Fisher", email: "jane@example.com", avatar: "https://i.pravatar.cc/150?u=a04258114e29026702d" },
-        date: "Feb 17, 2026",
-        amount: "$250.00",
-        status: "pending"
-    },
-    {
-        id: "#TRX-9818",
-        user: { name: "William Howard", email: "william@example.com", avatar: "https://i.pravatar.cc/150?u=a048581f4e29026701d" },
-        date: "Feb 16, 2026",
-        amount: "$120.50",
-        status: "completed"
-    },
-    {
-        id: "#TRX-9817",
-        user: { name: "Kristen Copper", email: "kristen@example.com", avatar: "https://i.pravatar.cc/150?u=a092581d4ef9026700d" },
-        date: "Feb 15, 2026",
-        amount: "$89.99",
-        status: "completed"
-    }
+  {
+    id: "#TRX-9821",
+    user: { name: "Tony Reichert", email: "tony@example.com", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d" },
+    date: "Feb 19, 2026",
+    amount: "$450.00",
+    status: "completed"
+  },
+  {
+    id: "#TRX-9820",
+    user: { name: "Zoey Lang", email: "zoey@example.com", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
+    date: "Feb 18, 2026",
+    amount: "$59.00",
+    status: "failed"
+  },
+  {
+    id: "#TRX-9819",
+    user: { name: "Jane Fisher", email: "jane@example.com", avatar: "https://i.pravatar.cc/150?u=a04258114e29026702d" },
+    date: "Feb 17, 2026",
+    amount: "$250.00",
+    status: "pending"
+  },
+  {
+    id: "#TRX-9818",
+    user: { name: "William Howard", email: "william@example.com", avatar: "https://i.pravatar.cc/150?u=a048581f4e29026701d" },
+    date: "Feb 16, 2026",
+    amount: "$120.50",
+    status: "completed"
+  },
+  {
+    id: "#TRX-9817",
+    user: { name: "Kristen Copper", email: "kristen@example.com", avatar: "https://i.pravatar.cc/150?u=a092581d4ef9026700d" },
+    date: "Feb 15, 2026",
+    amount: "$89.99",
+    status: "completed"
+  }
 ];
 
 const statusColorMap: Record<string, "success" | "danger" | "warning"> = {
@@ -105,7 +105,7 @@ export default function TransactionsPage() {
             {cellValue}
           </Chip>
         );
-       case "amount":
+      case "amount":
         return <span className="font-bold">{cellValue}</span>;
       default:
         return cellValue;
@@ -119,18 +119,18 @@ export default function TransactionsPage() {
         <p className="text-default-500">View recent payments and invoices.</p>
       </div>
 
-       <div className="flex justify-between items-center bg-default-100/50 p-4 rounded-xl mb-2">
-          <Input 
-             className="max-w-xs" 
-             placeholder="Search transactions..." 
-             startContent={<SearchIcon />} 
-             value={filterValue}
-             onValueChange={setFilterValue}
-          />
-          <button className="flex items-center gap-2 text-primary text-sm font-semibold">
-             <DownloadIcon size={16} /> Export CSV
-          </button>
-       </div>
+      <div className="flex justify-between items-center bg-default-100/50 p-4 rounded-xl mb-2">
+        <Input
+          className="max-w-xs"
+          placeholder="Search transactions..."
+          startContent={<SearchIcon />}
+          value={filterValue}
+          onValueChange={setFilterValue}
+        />
+        <button className="text-white flex items-center gap-2 text-primary text-sm font-semibold">
+          <DownloadIcon size={16} /> Export CSV
+        </button>
+      </div>
 
       <Table aria-label="Transactions table">
         <TableHeader columns={columns}>
