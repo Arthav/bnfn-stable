@@ -60,6 +60,7 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
         industry: "",
         mood: [],
         themeStyle: "None",
+        model: "openrouter",
     });
 
     const [customIndustry, setCustomIndustry] = useState("");
@@ -183,7 +184,7 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
                     {/* Industry Selection */}
                     <div className="space-y-3">
                         <div className="flex justify-between items-end">
-                            <label className="text-medium font-semibold text-default-700">Industry <span className="text-danger">*</span></label>
+                            <span className="text-medium font-semibold text-default-700">Industry <span className="text-danger">*</span></span>
                             <span className="text-tiny text-default-400">Select one</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -229,7 +230,7 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
                     {/* Mood Selection */}
                     <div className="space-y-3">
                         <div className="flex justify-between items-end">
-                            <label className="text-medium font-semibold text-default-700">Brand Mood <span className="text-danger">*</span></label>
+                            <span className="text-medium font-semibold text-default-700">Brand Mood <span className="text-danger">*</span></span>
                             <span className={cn("text-tiny", formData.mood.length >= 2 ? "text-warning" : "text-default-400")}>
                                 {formData.mood.length}/2 selected
                             </span>
@@ -262,7 +263,7 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
                     {/* Theme Style Selection */}
                     <div className="space-y-3">
                         <div className="flex justify-between items-end">
-                            <label className="text-medium font-semibold text-default-700">Theme Style <span className="text-danger">*</span></label>
+                            <span className="text-medium font-semibold text-default-700">Theme Style <span className="text-danger">*</span></span>
                             <span className="text-tiny text-default-400">Select one</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -287,6 +288,64 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
                                     </Chip>
                                 );
                             })}
+                        </div>
+                    </div>
+
+                    {/* Model Selection */}
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-end">
+                            <span className="text-medium font-semibold text-default-700">AI Model <span className="text-default-400 font-normal text-tiny">(Optional)</span></span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        handleChange("model", "openrouter");
+                                    }
+                                }}
+                                onClick={() => handleChange("model", "openrouter")}
+                                className={cn(
+                                    "cursor-pointer rounded-xl p-4 border-2 transition-all flex items-center gap-3",
+                                    formData.model === "openrouter"
+                                        ? "border-primary bg-primary/5 shadow-md"
+                                        : "border-transparent bg-default-100 hover:bg-default-200"
+                                )}
+                            >
+                                <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", formData.model === "openrouter" ? "border-primary" : "border-default-400")}>
+                                    {formData.model === "openrouter" && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                                </div>
+                                <div>
+                                    <p className="font-bold text-small">Arcee: trinity large</p>
+                                    <p className="text-tiny text-default-500">Fast & Free (Default)</p>
+                                </div>
+                            </div>
+
+                            <div
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        handleChange("model", "aihubmix");
+                                    }
+                                }}
+                                onClick={() => handleChange("model", "aihubmix")}
+                                className={cn(
+                                    "cursor-pointer rounded-xl p-4 border-2 transition-all flex items-center gap-3",
+                                    formData.model === "aihubmix"
+                                        ? "border-secondary bg-secondary/5 shadow-md"
+                                        : "border-transparent bg-default-100 hover:bg-default-200"
+                                )}
+                            >
+                                <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", formData.model === "aihubmix" ? "border-secondary" : "border-default-400")}>
+                                    {formData.model === "aihubmix" && <div className="w-2.5 h-2.5 rounded-full bg-secondary" />}
+                                </div>
+                                <div>
+                                    <p className="font-bold text-small">GLM-5</p>
+                                    <p className="text-tiny text-default-500">Advanced Reasoning</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

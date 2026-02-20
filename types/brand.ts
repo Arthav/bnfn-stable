@@ -26,6 +26,7 @@ export interface BrandInput {
     industry: string;
     mood: BrandMood[];
     themeStyle: ThemeStyle;
+    model: "openrouter" | "aihubmix";
 }
 
 export interface ColorPalette {

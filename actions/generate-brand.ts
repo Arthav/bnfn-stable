@@ -103,33 +103,63 @@ export async function generateBrand(input: BrandInput): Promise<BrandResult> {
     }
   `;
 
+    const shouldUseAIHubMix = input.model === "aihubmix";
+    const API_KEY = shouldUseAIHubMix ? process.env.AIHUBMIX_API_KEY : OPENROUTER_API_KEY;
+    const API_URL = shouldUseAIHubMix ? "https://aihubmix.com/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions";
+    const MODEL_NAME = shouldUseAIHubMix ? "coding-glm-5-free" : "arcee-ai/trinity-large-preview:free";
+
+    if (!API_KEY) {
+        throw new Error(`${shouldUseAIHubMix ? "AIHUBMIX_API_KEY" : "OPEN_ROUTER_KEY"} is not defined`);
+    }
+
     try {
-        // First API call with reasoning enabled
-        let response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const body: any = {
+            "model": MODEL_NAME,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            "max_tokens": 65536,
+            "temperature": 1.0
+        };
+
+        // Specific configurations per provider
+        if (shouldUseAIHubMix) {
+            body["thinking"] = { "type": "enabled" };
+        } else {
+            // OpenRouter specific
+            body["response_format"] = { "type": "json_object" };
+        }
+
+        let response = await fetch(API_URL, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                "Authorization": `Bearer ${API_KEY}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                "model": "arcee-ai/trinity-large-preview:free",
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                "response_format": { "type": "json_object" }
-            })
+            body: JSON.stringify(body)
         });
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`OpenRouter API error: ${response.statusText} - ${errorText}`);
+            throw new Error(`API Error (${shouldUseAIHubMix ? "AIHubMix" : "OpenRouter"}): ${response.statusText} - ${errorText}`);
         }
 
         const result = await response.json();
-        const content = result.choices[0].message.content;
+        let content = result.choices[0].message.content;
+
+        // Clean up response if it contains thinking process (often wrapped in tags or distinct blocks)
+        // For simple JSON parsing, we might need to extract the JSON part if the model is "thinking" visibly
+        // But assumed model returns clean content or we parse what we can.
+
+        // If content contains markdown code blocks, strip them
+        if (content.includes("```json")) {
+            content = content.split("```json")[1].split("```")[0].trim();
+        } else if (content.includes("```")) {
+            content = content.split("```")[1].split("```")[0].trim();
+        }
 
         try {
             const parsedResult = JSON.parse(content) as BrandResult;

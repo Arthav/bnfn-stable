@@ -166,9 +166,9 @@ export function BrandResult({ result, onReset, onRegenerate }: BrandResultProps)
         doc.setFontSize(10);
         Object.entries(result.voiceAndTone.contextualTone).forEach(([ctx, tone]) => {
             checkPageBreak(25);
-            doc.setFont(undefined, 'bold');
+            doc.setFont("helvetica", "bold");
             doc.text(`${ctx.charAt(0).toUpperCase() + ctx.slice(1)}:`, 14, yPos);
-            doc.setFont(undefined, 'normal');
+            doc.setFont("helvetica", "normal");
             const splitTone = doc.splitTextToSize(tone as string, pageWidth - 40);
             doc.text(splitTone, 40, yPos);
             yPos += splitTone.length * 4 + 4;
@@ -240,7 +240,7 @@ export function BrandResult({ result, onReset, onRegenerate }: BrandResultProps)
                         {result.businessName || "Your Brand"}
                     </h1>
                     <p className="text-xl md:text-2xl text-default-500 font-light italic">
-                        "{result.tagline}"
+                        &quot;{result.tagline}&quot;
                     </p>
                     <div className="flex justify-center pt-4">
                         <Button
@@ -472,7 +472,7 @@ export function BrandResult({ result, onReset, onRegenerate }: BrandResultProps)
                 {/* Do's and Don'ts */}
                 <Card className="shadow-sm">
                     <CardHeader className="pb-2">
-                        <h4 className="font-bold text-large">Do's & Don'ts</h4>
+                        <h4 className="font-bold text-large">Do&apos;s & Don&apos;ts</h4>
                     </CardHeader>
                     <Divider />
                     <CardBody className="gap-3">
@@ -499,7 +499,7 @@ export function BrandResult({ result, onReset, onRegenerate }: BrandResultProps)
                     <CardBody className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p className="text-tiny uppercase font-bold text-default-400 mb-1">Hero Headline</p>
-                            <p className="text-large font-bold text-default-900 font-serif">"{result.voiceAndTone.sampleCopy.heroHeadline}"</p>
+                            <p className="text-large font-bold text-default-900 font-serif">&quot;{result.voiceAndTone.sampleCopy.heroHeadline}&quot;</p>
                         </div>
                         <div>
                             <p className="text-tiny uppercase font-bold text-default-400 mb-1">Call to Action</p>
@@ -513,7 +513,7 @@ export function BrandResult({ result, onReset, onRegenerate }: BrandResultProps)
                         </div>
                         <div>
                             <p className="text-tiny uppercase font-bold text-default-400 mb-1">Email Greeting</p>
-                            <p className="text-small text-default-600 italic">"{result.voiceAndTone.sampleCopy.emailGreeting}"</p>
+                            <p className="text-small text-default-600 italic">&quot;{result.voiceAndTone.sampleCopy.emailGreeting}&quot;</p>
                         </div>
                     </CardBody>
                 </Card>
