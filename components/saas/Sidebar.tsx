@@ -27,10 +27,10 @@ export const Sidebar = () => {
 
     return (
         <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 border-r border-default-200 bg-background/60 backdrop-blur-xl">
-            <div className="p-6 flex items-center gap-2 border-b border-default-200/50">
+            <Link href="/" className="p-6 flex items-center gap-2 border-b border-default-200/50">
                 <BNFNLogo />
                 <span className="font-bold text-xl">Saas Example</span>
-            </div>
+            </Link>
 
             <div className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
                 <div className="text-xs font-semibold text-default-500 uppercase px-2 mb-2">Main Menu</div>
@@ -67,9 +67,11 @@ export const Sidebar = () => {
                 <div className="bg-primary/5 rounded-xl p-4">
                     <h4 className="font-semibold text-sm mb-1">Pro Plan</h4>
                     <p className="text-xs text-default-500 mb-3">You have 12 days left in your trial.</p>
-                    <button className="w-full bg-primary text-white text-xs font-medium py-2 rounded-lg hover:opacity-90 transition-opacity">
-                        Upgrade Now
-                    </button>
+                    <Link href="/saasdashboard/pricing" className="block w-full">
+                        <button className="w-full bg-primary text-white text-xs font-medium py-2 rounded-lg hover:opacity-90 transition-opacity">
+                            Upgrade Now
+                        </button>
+                    </Link>
                 </div>
             </div>
         </aside>
