@@ -3,64 +3,64 @@
 @tailwind utilities;
 
 :root {
-    --chat-width: 40rem;
-    --chat-height: 25rem;
+  --chat-width: 40rem;
+  --chat-height: 25rem;
 }
 
 .chat-window {
-    border: 1px solid #ccc;
-    padding: 16px;
-    width: var(--chat-width);
-    margin: 16px auto;
-    height: var(--chat-height);
-    overflow-y: auto;
-    background: #000000;
-  }
-  
-  .chat-message {
-    margin-bottom: 8px;
-    padding: 10px;
-    border-radius: 14px;
-    border: 2px solid #ccc;
-  }
-  
-  .user-message {
-    background: #000000;
-    text-align: left;
-  }
-  
-  .ai-message {
-    background: #585858;
-    text-align: right;
-  }
-  
-  .input-container {
-    display: flex;
-    gap: 8px;
-    width: var(--chat-width);
-    margin: 16px auto;
-  }
-  
-  input[type='text'] {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-  }
-  
-  button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
+  border: 1px solid #ccc;
+  padding: 16px;
+  width: var(--chat-width);
+  margin: 16px auto;
+  height: var(--chat-height);
+  overflow-y: auto;
+  background: #000000;
+}
+
+.chat-message {
+  margin-bottom: 8px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 2px solid #ccc;
+}
+
+.user-message {
+  background: #000000;
+  text-align: left;
+}
+
+.ai-message {
+  background: #585858;
+  text-align: right;
+}
+
+.input-container {
+  display: flex;
+  gap: 8px;
+  width: var(--chat-width);
+  margin: 16px auto;
+}
+
+input[type='text'] {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
 
 @layer utilities {
   .mask-linear-gradient {
@@ -68,4 +68,43 @@
     -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   }
 }
-  
+
+/* Spotlight Card */
+.card-spotlight {
+  position: relative;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(25, 25, 25, 1);
+  overflow: hidden;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: rgba(255, 255, 255, 0.25);
+}
+
+.card-spotlight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y),
+      var(--spotlight-color),
+      transparent 40%);
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+  z-index: 10;
+  /* Use mask to make it a border glow */
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  padding: 2px;
+  /* Width of the border */
+  border-radius: inherit;
+}
+
+.card-spotlight:hover::before {
+  opacity: 1;
+}

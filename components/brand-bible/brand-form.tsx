@@ -8,6 +8,7 @@ import { BrandInput, BrandMood, ThemeStyle } from "@/types/brand";
 import { Chip } from "@nextui-org/chip";
 import { CheckIcon, Sparkles, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
+import SpotlightCard from "@/components/ui/spotlight-card";
 
 const INDUSTRIES = [
     "Technology",
@@ -130,237 +131,239 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
     };
 
     return (
-        <Card className="max-w-4xl mx-auto shadow-2xl border-none bg-content1/50 backdrop-blur-lg">
-            <CardHeader className="flex flex-col gap-2 items-center text-center pt-8 pb-4 relative">
-                <Button
-                    isIconOnly
-                    variant="light"
-                    className="absolute left-4 top-4 text-default-400 hover:text-primary"
-                    onPress={() => window.location.href = '/'}
-                >
-                    <Home size={20} />
-                </Button>
-                <div className="p-3 bg-primary/10 rounded-full mb-2 text-primary">
-                    <Sparkles size={32} />
-                </div>
-                <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-                    Create Your Brand Identity
-                </h2>
-                <p className="text-default-500 max-w-md">
-                    Tell us about your business to generate a unique brand bible.
-                </p>
-            </CardHeader>
-            <CardBody className="px-8 py-8">
-                <form onSubmit={handleSubmit} className="flex flex-col gap-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Input
-                            isRequired
-                            label="Business Name"
-                            labelPlacement="outside"
-                            placeholder="e.g. Acme Corp"
-                            value={formData.businessName}
-                            onValueChange={(v) => handleChange("businessName", v)}
-                            variant="bordered"
-                            classNames={{
-                                inputWrapper: "bg-default-50 hover:bg-default-100 transition-colors",
-                            }}
-                        />
-
-                        <Textarea
-                            isRequired
-                            label="Business Description"
-                            labelPlacement="outside"
-                            placeholder="Describe what your business does..."
-                            value={formData.description}
-                            onValueChange={(v) => handleChange("description", v)}
-                            variant="bordered"
-                            minRows={1}
-                            classNames={{
-                                inputWrapper: "bg-default-50 hover:bg-default-100 transition-colors",
-                            }}
-                        />
-                    </div>
-
-                    {/* Industry Selection */}
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-end">
-                            <span className="text-medium font-semibold text-default-700">Industry <span className="text-danger">*</span></span>
-                            <span className="text-tiny text-default-400">Select one</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {INDUSTRIES.map((industry) => {
-                                const isSelected = formData.industry === industry;
-                                return (
-                                    <Chip
-                                        key={industry}
-                                        onClick={() => handleChange("industry", industry)}
-                                        variant={isSelected ? "solid" : "flat"}
-                                        color={isSelected ? "primary" : "default"}
-                                        classNames={{
-                                            base: cn(
-                                                "cursor-pointer transition-all hover:scale-105 active:scale-95 px-2 py-4 h-auto",
-                                                isSelected ? "shadow-md shadow-primary/30" : "hover:bg-default-200 border border-transparent"
-                                            ),
-                                            content: "text-small font-medium"
-                                        }}
-                                        startContent={isSelected ? <CheckIcon size={14} className="ml-1" /> : undefined}
-                                    >
-                                        {industry}
-                                    </Chip>
-                                );
-                            })}
-                        </div>
-
-                        {formData.industry === "Other" && (
-                            <div className="pt-2 animate-fade-in">
-                                <Input
-                                    label="Specify Industry"
-                                    placeholder="e.g. Space Tourism"
-                                    labelPlacement="outside"
-                                    value={customIndustry}
-                                    onValueChange={setCustomIndustry}
-                                    variant="flat"
-                                    color="primary"
-                                    isRequired
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Mood Selection */}
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-end">
-                            <span className="text-medium font-semibold text-default-700">Brand Mood <span className="text-danger">*</span></span>
-                            <span className={cn("text-tiny", formData.mood.length >= 2 ? "text-warning" : "text-default-400")}>
-                                {formData.mood.length}/2 selected
-                            </span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {MOODS.map((mood) => {
-                                const isSelected = formData.mood.includes(mood);
-                                return (
-                                    <Chip
-                                        key={mood}
-                                        onClick={() => handleMoodToggle(mood)}
-                                        variant={isSelected ? "shadow" : "flat"}
-                                        color={isSelected ? "secondary" : "default"}
-                                        classNames={{
-                                            base: cn(
-                                                "cursor-pointer transition-all hover:scale-105 active:scale-95 px-2 py-4 h-auto",
-                                                isSelected ? "shadow-md shadow-secondary/30 ring-2 ring-secondary ring-offset-2 ring-offset-background" : "hover:bg-default-200 border border-transparent"
-                                            ),
-                                            content: "text-small font-medium"
-                                        }}
-                                        startContent={isSelected ? <CheckIcon size={14} className="ml-1" /> : undefined}
-                                    >
-                                        {mood}
-                                    </Chip>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Theme Style Selection */}
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-end">
-                            <span className="text-medium font-semibold text-default-700">Theme Style <span className="text-danger">*</span></span>
-                            <span className="text-tiny text-default-400">Select one</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {THEMES.map((theme) => {
-                                const isSelected = formData.themeStyle === theme;
-                                return (
-                                    <Chip
-                                        key={theme}
-                                        onClick={() => handleChange("themeStyle", theme)}
-                                        variant={isSelected ? "solid" : "bordered"}
-                                        color={isSelected ? "success" : "default"}
-                                        classNames={{
-                                            base: cn(
-                                                "cursor-pointer transition-all hover:scale-105 active:scale-95 px-3 py-5 h-auto",
-                                                isSelected ? "shadow-md shadow-success/30" : "hover:border-default-400"
-                                            ),
-                                            content: "text-small font-semibold"
-                                        }}
-                                        startContent={isSelected ? <CheckIcon size={14} className="ml-1" /> : undefined}
-                                    >
-                                        {theme}
-                                    </Chip>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Model Selection */}
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-end">
-                            <span className="text-medium font-semibold text-default-700">AI Model <span className="text-default-400 font-normal text-tiny">(Optional)</span></span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                        handleChange("model", "openrouter");
-                                    }
-                                }}
-                                onClick={() => handleChange("model", "openrouter")}
-                                className={cn(
-                                    "cursor-pointer rounded-xl p-4 border-2 transition-all flex items-center gap-3",
-                                    formData.model === "openrouter"
-                                        ? "border-primary bg-primary/5 shadow-md"
-                                        : "border-transparent bg-default-100 hover:bg-default-200"
-                                )}
-                            >
-                                <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", formData.model === "openrouter" ? "border-primary" : "border-default-400")}>
-                                    {formData.model === "openrouter" && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                                </div>
-                                <div>
-                                    <p className="font-bold text-small">Arcee: trinity large</p>
-                                    <p className="text-tiny text-default-500">Fast & Free (Default)</p>
-                                </div>
-                            </div>
-
-                            <div
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                        handleChange("model", "aihubmix");
-                                    }
-                                }}
-                                onClick={() => handleChange("model", "aihubmix")}
-                                className={cn(
-                                    "cursor-pointer rounded-xl p-4 border-2 transition-all flex items-center gap-3",
-                                    formData.model === "aihubmix"
-                                        ? "border-secondary bg-secondary/5 shadow-md"
-                                        : "border-transparent bg-default-100 hover:bg-default-200"
-                                )}
-                            >
-                                <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", formData.model === "aihubmix" ? "border-secondary" : "border-default-400")}>
-                                    {formData.model === "aihubmix" && <div className="w-2.5 h-2.5 rounded-full bg-secondary" />}
-                                </div>
-                                <div>
-                                    <p className="font-bold text-small">GLM-5</p>
-                                    <p className="text-tiny text-default-500">Advanced Reasoning</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+        <SpotlightCard className="max-w-4xl mx-auto shadow-2xl" spotlightColor="rgba(120, 40, 200, 0.5)">
+            <Card className="relative border-none bg-black/90 backdrop-blur-xl">
+                <CardHeader className="flex flex-col gap-2 items-center text-center pt-8 pb-4 relative">
                     <Button
-                        color="primary"
-                        type="submit"
-                        isLoading={isLoading}
-                        className="w-full mt-6 font-bold text-lg shadow-xl shadow-primary/20"
-                        size="lg"
-                        isDisabled={!formData.businessName || !formData.description || !formData.industry || formData.mood.length === 0 || (formData.industry === "Other" && !customIndustry)}
+                        isIconOnly
+                        variant="light"
+                        className="absolute left-4 top-4 text-default-400 hover:text-primary"
+                        onPress={() => window.location.href = '/'}
                     >
-                        {isLoading ? `Generating Brand Magic... (${seconds}s) (estimated 45s)` : "Generate Brand Bible"}
+                        <Home size={20} />
                     </Button>
-                </form>
-            </CardBody>
-        </Card>
+                    <div className="p-3 bg-primary/10 rounded-full mb-2 text-primary">
+                        <Sparkles size={32} />
+                    </div>
+                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                        Create Your Brand Identity
+                    </h2>
+                    <p className="text-default-500 max-w-md">
+                        Tell us about your business to generate a unique brand bible.
+                    </p>
+                </CardHeader>
+                <CardBody className="px-8 py-8">
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Input
+                                isRequired
+                                label="Business Name"
+                                labelPlacement="outside"
+                                placeholder="e.g. Acme Corp"
+                                value={formData.businessName}
+                                onValueChange={(v) => handleChange("businessName", v)}
+                                variant="bordered"
+                                classNames={{
+                                    inputWrapper: "bg-default-50 hover:bg-default-100 transition-colors",
+                                }}
+                            />
+
+                            <Textarea
+                                isRequired
+                                label="Business Description"
+                                labelPlacement="outside"
+                                placeholder="Describe what your business does..."
+                                value={formData.description}
+                                onValueChange={(v) => handleChange("description", v)}
+                                variant="bordered"
+                                minRows={1}
+                                classNames={{
+                                    inputWrapper: "bg-default-50 hover:bg-default-100 transition-colors",
+                                }}
+                            />
+                        </div>
+
+                        {/* Industry Selection */}
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-end">
+                                <span className="text-medium font-semibold text-default-700">Industry <span className="text-danger">*</span></span>
+                                <span className="text-tiny text-default-400">Select one</span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {INDUSTRIES.map((industry) => {
+                                    const isSelected = formData.industry === industry;
+                                    return (
+                                        <Chip
+                                            key={industry}
+                                            onClick={() => handleChange("industry", industry)}
+                                            variant={isSelected ? "solid" : "flat"}
+                                            color={isSelected ? "primary" : "default"}
+                                            classNames={{
+                                                base: cn(
+                                                    "cursor-pointer transition-all hover:scale-105 active:scale-95 px-2 py-4 h-auto",
+                                                    isSelected ? "shadow-md shadow-primary/30" : "hover:bg-default-200 border border-transparent"
+                                                ),
+                                                content: "text-small font-medium"
+                                            }}
+                                            startContent={isSelected ? <CheckIcon size={14} className="ml-1" /> : undefined}
+                                        >
+                                            {industry}
+                                        </Chip>
+                                    );
+                                })}
+                            </div>
+
+                            {formData.industry === "Other" && (
+                                <div className="pt-2 animate-fade-in">
+                                    <Input
+                                        label="Specify Industry"
+                                        placeholder="e.g. Space Tourism"
+                                        labelPlacement="outside"
+                                        value={customIndustry}
+                                        onValueChange={setCustomIndustry}
+                                        variant="flat"
+                                        color="primary"
+                                        isRequired
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Mood Selection */}
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-end">
+                                <span className="text-medium font-semibold text-default-700">Brand Mood <span className="text-danger">*</span></span>
+                                <span className={cn("text-tiny", formData.mood.length >= 2 ? "text-warning" : "text-default-400")}>
+                                    {formData.mood.length}/2 selected
+                                </span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {MOODS.map((mood) => {
+                                    const isSelected = formData.mood.includes(mood);
+                                    return (
+                                        <Chip
+                                            key={mood}
+                                            onClick={() => handleMoodToggle(mood)}
+                                            variant={isSelected ? "shadow" : "flat"}
+                                            color={isSelected ? "secondary" : "default"}
+                                            classNames={{
+                                                base: cn(
+                                                    "cursor-pointer transition-all hover:scale-105 active:scale-95 px-2 py-4 h-auto",
+                                                    isSelected ? "shadow-md shadow-secondary/30 ring-2 ring-secondary ring-offset-2 ring-offset-background" : "hover:bg-default-200 border border-transparent"
+                                                ),
+                                                content: "text-small font-medium"
+                                            }}
+                                            startContent={isSelected ? <CheckIcon size={14} className="ml-1" /> : undefined}
+                                        >
+                                            {mood}
+                                        </Chip>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Theme Style Selection */}
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-end">
+                                <span className="text-medium font-semibold text-default-700">Theme Style <span className="text-danger">*</span></span>
+                                <span className="text-tiny text-default-400">Select one</span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {THEMES.map((theme) => {
+                                    const isSelected = formData.themeStyle === theme;
+                                    return (
+                                        <Chip
+                                            key={theme}
+                                            onClick={() => handleChange("themeStyle", theme)}
+                                            variant={isSelected ? "solid" : "bordered"}
+                                            color={isSelected ? "success" : "default"}
+                                            classNames={{
+                                                base: cn(
+                                                    "cursor-pointer transition-all hover:scale-105 active:scale-95 px-3 py-5 h-auto",
+                                                    isSelected ? "shadow-md shadow-success/30" : "hover:border-default-400"
+                                                ),
+                                                content: "text-small font-semibold"
+                                            }}
+                                            startContent={isSelected ? <CheckIcon size={14} className="ml-1" /> : undefined}
+                                        >
+                                            {theme}
+                                        </Chip>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Model Selection */}
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-end">
+                                <span className="text-medium font-semibold text-default-700">AI Model <span className="text-default-400 font-normal text-tiny">(Optional)</span></span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" || e.key === " ") {
+                                            handleChange("model", "openrouter");
+                                        }
+                                    }}
+                                    onClick={() => handleChange("model", "openrouter")}
+                                    className={cn(
+                                        "cursor-pointer rounded-xl p-4 border-2 transition-all flex items-center gap-3",
+                                        formData.model === "openrouter"
+                                            ? "border-primary bg-primary/5 shadow-md"
+                                            : "border-transparent bg-default-100 hover:bg-default-200"
+                                    )}
+                                >
+                                    <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", formData.model === "openrouter" ? "border-primary" : "border-default-400")}>
+                                        {formData.model === "openrouter" && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-small">Arcee: trinity large</p>
+                                        <p className="text-tiny text-default-500">Fast & Free (Default)</p>
+                                    </div>
+                                </div>
+
+                                <div
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" || e.key === " ") {
+                                            handleChange("model", "aihubmix");
+                                        }
+                                    }}
+                                    onClick={() => handleChange("model", "aihubmix")}
+                                    className={cn(
+                                        "cursor-pointer rounded-xl p-4 border-2 transition-all flex items-center gap-3",
+                                        formData.model === "aihubmix"
+                                            ? "border-secondary bg-secondary/5 shadow-md"
+                                            : "border-transparent bg-default-100 hover:bg-default-200"
+                                    )}
+                                >
+                                    <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", formData.model === "aihubmix" ? "border-secondary" : "border-default-400")}>
+                                        {formData.model === "aihubmix" && <div className="w-2.5 h-2.5 rounded-full bg-secondary" />}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-small">GLM-5</p>
+                                        <p className="text-tiny text-default-500">Advanced Reasoning</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <Button
+                            color="primary"
+                            type="submit"
+                            isLoading={isLoading}
+                            className="w-full mt-6 font-bold text-lg shadow-xl shadow-primary/20"
+                            size="lg"
+                            isDisabled={!formData.businessName || !formData.description || !formData.industry || formData.mood.length === 0 || (formData.industry === "Other" && !customIndustry)}
+                        >
+                            {isLoading ? `Generating Brand Magic... (${seconds}s) (estimated 45s)` : "Generate Brand Bible"}
+                        </Button>
+                    </form>
+                </CardBody>
+            </Card>
+        </SpotlightCard>
     );
 }
