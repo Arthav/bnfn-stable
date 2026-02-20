@@ -49,4 +49,26 @@ export interface BrandResult {
     reasoning: string;
     businessName?: string;
     description?: string;
+    // New additions
+    tagline: string;
+    positioning: string;
+    uvp: string[];
+    brandStory: {
+        short: string;
+        long: string;
+    };
+    iconStyle: string;
+    audienceAnalysis: {
+        personas: Array<{
+            name: string;
+            demographics: string;
+            painPoints: string[];
+            motivations: string[];
+            whatTheyCareAbout: string;
+        }>;
+        competitorContext: string;
+        brandArchetype: string;
+        customerPromise: string;
+        whatWeNeverDo: string;
+    };
 }

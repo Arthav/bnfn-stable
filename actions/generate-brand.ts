@@ -32,7 +32,37 @@ export async function generateBrand(input: BrandInput): Promise<BrandResult> {
         "sizing": "description of scale or sizing"
       },
       "themeDescription": "A concise description of the overall theme.",
-      "reasoning": "Explanation of why these choices were made based on the input."
+      "reasoning": "Explanation of why these choices were made based on the input.",
+      "tagline": "A catchy, memorable tagline.",
+      "positioning": "Who it’s for + what you do + why you’re different.",
+      "uvp": ["Key differentiator 1", "Key differentiator 2", "Key differentiator 3"],
+      "brandStory": {
+        "short": "Short version of the brand story.",
+        "long": "Longer, narrative version of the brand story."
+      },
+      "iconStyle": "Guidance on iconography style.",
+      "audienceAnalysis": {
+        "personas": [
+          {
+            "name": "Persona Name",
+            "demographics": "Age, gender, location, etc.",
+            "painPoints": ["Pain point 1", "Pain point 2"],
+            "motivations": ["Motivation 1", "Motivation 2"],
+            "whatTheyCareAbout": "Core value or interest."
+          },
+          {
+             "name": "Second Persona Name",
+             "demographics": "...",
+             "painPoints": ["..."],
+             "motivations": ["..."],
+             "whatTheyCareAbout": "..."
+          }
+        ],
+        "competitorContext": "Brief analysis of where the brand sits relative to competitors.",
+        "brandArchetype": "e.g., Hero, Sage, Creator.",
+        "customerPromise": "What the brand promises to the customer.",
+        "whatWeNeverDo": "What the brand explicitly avoids or stands against."
+      }
     }
   `;
 
