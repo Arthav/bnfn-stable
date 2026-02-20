@@ -63,7 +63,7 @@ export const RecentActivity = () => {
                     <h4 className="font-bold text-large">Recent Transactions</h4>
                     <p className="text-tiny text-default-500 uppercase font-bold">Latest activity</p>
                 </div>
-                <button className="text-primary text-xs font-semibold hover:underline">View All</button>
+                <button className="text-white text-xs font-semibold hover:underline">View All</button>
             </CardHeader>
             <CardBody className="px-3 pb-3">
                 <div className="flex flex-col gap-3">

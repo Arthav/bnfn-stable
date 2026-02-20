@@ -67,7 +67,7 @@ export const Sidebar = () => {
                 <div className="bg-primary/5 rounded-xl p-4">
                     <h4 className="font-semibold text-sm mb-1">Pro Plan</h4>
                     <p className="text-xs text-default-500 mb-3">You have 12 days left in your trial.</p>
-                    <button className="w-full bg-primary text-primary-foreground text-xs font-medium py-2 rounded-lg hover:opacity-90 transition-opacity">
+                    <button className="w-full bg-primary text-white text-xs font-medium py-2 rounded-lg hover:opacity-90 transition-opacity">
                         Upgrade Now
                     </button>
                 </div>

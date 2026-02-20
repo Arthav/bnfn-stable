@@ -29,7 +29,7 @@ export const TopBar = () => {
 
             <div className="flex items-center gap-4">
                 <button className="p-2 rounded-full hover:bg-default-100 transition-colors relative">
-                    <BellIcon size={20} className="text-default-600" />
+                    <BellIcon size={20} className="text-white" />
                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-background"></span>
                 </button>
 
