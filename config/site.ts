@@ -16,6 +16,10 @@ export const siteConfig = {
       label: "SaaS Dashboard",
       href: "/saasdashboard",
     },
+    {
+      label: "Brand Bible",
+      href: "/brand-bible",
+    },
   ],
   navMenuItems: [
     {
@@ -29,6 +33,10 @@ export const siteConfig = {
     {
       label: "SaaS Dashboard",
       href: "/saasdashboard",
+    },
+    {
+      label: "Brand Bible",
+      href: "/brand-bible",
     },
   ],
   links: {
