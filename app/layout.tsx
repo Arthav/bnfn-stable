@@ -38,6 +38,8 @@ export const viewport: Viewport = {
   ],
 };
 
+import { PageTransitionProvider } from "@/components/page-transition-provider";
+
 export default function RootLayout({
   children,
 }: {
@@ -55,7 +57,9 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          {children}
+          <PageTransitionProvider>
+            {children}
+          </PageTransitionProvider>
         </Providers>
       </body>
     </html>

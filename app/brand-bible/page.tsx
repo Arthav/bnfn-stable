@@ -8,6 +8,8 @@ import { BrandInput, BrandResult as BrandResultType } from "@/types/brand";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { TransitionCurtain } from "@/components/transition-curtain";
+
 export default function BrandBiblePage() {
     const [result, setResult] = useState<BrandResultType | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -40,8 +42,11 @@ export default function BrandBiblePage() {
     };
 
     return (
-        <div className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
+        <div className="container mx-auto max-w-7xl pt-16 px-6 flex-grow relative">
             <ToastContainer position="bottom-right" theme="dark" />
+
+            <TransitionCurtain isLoading={isLoading} />
+
             <div className="text-center mb-10">
                 <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
                     Brand Bible Generator

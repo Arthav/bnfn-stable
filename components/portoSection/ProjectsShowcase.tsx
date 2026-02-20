@@ -270,6 +270,7 @@ export default function ProjectsShowcase() {
             </div>
 
             <DndContext
+                id="projects-showcase-dnd"
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragStart={handleDragStart}
