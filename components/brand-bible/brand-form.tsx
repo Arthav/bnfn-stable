@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@nextui-org/button";
 import { Input, Textarea } from "@nextui-org/input";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
@@ -62,6 +62,38 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
         themeStyle: "None",
     });
 
+    const [customIndustry, setCustomIndustry] = useState("");
+    const [seconds, setSeconds] = useState(0);
+
+    // Timer effect
+    useState(() => {
+        let interval: NodeJS.Timeout;
+        if (isLoading) {
+            const start = Date.now();
+            interval = setInterval(() => {
+                setSeconds(Math.floor((Date.now() - start) / 1000));
+            }, 1000);
+        } else {
+            setSeconds(0);
+        }
+        return () => clearInterval(interval);
+    }); // Needs to depend on isLoading, but useState initializer runs once. Switching to useEffect.
+
+    // Correct implementation with useEffect
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isLoading) {
+            setSeconds(0);
+            const start = Date.now();
+            interval = setInterval(() => {
+                setSeconds(Math.floor((Date.now() - start) / 1000));
+            }, 1000);
+        } else {
+            setSeconds(0);
+        }
+        return () => clearInterval(interval);
+    }, [isLoading]);
+
     const handleMoodToggle = (mood: BrandMood) => {
         setFormData((prev) => {
             const currentMoods = prev.mood;
@@ -83,10 +115,17 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
         e.preventDefault();
         // Basic validation
         if (!formData.industry || formData.mood.length === 0) {
-            // You might want to show a toast or error state here
             return;
         }
-        onSubmit(formData);
+
+        const finalData = {
+            ...formData,
+            industry: formData.industry === "Other" ? customIndustry : formData.industry
+        };
+
+        if (finalData.industry === "Other" && !customIndustry) return; // Validate custom input
+
+        onSubmit(finalData);
     };
 
     return (
@@ -162,6 +201,21 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
                                 );
                             })}
                         </div>
+
+                        {formData.industry === "Other" && (
+                            <div className="pt-2 animate-fade-in">
+                                <Input
+                                    label="Specify Industry"
+                                    placeholder="e.g. Space Tourism"
+                                    labelPlacement="outside"
+                                    value={customIndustry}
+                                    onValueChange={setCustomIndustry}
+                                    variant="flat"
+                                    color="primary"
+                                    isRequired
+                                />
+                            </div>
+                        )}
                     </div>
 
                     {/* Mood Selection */}
@@ -234,9 +288,9 @@ export function BrandForm({ onSubmit, isLoading }: BrandFormProps) {
                         isLoading={isLoading}
                         className="w-full mt-6 font-bold text-lg shadow-xl shadow-primary/20"
                         size="lg"
-                        isDisabled={!formData.businessName || !formData.description || !formData.industry || formData.mood.length === 0}
+                        isDisabled={!formData.businessName || !formData.description || !formData.industry || formData.mood.length === 0 || (formData.industry === "Other" && !customIndustry)}
                     >
-                        {isLoading ? "Generating Brand Magic..." : "Generate Brand Bible"}
+                        {isLoading ? `Generating Brand Magic... (${seconds}s) (estimated 45s)` : "Generate Brand Bible"}
                     </Button>
                 </form>
             </CardBody>

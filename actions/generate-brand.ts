@@ -62,6 +62,43 @@ export async function generateBrand(input: BrandInput): Promise<BrandResult> {
         "brandArchetype": "e.g., Hero, Sage, Creator.",
         "customerPromise": "What the brand promises to the customer.",
         "whatWeNeverDo": "What the brand explicitly avoids or stands against."
+      },
+      "logoGuidelines": {
+        "variants": {
+            "horizontal": "Description of horizontal logo variant.",
+            "stacked": "Description of stacked logo variant.",
+            "iconOnly": "Description of icon-only variant."
+        },
+        "clearSpaceRules": "Rules for clear space around the logo.",
+        "minimumSize": "Minimum size requirements.",
+        "incorrectUsage": ["Example 1", "Example 2", "Example 3"]
+      },
+      "voiceAndTone": {
+        "attributes": ["Trait 1", "Trait 2", "Trait 3"],
+        "contextualTone": {
+            "marketing": "Tone for marketing.",
+            "support": "Tone for support.",
+            "academic": "Tone for academic/technical.",
+            "social": "Tone for social media."
+        },
+        "doAndDonts": [
+             { "do": "Do this...", "dont": "Don't do this..." },
+             { "do": "Do this...", "dont": "Don't do this..." }
+        ],
+        "sampleCopy": {
+            "heroHeadline": "Sample hero headline.",
+            "aboutUs": "Sample about us text.",
+            "cta": "Sample CTA text.",
+            "errorMessage": "Sample error message.",
+            "emailGreeting": "Sample email greeting."
+        }
+      },
+      "landingPagePreview": {
+        "heroTitle": "Headline for the landing page preview.",
+        "heroSubtitle": "Subtitle for the landing page preview.",
+        "ctaText": "Button text.",
+        "featureTitle": "Title for a feature section.",
+        "featureDescription": "Description for a feature section."
       }
     }
   `;

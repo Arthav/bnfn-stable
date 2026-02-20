@@ -71,4 +71,39 @@ export interface BrandResult {
         customerPromise: string;
         whatWeNeverDo: string;
     };
+    // New additions (Logo, Voice, Landing Page)
+    logoGuidelines: {
+        variants: {
+            horizontal: string;
+            stacked: string;
+            iconOnly: string;
+        };
+        clearSpaceRules: string;
+        minimumSize: string;
+        incorrectUsage: string[];
+    };
+    voiceAndTone: {
+        attributes: string[]; // 3-5 traits
+        contextualTone: {
+            marketing: string;
+            support: string;
+            academic: string;
+            social: string;
+        };
+        doAndDonts: Array<{ do: string; dont: string }>;
+        sampleCopy: {
+            heroHeadline: string;
+            aboutUs: string;
+            cta: string;
+            errorMessage: string;
+            emailGreeting: string;
+        };
+    };
+    landingPagePreview: {
+        heroTitle: string;
+        heroSubtitle: string;
+        ctaText: string;
+        featureTitle: string;
+        featureDescription: string;
+    };
 }
