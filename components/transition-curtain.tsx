@@ -19,18 +19,27 @@ const loadingTexts = [
 
 export function TransitionCurtain({ isLoading, isPageTransition = false }: TransitionCurtainProps) {
     const [textIndex, setTextIndex] = useState(0);
+    const [elapsed, setElapsed] = useState(0);
 
     useEffect(() => {
         if (!isLoading) {
             setTextIndex(0);
+            setElapsed(0);
             return;
         }
 
         const interval = setInterval(() => {
             setTextIndex((prev) => (prev + 1) % loadingTexts.length);
-        }, 3000); // Change text every 3 seconds for better pacing
+        }, 3000);
 
-        return () => clearInterval(interval);
+        const timer = setInterval(() => {
+            setElapsed((prev) => prev + 1);
+        }, 1000);
+
+        return () => {
+            clearInterval(interval);
+            clearInterval(timer);
+        };
     }, [isLoading]);
 
     // Custom deep purple color for the curtain
@@ -74,6 +83,10 @@ export function TransitionCurtain({ isLoading, isPageTransition = false }: Trans
                         </motion.div>
 
                         <h2 className="text-4xl font-bold mb-3 tracking-tight">Please Wait</h2>
+                        <h3 className="text-4xl font-bold mb-3 tracking-tight">Estimated wait time: 2 minutes</h3>
+                        <p className="text-lg text-purple-300 mb-3 font-mono">
+                            Elapsed: {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}
+                        </p>
 
                         <div className="h-8 flex items-center justify-center overflow-hidden">
                             <AnimatePresence mode="wait">

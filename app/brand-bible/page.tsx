@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { BrandForm } from "@/components/brand-bible/brand-form";
 import { BrandResult } from "@/components/brand-bible/brand-result";
-import { generateBrand } from "@/actions/generate-brand";
+// import { generateBrand } from "@/actions/generate-brand";
 import { BrandInput, BrandResult as BrandResultType } from "@/types/brand";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,10 +17,43 @@ export default function BrandBiblePage() {
 
     const handleGenerate = async (data: BrandInput) => {
         setIsLoading(true);
-        setLastInput(data); // Store input for regeneration
+        setLastInput(data);
         try {
-            const generatedBrand = await generateBrand(data);
-            setResult(generatedBrand);
+            const response = await fetch("/api/generate-brand", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+
+            const reader = response.body?.getReader();
+            if (!reader) throw new Error("No reader available");
+
+            const decoder = new TextDecoder();
+            let resultText = "";
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                resultText += decoder.decode(value, { stream: true });
+            }
+
+            // Clean up any markdown code blocks if present (safeguard)
+            if (resultText.includes("```json")) {
+                resultText = resultText.split("```json")[1].split("```")[0].trim();
+            } else if (resultText.includes("```")) {
+                resultText = resultText.split("```")[1].split("```")[0].trim();
+            }
+
+            const generatedBrand = JSON.parse(resultText) as BrandResultType;
+            setResult({
+                ...generatedBrand,
+                businessName: data.businessName,
+                description: data.description
+            });
             toast.success("Brand Identity Generated Successfully!");
         } catch (error) {
             console.error("Failed to generate brand:", error);
