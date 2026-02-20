@@ -39,8 +39,8 @@ export default function SettingsPage() {
                 <Input label="Last Name" defaultValue="Reichert" labelPlacement="outside" />
                 <Input label="Email" defaultValue="tony.reichert@example.com" labelPlacement="outside" className="md:col-span-2" />
                 <div className="md:col-span-2">
-                  <label className="text-small mb-1 block">Bio</label>
-                  <textarea className="w-full p-2 rounded-xl bg-default-100 text-small outline-none focus:ring-2 ring-primary transition-all min-h-[100px]" defaultValue="Product Designer based in San Francisco." />
+                  <label htmlFor="bio" className="text-small mb-1 block">Bio</label>
+                  <textarea id="bio" className="w-full p-2 rounded-xl bg-default-100 text-small outline-none focus:ring-2 ring-primary transition-all min-h-[100px]" defaultValue="Product Designer based in San Francisco." />
                 </div>
               </div>
 
