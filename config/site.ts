@@ -20,6 +20,10 @@ export const siteConfig = {
       label: "Brand Bible",
       href: "/brand-bible",
     },
+    {
+      label: "Mini Games",
+      href: "/mini-games",
+    },
   ],
   navMenuItems: [
     {
@@ -37,6 +41,10 @@ export const siteConfig = {
     {
       label: "Brand Bible",
       href: "/brand-bible",
+    },
+    {
+      label: "Mini Games",
+      href: "/mini-games",
     },
   ],
   links: {
