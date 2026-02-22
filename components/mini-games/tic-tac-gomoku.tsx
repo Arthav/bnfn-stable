@@ -22,6 +22,7 @@ interface TicTacGomokuProps {
 
 export const TicTacGomoku = ({ mode, onGameEnd, onBack }: TicTacGomokuProps) => {
     const [board, setBoard] = useState<Player[][]>(createEmptyBoard());
+    const [history, setHistory] = useState<{ board: Player[][]; currentPlayer: Player }[]>([]);
 
     // ... (rest of the state setup remains the same)
 
@@ -36,7 +37,22 @@ export const TicTacGomoku = ({ mode, onGameEnd, onBack }: TicTacGomokuProps) => 
         setWinner(null);
         setWinningLine([]);
         setIsComputerThinking(false);
+        setHistory([]);
     };
+
+    const handleUndo = useCallback(() => {
+        if (history.length === 0 || winner) return;
+
+        const popCount = mode === "vs_computer" ? 2 : 1;
+
+        // Ensure we don't pop more than what exists
+        const actualPopCount = Math.min(popCount, history.length);
+        const targetState = history[history.length - actualPopCount];
+
+        setBoard(targetState.board);
+        setCurrentPlayer(targetState.currentPlayer);
+        setHistory(prev => prev.slice(0, prev.length - actualPopCount));
+    }, [history, winner, mode]);
 
     const handleCellClick = useCallback(
         (row: number, col: number) => {
@@ -45,6 +61,10 @@ export const TicTacGomoku = ({ mode, onGameEnd, onBack }: TicTacGomokuProps) => 
 
             const newBoard = board.map((r) => [...r]);
             newBoard[row][col] = currentPlayer;
+
+            // Save history snapshot BEFORE setting the new state
+            setHistory(prev => [...prev, { board: board.map(r => [...r]), currentPlayer }]);
+
             setBoard(newBoard);
 
             const winResult = checkWin(newBoard, row, col, currentPlayer);
@@ -87,6 +107,12 @@ export const TicTacGomoku = ({ mode, onGameEnd, onBack }: TicTacGomokuProps) => 
 
                     const newBoard = board.map((row) => [...row]);
                     newBoard[r][c] = "O";
+
+                    // The AI also records its history snapshot
+                    // Wait, normally we skip saving the computer's state so the user can undo it cleanly back to their turn.
+                    // But if we pop 2, we *must* record the state just before the AI moves, so the second pop hits the user's pre-move state.
+                    setHistory(prev => [...prev, { board: board.map(row => [...row]), currentPlayer: "O" }]);
+
                     setBoard(newBoard);
 
                     const winResult = checkWin(newBoard, r, c, "O");
@@ -150,6 +176,15 @@ export const TicTacGomoku = ({ mode, onGameEnd, onBack }: TicTacGomokuProps) => 
                                 Back
                             </Button>
                         )}
+                        <Button
+                            size="sm"
+                            variant="flat"
+                            color="warning"
+                            onClick={handleUndo}
+                            isDisabled={history.length === 0 || winner !== null}
+                        >
+                            Undo
+                        </Button>
                         <Button size="sm" variant="flat" color="primary" onClick={resetGame}>
                             Restart
                         </Button>

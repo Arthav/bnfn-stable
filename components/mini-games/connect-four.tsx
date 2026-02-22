@@ -23,6 +23,7 @@ interface ConnectFourProps {
 
 export const ConnectFour = ({ mode, onGameEnd, onBack }: ConnectFourProps) => {
     const [board, setBoard] = useState<Player[][]>(createEmptyBoard());
+    const [history, setHistory] = useState<{ board: Player[][]; currentPlayer: Player }[]>([]);
     const [currentPlayer, setCurrentPlayer] = useState<Player>("Red"); // Red goes first usually
     const [winner, setWinner] = useState<Player | null>(null);
     const [winningLine, setWinningLine] = useState<[number, number][]>([]);
@@ -36,7 +37,24 @@ export const ConnectFour = ({ mode, onGameEnd, onBack }: ConnectFourProps) => {
         setWinningLine([]);
         setIsComputerThinking(false);
         setHoverCol(null);
+        setHistory([]);
     };
+
+    const handleUndo = useCallback(() => {
+        if (history.length === 0 || winner) return;
+
+        const popCount = mode === "vs_computer" ? 2 : 1;
+
+        const actualPopCount = Math.min(popCount, history.length);
+        const targetState = history[history.length - actualPopCount];
+
+        setBoard(targetState.board);
+        setCurrentPlayer(targetState.currentPlayer);
+        setHistory(prev => prev.slice(0, prev.length - actualPopCount));
+
+        // Ensure UI doesn't visually hang
+        setHoverCol(null);
+    }, [history, winner, mode]);
 
     const handleColumnClick = useCallback(
         (col: number) => {
@@ -46,6 +64,9 @@ export const ConnectFour = ({ mode, onGameEnd, onBack }: ConnectFourProps) => {
 
             const newBoard = board.map((r) => [...r]);
             newBoard[dropRow][col] = currentPlayer;
+
+            setHistory(prev => [...prev, { board: board.map(r => [...r]), currentPlayer }]);
+
             setBoard(newBoard);
 
             const winResult = checkWin(newBoard, dropRow, col, currentPlayer);
@@ -79,6 +100,9 @@ export const ConnectFour = ({ mode, onGameEnd, onBack }: ConnectFourProps) => {
                     if (row !== -1) {
                         const newBoard = board.map((r) => [...r]);
                         newBoard[row][bestCol] = "Yellow";
+
+                        setHistory(prev => [...prev, { board: board.map(r => [...r]), currentPlayer: "Yellow" }]);
+
                         setBoard(newBoard);
 
                         const winResult = checkWin(newBoard, row, bestCol, "Yellow");
@@ -138,6 +162,15 @@ export const ConnectFour = ({ mode, onGameEnd, onBack }: ConnectFourProps) => {
                                 Back
                             </Button>
                         )}
+                        <Button
+                            size="sm"
+                            variant="flat"
+                            color="warning"
+                            onClick={handleUndo}
+                            isDisabled={history.length === 0 || winner !== null}
+                        >
+                            Undo
+                        </Button>
                         <Button size="sm" color="primary" variant="flat" onClick={resetGame}>
                             Restart
                         </Button>

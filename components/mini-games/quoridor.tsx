@@ -25,6 +25,7 @@ interface QuoridorProps {
 
 export const Quoridor = ({ mode, onGameEnd, onBack }: QuoridorProps) => {
     const [gameState, setGameState] = useState<QuoridorState>(createInitialState());
+    const [history, setHistory] = useState<QuoridorState[]>([]);
     const [hoverWall, setHoverWall] = useState<Wall | null>(null);
     const [winner, setWinner] = useState<string | null>(null);
     const [isComputerThinking, setIsComputerThinking] = useState(false);
@@ -41,7 +42,27 @@ export const Quoridor = ({ mode, onGameEnd, onBack }: QuoridorProps) => {
         setWinner(null);
         setHoverWall(null);
         setIsComputerThinking(false);
+        setHistory([]);
     };
+
+    const handleUndo = useCallback(() => {
+        if (history.length === 0 || winner) return;
+
+        const popCount = mode === "vs_computer" ? 2 : 1;
+
+        const actualPopCount = Math.min(popCount, history.length);
+        const targetState = history[history.length - actualPopCount];
+
+        // Deep copy from history
+        setGameState({
+            ...targetState,
+            p1Pos: [...targetState.p1Pos],
+            p2Pos: [...targetState.p2Pos],
+            walls: targetState.walls.map(w => ({ ...w }))
+        });
+        setHistory(prev => prev.slice(0, prev.length - actualPopCount));
+        setHoverWall(null);
+    }, [history, winner, mode]);
 
     const checkWinCondition = (state: QuoridorState) => {
         if (state.p1Pos[0] === 0) return "Player 1"; // P1 reached top
@@ -50,6 +71,17 @@ export const Quoridor = ({ mode, onGameEnd, onBack }: QuoridorProps) => {
     };
 
     const commitAction = useCallback((newState: QuoridorState) => {
+        // Save history snapshot of CURRENT state BEFORE committing NEW state
+        setHistory(prev => [
+            ...prev,
+            {
+                ...gameState,
+                p1Pos: [...gameState.p1Pos],
+                p2Pos: [...gameState.p2Pos],
+                walls: gameState.walls.map(w => ({ ...w }))
+            }
+        ]);
+
         setGameState(newState);
         const winResult = checkWinCondition(newState);
         if (winResult) {
@@ -321,6 +353,15 @@ export const Quoridor = ({ mode, onGameEnd, onBack }: QuoridorProps) => {
                                 Back
                             </Button>
                         )}
+                        <Button
+                            size="sm"
+                            variant="flat"
+                            color="warning"
+                            onClick={handleUndo}
+                            isDisabled={history.length === 0 || winner !== null}
+                        >
+                            Undo
+                        </Button>
                         <Button size="sm" color="primary" variant="flat" onClick={resetGame}>
                             Restart
                         </Button>
