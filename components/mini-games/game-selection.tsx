@@ -30,6 +30,12 @@ const availableGames: Game[] = [
         description: "Find matching pairs of cards.",
         availableModes: ["vs_player", "competition"],
     },
+    {
+        id: "quoridor",
+        title: "Quoridor",
+        description: "Navigate a 9x9 maze while placing walls to trap your opponent.",
+        availableModes: ["vs_computer", "vs_player", "competition"],
+    },
 ];
 
 interface GameSelectionProps {
