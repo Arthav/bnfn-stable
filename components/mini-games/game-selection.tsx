@@ -14,8 +14,8 @@ export interface Game {
 const availableGames: Game[] = [
     {
         id: "tic-tac-toe",
-        title: "Tic-Tac-Toe",
-        description: "Classic 3x3 strategy game.",
+        title: "Tic-Tac-Gomoku",
+        description: "Connect 5 in a row on a massive 20x20 grid.",
         availableModes: ["vs_computer", "vs_player", "competition"],
     },
     {
@@ -25,16 +25,10 @@ const availableGames: Game[] = [
         availableModes: ["vs_computer", "vs_player", "competition"],
     },
     {
-        id: "snake",
-        title: "Snake",
-        description: "Classic snake game. Score attack.",
-        availableModes: ["vs_computer"],
-    },
-    {
         id: "memory-match",
         title: "Memory Match",
         description: "Find matching pairs of cards.",
-        availableModes: ["vs_computer", "vs_player"],
+        availableModes: ["vs_player", "competition"],
     },
 ];
 
@@ -85,8 +79,8 @@ export const GameSelection = ({
                                 isHoverable={!isDisabled}
                                 isPressable={!isDisabled}
                                 className={`h-full border-2 transition-all duration-300 ${isSelected
-                                        ? "border-secondary scale-105 shadow-xl shadow-secondary/20"
-                                        : "border-default-200 hover:border-default-400"
+                                    ? "border-secondary scale-105 shadow-xl shadow-secondary/20"
+                                    : "border-default-200 hover:border-default-400"
                                     }`}
                                 onClick={() => {
                                     if (!isDisabled || isSelected) {
