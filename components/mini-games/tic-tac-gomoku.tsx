@@ -17,10 +17,14 @@ import {
 interface TicTacGomokuProps {
     mode: GameMode;
     onGameEnd: (winner: Player | "draw") => void;
+    onBack?: () => void;
 }
 
-export const TicTacGomoku = ({ mode, onGameEnd }: TicTacGomokuProps) => {
+export const TicTacGomoku = ({ mode, onGameEnd, onBack }: TicTacGomokuProps) => {
     const [board, setBoard] = useState<Player[][]>(createEmptyBoard());
+
+    // ... (rest of the state setup remains the same)
+
     const [currentPlayer, setCurrentPlayer] = useState<Player>("X");
     const [winner, setWinner] = useState<Player | null>(null);
     const [winningLine, setWinningLine] = useState<[number, number][]>([]);
@@ -120,8 +124,8 @@ export const TicTacGomoku = ({ mode, onGameEnd }: TicTacGomokuProps) => {
     const validSet = getValidCells();
 
     return (
-        <div className="flex flex-col items-center gap-6 w-full max-w-4xl mx-auto">
-            <div className="flex justify-between w-full items-center px-4">
+        <div className="flex flex-col items-center gap-4 w-full h-full mx-auto">
+            <div className="flex justify-between w-full items-center px-2 sm:px-4">
                 <div className="flex flex-col items-start">
                     <h2 className="text-2xl font-bold font-heading">Tic-Tac-Gomoku</h2>
                     <p className="text-sm text-default-500">First to 5 in a row wins. Must place adjacent to existing pieces.</p>
@@ -140,13 +144,20 @@ export const TicTacGomoku = ({ mode, onGameEnd }: TicTacGomokuProps) => {
                             </span>
                         </div>
                     )}
-                    <Button size="sm" variant="flat" onClick={resetGame}>
-                        Restart
-                    </Button>
+                    <div className="flex gap-2">
+                        {onBack && (
+                            <Button size="sm" variant="bordered" onClick={onBack}>
+                                Back
+                            </Button>
+                        )}
+                        <Button size="sm" variant="flat" color="primary" onClick={resetGame}>
+                            Restart
+                        </Button>
+                    </div>
                 </div>
             </div>
 
-            <div className="w-full overflow-auto rounded-3xl border-2 border-divider p-4 bg-content1 shadow-inner max-h-[60vh] custom-scrollbar">
+            <div className="w-full rounded-2xl border-2 border-divider p-2 sm:p-4 bg-content1 shadow-inner custom-scrollbar">
                 <div
                     className="grid gap-1 mx-auto min-w-max"
                     style={{

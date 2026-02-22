@@ -61,7 +61,7 @@ export default function MiniGamesPage() {
                 </p>
             </div>
 
-            <div className="w-full max-w-6xl z-10 relative">
+            <div className={`w-full z-10 relative transition-all duration-500 ${step === "play" ? "max-w-full px-2 lg:px-8 shrink-0" : "max-w-6xl"}`}>
                 <AnimatePresence mode="wait">
                     {step === "mode" && (
                         <motion.div
@@ -119,12 +119,13 @@ export default function MiniGamesPage() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 1.05 }}
-                            className="w-full flex justify-center items-center flex-col min-h-[50vh] bg-content1 rounded-3xl border border-divider p-8"
+                            className="w-full flex justify-center items-center flex-col min-h-[80vh] bg-content1/50 rounded-3xl border border-divider p-2 sm:p-6"
                         >
                             {selectedGames.includes("tic-tac-toe") ? (
                                 <TicTacGomoku
                                     mode={selectedMode!}
                                     onGameEnd={(winner) => console.log("Game over", winner)}
+                                    onBack={() => setStep("game")}
                                 />
                             ) : (
                                 <>
