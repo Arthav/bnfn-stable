@@ -93,6 +93,16 @@ const initialProjects: Project[] = [
         emoji: "🤖",
         className: "md:col-span-1",
     },
+    {
+        id: "aifixhuman",
+        title: "AIFIXHUMAN",
+        description: "Submit yourself to the ultimate AI optimization protocol. Say goodbye to flaws and biological limitations. (parody)",
+        tags: ["React", "AI", "Design"],
+        liveUrl: "https://aifixhuman.vercel.app/",
+        gradient: "from-red-600/20 to-red-900/20",
+        emoji: "🦾",
+        className: "md:col-span-1",
+    },
 ];
 
 function SortableItem(props: { project: Project }) {
