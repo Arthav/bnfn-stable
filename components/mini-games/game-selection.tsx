@@ -36,6 +36,12 @@ const availableGames: Game[] = [
         description: "Navigate a 9x9 maze while placing walls to trap your opponent.",
         availableModes: ["vs_computer", "vs_player", "competition"],
     },
+    {
+        id: "orbito",
+        title: "Orbito",
+        description: "Survive a fast-paced 4x4 shifting gravity grid. First to 4-in-a-row wins!",
+        availableModes: ["vs_computer", "vs_player", "competition"],
+    },
 ];
 
 interface GameSelectionProps {

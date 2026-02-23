@@ -7,6 +7,7 @@ import { TicTacGomoku } from "@/components/mini-games/tic-tac-gomoku";
 import { ConnectFour } from "@/components/mini-games/connect-four";
 import { MemoryMatch } from "@/components/mini-games/memory-match";
 import { Quoridor } from "@/components/mini-games/quoridor";
+import { Orbito } from "@/components/mini-games/orbito";
 import { Button } from "@nextui-org/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -152,7 +153,14 @@ export default function MiniGamesPage() {
                                     onBack={() => setStep("game")}
                                 />
                             )}
-                            {!selectedGames.includes("tic-tac-toe") && !selectedGames.includes("connect-four") && !selectedGames.includes("memory-match") && !selectedGames.includes("quoridor") && (
+                            {selectedGames.includes("orbito") && (
+                                <Orbito
+                                    mode={selectedMode!}
+                                    onGameEnd={(winner) => console.log("Game over", winner)}
+                                    onBack={() => setStep("game")}
+                                />
+                            )}
+                            {!selectedGames.includes("tic-tac-toe") && !selectedGames.includes("connect-four") && !selectedGames.includes("memory-match") && !selectedGames.includes("quoridor") && !selectedGames.includes("orbito") && (
                                 <>
                                     <h2 className="text-4xl font-black opacity-30 mb-4 animate-pulse">Coming Soon</h2>
                                     <p className="text-xl text-default-500 mb-8 max-w-lg text-center">
