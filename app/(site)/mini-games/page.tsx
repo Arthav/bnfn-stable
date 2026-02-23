@@ -63,7 +63,7 @@ export default function MiniGamesPage() {
             {/* Header aligned mostly inside components, but title here for coherence if needed */}
             <div className="mb-12 text-center z-10">
                 <h1 className="text-5xl md:text-6xl font-black tracking-tight font-heading uppercase">
-                    Arcade <span className="text-primary">Lounge</span>
+                    Chillbro <span className="text-primary">Lounge</span>
                 </h1>
                 <p className="text-xl text-default-500 mt-4 max-w-2xl mx-auto">
                     Challenge the computer, play with friends locally, or set up a multi-game tournament.

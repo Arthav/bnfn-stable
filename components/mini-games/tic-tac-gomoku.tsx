@@ -13,6 +13,7 @@ import {
     getComputerMove,
     GameMode,
 } from "./gomoku-logic";
+import { playPlaceSound, playUndoSound, playWinSound } from "./game-sounds";
 
 interface TicTacGomokuProps {
     mode: GameMode;
@@ -52,6 +53,7 @@ export const TicTacGomoku = ({ mode, onGameEnd, onBack }: TicTacGomokuProps) => 
         setBoard(targetState.board);
         setCurrentPlayer(targetState.currentPlayer);
         setHistory(prev => prev.slice(0, prev.length - actualPopCount));
+        playUndoSound();
     }, [history, winner, mode]);
 
     const handleCellClick = useCallback(
@@ -66,11 +68,13 @@ export const TicTacGomoku = ({ mode, onGameEnd, onBack }: TicTacGomokuProps) => 
             setHistory(prev => [...prev, { board: board.map(r => [...r]), currentPlayer }]);
 
             setBoard(newBoard);
+            playPlaceSound();
 
             const winResult = checkWin(newBoard, row, col, currentPlayer);
             if (winResult) {
                 setWinner(winResult.winner);
                 setWinningLine(winResult.line);
+                playWinSound();
                 onGameEnd(winResult.winner);
                 return;
             }
@@ -119,6 +123,7 @@ export const TicTacGomoku = ({ mode, onGameEnd, onBack }: TicTacGomokuProps) => 
                     if (winResult) {
                         setWinner(winResult.winner);
                         setWinningLine(winResult.line);
+                        playWinSound();
                         onGameEnd(winResult.winner);
                         setIsComputerThinking(false);
                         return;

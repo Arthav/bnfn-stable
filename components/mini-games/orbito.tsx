@@ -14,6 +14,7 @@ import {
     checkWin,
     getComputerAction,
 } from "./orbito-logic";
+import { playPlaceSound, playShiftSound, playUndoSound, playWinSound } from "./game-sounds";
 
 export type GameMode = "vs_computer" | "vs_player" | "competition";
 
@@ -54,6 +55,7 @@ export const Orbito = ({ mode, onGameEnd, onBack }: OrbitoProps) => {
 
         setGameState(cloneState(targetState));
         setHistory(prev => prev.slice(0, prev.length - actualPopCount));
+        playUndoSound();
     };
 
     // Tracks if a cell is currently marked as a valid target for a "Sneaky" move
@@ -106,6 +108,7 @@ export const Orbito = ({ mode, onGameEnd, onBack }: OrbitoProps) => {
                     // Directly place own piece (skips sneaky move)
                     const newBoard = gameState.board.map(row => [...row]);
                     newBoard[r][c] = { player: myColor, id: marbleId };
+                    playPlaceSound();
 
                     setGameState({
                         board: newBoard,
@@ -121,6 +124,7 @@ export const Orbito = ({ mode, onGameEnd, onBack }: OrbitoProps) => {
                 const marbleId = crypto.randomUUID();
                 newlyPlacedId.current = marbleId;
                 newBoard[r][c] = { player: myColor, id: marbleId };
+                playPlaceSound();
 
                 setGameState({
                     board: newBoard,
@@ -151,6 +155,7 @@ export const Orbito = ({ mode, onGameEnd, onBack }: OrbitoProps) => {
         if (winCheck.winner) {
             setWinner(winCheck.winner);
             setWinningLine(winCheck.line);
+            playWinSound();
             onGameEnd(winCheck.winner);
         } else if (isFull) {
             setWinner("Draw");
@@ -161,6 +166,7 @@ export const Orbito = ({ mode, onGameEnd, onBack }: OrbitoProps) => {
     const handleOrbitoButton = () => {
         if (gameState.phase !== "shift" || winner || isComputerThinking) return;
         commitShift(gameState.board, gameState.turn);
+        playShiftSound();
     };
 
     // Computer AI Effect — only triggers when it becomes the AI's turn

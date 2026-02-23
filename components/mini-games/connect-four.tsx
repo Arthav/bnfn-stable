@@ -14,6 +14,7 @@ import {
     getComputerMove,
     GameMode,
 } from "./connect-four-logic";
+import { playPlaceSound, playUndoSound, playWinSound } from "./game-sounds";
 
 interface ConnectFourProps {
     mode: GameMode;
@@ -51,6 +52,7 @@ export const ConnectFour = ({ mode, onGameEnd, onBack }: ConnectFourProps) => {
         setBoard(targetState.board);
         setCurrentPlayer(targetState.currentPlayer);
         setHistory(prev => prev.slice(0, prev.length - actualPopCount));
+        playUndoSound();
 
         // Ensure UI doesn't visually hang
         setHoverCol(null);
@@ -68,11 +70,13 @@ export const ConnectFour = ({ mode, onGameEnd, onBack }: ConnectFourProps) => {
             setHistory(prev => [...prev, { board: board.map(r => [...r]), currentPlayer }]);
 
             setBoard(newBoard);
+            playPlaceSound();
 
             const winResult = checkWin(newBoard, dropRow, col, currentPlayer);
             if (winResult) {
                 setWinner(winResult.winner);
                 setWinningLine(winResult.line);
+                playWinSound();
                 onGameEnd(winResult.winner);
                 return;
             }
@@ -109,6 +113,7 @@ export const ConnectFour = ({ mode, onGameEnd, onBack }: ConnectFourProps) => {
                         if (winResult) {
                             setWinner(winResult.winner);
                             setWinningLine(winResult.line);
+                            playWinSound();
                             onGameEnd(winResult.winner);
                             setIsComputerThinking(false);
                             return;

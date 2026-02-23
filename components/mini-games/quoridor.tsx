@@ -14,6 +14,7 @@ import {
     isValidWallPlacement,
     getComputerAction,
 } from "./quoridor-logic";
+import { playPlaceSound, playUndoSound, playWinSound } from "./game-sounds";
 
 export type GameMode = "vs_computer" | "vs_player" | "competition";
 
@@ -61,6 +62,7 @@ export const Quoridor = ({ mode, onGameEnd, onBack }: QuoridorProps) => {
             walls: targetState.walls.map(w => ({ ...w }))
         });
         setHistory(prev => prev.slice(0, prev.length - actualPopCount));
+        playUndoSound();
         setHoverWall(null);
     }, [history, winner, mode]);
 
@@ -83,9 +85,11 @@ export const Quoridor = ({ mode, onGameEnd, onBack }: QuoridorProps) => {
         ]);
 
         setGameState(newState);
+        playPlaceSound();
         const winResult = checkWinCondition(newState);
         if (winResult) {
             setWinner(winResult);
+            playWinSound();
             onGameEnd(winResult);
         }
     }, [mode, onGameEnd]);

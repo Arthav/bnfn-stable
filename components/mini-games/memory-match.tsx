@@ -10,6 +10,7 @@ import {
     checkMatch,
     AIMemory,
 } from "./memory-match-logic";
+import { playPlaceSound, playWinSound } from "./game-sounds";
 
 interface MemoryMatchProps {
     mode: GameMode;
@@ -52,6 +53,7 @@ export const MemoryMatch = ({ mode, onGameEnd, onBack }: MemoryMatchProps) => {
 
         setTimeout(() => {
             if (isMatch) {
+                playWinSound();
                 // Update match state
                 const newCards = [...cards];
                 newCards[idx1].isMatched = true;
@@ -100,6 +102,7 @@ export const MemoryMatch = ({ mode, onGameEnd, onBack }: MemoryMatchProps) => {
         const newCards = [...cards];
         newCards[index].isFlipped = true;
         setCards(newCards);
+        playPlaceSound();
 
         const newFlipped = [...flippedIndices, index];
         setFlippedIndices(newFlipped);
