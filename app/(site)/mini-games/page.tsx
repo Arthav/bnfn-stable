@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ModeSelection, PlayMode } from "@/components/mini-games/mode-selection";
 import { GameSelection } from "@/components/mini-games/game-selection";
 import { TicTacGomoku } from "@/components/mini-games/tic-tac-gomoku";
@@ -15,6 +15,34 @@ export default function MiniGamesPage() {
     const [selectedMode, setSelectedMode] = useState<PlayMode | null>(null);
     const [selectedGames, setSelectedGames] = useState<string[]>([]);
     const [step, setStep] = useState<"mode" | "game" | "play">("mode");
+    const [isMuted, setIsMuted] = useState(false);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    useEffect(() => {
+        const audio = new Audio("/sound/lobby.mp3");
+        audio.loop = true;
+        audio.volume = 0.3;
+        audioRef.current = audio;
+
+        // Autoplay on first user interaction
+        const startMusic = () => {
+            audio.play().catch(() => { });
+            document.removeEventListener("click", startMusic);
+        };
+        document.addEventListener("click", startMusic);
+
+        return () => {
+            audio.pause();
+            audio.src = "";
+            document.removeEventListener("click", startMusic);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.muted = isMuted;
+        }
+    }, [isMuted]);
 
     const handleModeSelect = (mode: PlayMode) => {
         setSelectedMode(mode);
@@ -62,9 +90,18 @@ export default function MiniGamesPage() {
 
             {/* Header aligned mostly inside components, but title here for coherence if needed */}
             <div className="mb-12 text-center z-10">
-                <h1 className="text-5xl md:text-6xl font-black tracking-tight font-heading uppercase">
-                    Chillbro <span className="text-primary">Lounge</span>
-                </h1>
+                <div className="flex items-center justify-center gap-3">
+                    <h1 className="text-5xl md:text-6xl font-black tracking-tight font-heading uppercase">
+                        Chillbro <span className="text-primary">Lounge</span>
+                    </h1>
+                    <button
+                        onClick={() => setIsMuted(!isMuted)}
+                        className="text-2xl opacity-60 hover:opacity-100 transition-opacity mt-2"
+                        title={isMuted ? "Unmute" : "Mute"}
+                    >
+                        {isMuted ? "🔇" : "🔊"}
+                    </button>
+                </div>
                 <p className="text-xl text-default-500 mt-4 max-w-2xl mx-auto">
                     Challenge the computer, play with friends locally, or set up a multi-game tournament.
                 </p>
