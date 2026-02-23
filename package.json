@@ -39,6 +39,7 @@
     "@nextui-org/user": "^2.2.6",
     "@react-aria/ssr": "3.9.7",
     "@react-aria/visually-hidden": "3.8.18",
+    "@supabase/supabase-js": "^2.97.0",
     "@types/three": "^0.181.0",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",

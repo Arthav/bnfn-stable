@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { fontSans, fontHeading } from "@/config/fonts";
+import { AnalyticsTracker } from "@/components/analytics-tracker";
 
 export const metadata: Metadata = {
   title: {
@@ -58,6 +59,7 @@ export default function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <PageTransitionProvider>
+            <AnalyticsTracker />
             {children}
           </PageTransitionProvider>
         </Providers>

@@ -272,7 +272,7 @@ export default function ProjectsShowcase() {
             <div className="flex flex-col gap-2">
                 <h2 className="text-4xl font-bold dark:text-white">Small Works</h2>
                 <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
-                    A curated selection of small projects I&apos;ve built. <br />
+                    A curated selection of small projects I&apos;ve built. (not including real work) <br />
                     <span className="text-sm text-purple-500 font-medium">
                         (Try dragging the cards to reorganize them!)
                     </span>
