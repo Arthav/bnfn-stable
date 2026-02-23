@@ -16,12 +16,14 @@ const availableGames: Game[] = [
         id: "tic-tac-toe",
         title: "Tic-Tac-Gomoku",
         description: "Connect 5 in a row on a massive 20x20 grid.",
+        imageUrl: "/images/tictactoe.png",
         availableModes: ["vs_computer", "vs_player", "competition"],
     },
     {
         id: "connect-four",
         title: "Connect Four",
         description: "Connect 4 discs horizontally, vertically, or diagonally.",
+        imageUrl: "/images/connect4.png",
         availableModes: ["vs_computer", "vs_player", "competition"],
     },
     {
@@ -33,13 +35,15 @@ const availableGames: Game[] = [
     {
         id: "quoridor",
         title: "Quoridor",
-        description: "Navigate a 9x9 maze while placing walls to trap your opponent.",
+        description: "Navigate a 9×9 maze while placing walls to trap your opponent.",
+        imageUrl: "/images/quoridor.png",
         availableModes: ["vs_computer", "vs_player", "competition"],
     },
     {
         id: "orbito",
         title: "Orbito",
-        description: "Survive a fast-paced 4x4 shifting gravity grid. First to 4-in-a-row wins!",
+        description: "Survive a fast-paced 4×4 shifting gravity grid. First to 4-in-a-row wins!",
+        imageUrl: "/images/orbito.png",
         availableModes: ["vs_computer", "vs_player", "competition"],
     },
 ];
@@ -78,7 +82,7 @@ export const GameSelection = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
                 {filteredGames.map((game) => {
                     const isSelected = selectedGames.includes(game.id);
-                    const isDisabled = !isSelected && selectedGames.length >= maxSelections;
+                    const isDisabled = !isSelected && selectedGames.length >= maxSelections && maxSelections > 1;
 
                     return (
                         <motion.div
@@ -101,10 +105,17 @@ export const GameSelection = ({
                                 }}
                             >
                                 <CardBody className="p-0 overflow-hidden relative group h-48 bg-default-100 flex items-center justify-center">
-                                    {/* Placeholder Image Space */}
-                                    <div className="text-6xl group-hover:scale-110 transition-transform duration-500">
-                                        🎮
-                                    </div>
+                                    {game.imageUrl ? (
+                                        <img
+                                            src={game.imageUrl}
+                                            alt={game.title}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                        />
+                                    ) : (
+                                        <div className="text-6xl group-hover:scale-110 transition-transform duration-500">
+                                            🎮
+                                        </div>
+                                    )}
                                     {isSelected && (
                                         <div className="absolute inset-0 bg-secondary/10 flex items-center justify-center backdrop-blur-[2px]">
                                             <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-white font-bold shadow-lg">

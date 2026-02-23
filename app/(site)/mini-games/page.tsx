@@ -35,6 +35,11 @@ export default function MiniGamesPage() {
                 return prev.filter((id) => id !== gameId);
             }
 
+            // For single-select modes, replace immediately
+            if (maxSelections === 1) {
+                return [gameId];
+            }
+
             if (prev.length < maxSelections) {
                 return [...prev, gameId];
             }
