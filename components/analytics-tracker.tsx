@@ -10,6 +10,9 @@ export function AnalyticsTracker() {
     useEffect(() => {
         if (!pathname) return;
 
+        // Do not track in development/localhost environment
+        if (process.env.NODE_ENV === "development") return;
+
         // Prevent strictly duplicate sequential tracking of the identical path
         // (strict mode fires useEffect twice)
         if (trackedPath.current === pathname) return;
