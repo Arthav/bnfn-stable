@@ -26,6 +26,12 @@ function formatRupiah(val: string): string {
     return `Rp ${num.toLocaleString("id-ID")}`;
 }
 
+const RANK_TITLES: Record<number, { label: string; emoji: string }> = {
+    1: { label: "CEO Rahasia", emoji: "👑" },
+    2: { label: "Sultan", emoji: "💎" },
+    3: { label: "Bos", emoji: "🔥" },
+};
+
 export default function Bukber2026Page() {
     const [data, setData] = useState<BukberEntry[]>([]);
     const [loading, setLoading] = useState(true);
@@ -39,7 +45,12 @@ export default function Bukber2026Page() {
             })
             .then((json: BukberEntry[]) => {
                 const filtered = json.filter((item) => item.Nama && item.Nama.trim() !== "");
-                setData(filtered);
+                const sorted = [...filtered].sort((a, b) => {
+                    const aNum = parseNumber(a["Estimasi "]) ?? 0;
+                    const bNum = parseNumber(b["Estimasi "]) ?? 0;
+                    return bNum - aNum;
+                });
+                setData(sorted);
             })
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
@@ -109,38 +120,49 @@ export default function Bukber2026Page() {
                             >
                                 <TableHeader>
                                     <TableColumn align="center" width={60}>
-                                        No
+                                        Rank
                                     </TableColumn>
                                     <TableColumn>Nama</TableColumn>
                                     <TableColumn align="end">Estimasi</TableColumn>
                                 </TableHeader>
                                 <TableBody>
-                                    {data.map((item) => (
-                                        <TableRow key={item.No}>
-                                            <TableCell>
-                                                <span className="text-default-400 text-sm">
-                                                    {item.No}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className="font-medium">{item.Nama}</span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    size="sm"
-                                                    variant="flat"
-                                                    color={
-                                                        parseNumber(item["Estimasi "]) === null
-                                                            ? "danger"
-                                                            : "warning"
-                                                    }
-                                                    className="font-mono"
-                                                >
-                                                    {formatRupiah(item["Estimasi "])}
-                                                </Chip>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    {data.map((item, index) => {
+                                        const rank = index + 1;
+                                        const title = RANK_TITLES[rank];
+                                        return (
+                                            <TableRow key={item.No}>
+                                                <TableCell>
+                                                    <span className="text-default-400 text-sm font-bold">
+                                                        {rank}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-medium">{item.Nama}</span>
+                                                        {title && (
+                                                            <Chip size="sm" variant="flat" color={rank === 1 ? "warning" : rank === 2 ? "primary" : "secondary"} className="text-xs">
+                                                                {title.emoji} {title.label}
+                                                            </Chip>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        size="sm"
+                                                        variant="flat"
+                                                        color={
+                                                            parseNumber(item["Estimasi "]) === null
+                                                                ? "danger"
+                                                                : "warning"
+                                                        }
+                                                        className="font-mono"
+                                                    >
+                                                        {formatRupiah(item["Estimasi "])}
+                                                    </Chip>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
                                 </TableBody>
                             </Table>
                         )}
