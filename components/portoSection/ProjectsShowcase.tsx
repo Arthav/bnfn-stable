@@ -103,6 +103,16 @@ const initialProjects: Project[] = [
         emoji: "🦾",
         className: "md:col-span-1",
     },
+    {
+        id: "bnfnflix",
+        title: "BNFNFLIX",
+        description: "A multi-platform streaming aggregator with cinematic dark UI and platform filtering.",
+        tags: ["React", "Streaming", "UI/UX"],
+        liveUrl: "https://bnfnflix.vercel.app/",
+        gradient: "from-indigo-600/20 to-sky-500/20",
+        emoji: "🎬",
+        className: "md:col-span-1",
+    },
 ];
 
 function SortableItem(props: { project: Project }) {

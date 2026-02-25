@@ -28,6 +28,10 @@ export const siteConfig = {
       label: "Analytics",
       href: "/analytics",
     },
+    {
+      label: "BNFNFLIX",
+      href: "https://bnfnflix.vercel.app/",
+    },
   ],
   navMenuItems: [
     {
@@ -53,6 +57,10 @@ export const siteConfig = {
     {
       label: "Analytics",
       href: "/analytics",
+    },
+    {
+      label: "BNFNFLIX",
+      href: "https://bnfnflix.vercel.app/",
     },
   ],
   links: {
