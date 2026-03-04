@@ -37,7 +37,7 @@ const initialProjects: Project[] = [
         title: "CredentID",
         description:
             "A seamless identity verification and credential management platform.",
-        tags: ["Next.js", "Identity", "Secure"],
+        tags: ["Next.js", "Identity", "Secure", "Landing Page"],
         liveUrl: "https://credentid.vercel.app/",
         gradient: "from-blue-600/20 to-cyan-500/20",
         emoji: "🆔",
@@ -47,7 +47,7 @@ const initialProjects: Project[] = [
         id: "maxima",
         title: "Maxima Property",
         description: "Modern real estate listing and property management interface.",
-        tags: ["React", "Real Estate", "UI/UX"],
+        tags: ["React", "Real Estate", "Admin", "Marketplace"],
         liveUrl: "https://maxima-property.vercel.app/",
         gradient: "from-emerald-600/20 to-teal-500/20",
         emoji: "🏠",
@@ -111,7 +111,7 @@ const initialProjects: Project[] = [
         liveUrl: "https://bnfnflix.vercel.app/",
         gradient: "from-indigo-600/20 to-sky-500/20",
         emoji: "🎬",
-        className: "md:col-span-1",
+        className: "md:col-span-2",
     },
     {
         id: "qanari",
