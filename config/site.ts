@@ -29,8 +29,8 @@ export const siteConfig = {
       href: "/analytics",
     },
     {
-      label: "BNFNFLIX",
-      href: "https://bnfnflix.vercel.app/",
+      label: "Dracin",
+      href: "https://dracin.indevs.in/",
     },
   ],
   navMenuItems: [
@@ -59,8 +59,8 @@ export const siteConfig = {
       href: "/analytics",
     },
     {
-      label: "BNFNFLIX",
-      href: "https://bnfnflix.vercel.app/",
+      label: "Dracin",
+      href: "https://dracin.indevs.in/",
     },
   ],
   links: {
