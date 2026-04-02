@@ -28,10 +28,7 @@ export const siteConfig = {
       label: "Analytics",
       href: "/analytics",
     },
-    {
-      label: "Dracin",
-      href: "https://dracin.indevs.in/",
-    },
+
   ],
   navMenuItems: [
     {
@@ -57,10 +54,6 @@ export const siteConfig = {
     {
       label: "Analytics",
       href: "/analytics",
-    },
-    {
-      label: "Dracin",
-      href: "https://dracin.indevs.in/",
     },
   ],
   links: {
