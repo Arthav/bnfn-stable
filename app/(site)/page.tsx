@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import Skills from "@/components/portoSection/Skills";
+import HeroSequenceSection from "@/components/portoSection/HeroSequenceSection";
 
 import BioSection from "@/components/portoSection/bio";
 import StatsSection from "@/components/portoSection/StatsSection";
@@ -62,6 +63,8 @@ export default function Home() {
 
         {heroSection}
       </div>
+
+      <HeroSequenceSection />
 
       {/* Skills section */}
       <Skills />
