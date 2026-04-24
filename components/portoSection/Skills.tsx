@@ -44,6 +44,8 @@ const skills = [
     { icon: SiJest, name: "Testing (Jest)" },
 ];
 
+const marqueeRepeatCount = 4;
+
 const SkillBadge = ({ icon: Icon, name }: { icon: any; name: string }) => (
     <div className="flex items-center gap-2 px-4 py-2 mx-4 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm hover:bg-white/10 transition-colors">
         <Icon className="w-6 h-6 text-white" />
@@ -54,6 +56,14 @@ const SkillBadge = ({ icon: Icon, name }: { icon: any; name: string }) => (
 export default function Skills() {
     const firstRow = skills.slice(0, Math.ceil(skills.length / 2));
     const secondRow = skills.slice(Math.ceil(skills.length / 2));
+    const repeatedFirstRow = Array.from(
+        { length: marqueeRepeatCount },
+        () => firstRow
+    ).flat();
+    const repeatedSecondRow = Array.from(
+        { length: marqueeRepeatCount },
+        () => secondRow
+    ).flat();
 
     return (
         <section id="skills" className="w-full py-20 overflow-hidden">
@@ -67,8 +77,8 @@ export default function Skills() {
             <div className="relative flex flex-col gap-8">
                 {/* First Row */}
                 <div className="flex w-full overflow-hidden mask-linear-gradient">
-                    <div className="flex animate-marquee min-w-full shrink-0 items-center justify-around group-hover:pause">
-                        {[...firstRow, ...firstRow].map((skill, index) => (
+                    <div className="flex w-max animate-marquee shrink-0 items-center">
+                        {repeatedFirstRow.map((skill, index) => (
                             <SkillBadge key={`row1-${index}`} {...skill} />
                         ))}
                     </div>
@@ -76,8 +86,8 @@ export default function Skills() {
 
                 {/* Second Row */}
                 <div className="flex w-full overflow-hidden mask-linear-gradient">
-                    <div className="flex animate-marquee-reverse min-w-full shrink-0 items-center justify-around group-hover:pause">
-                        {[...secondRow, ...secondRow].map((skill, index) => (
+                    <div className="flex w-max animate-marquee-reverse shrink-0 items-center">
+                        {repeatedSecondRow.map((skill, index) => (
                             <SkillBadge key={`row2-${index}`} {...skill} />
                         ))}
                     </div>

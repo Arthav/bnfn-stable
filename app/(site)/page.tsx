@@ -8,6 +8,7 @@ import StatsSection from "@/components/portoSection/StatsSection";
 import ExperienceTimeline from "@/components/portoSection/ExperienceTimeline";
 import ProjectsShowcase from "@/components/portoSection/ProjectsShowcase";
 import ContactFooter from "@/components/portoSection/ContactFooter";
+import SinePathMarquee from "@/components/portoSection/SinePathMarquee";
 import Marquee from "@/components/ui/Marquee";
 import Magnetic from "@/components/ui/Magnetic";
 import { motion } from "framer-motion";
@@ -20,22 +21,54 @@ export default function Home() {
     script.src = "https://unpkg.com/@splinetool/viewer/build/spline-viewer.js";
     script.async = true;
 
-    script.onload = () => {
-      const splineViewer = document.querySelector("spline-viewer");
-      if (splineViewer) {
-        const shadowRoot = splineViewer.shadowRoot;
-        if (shadowRoot) {
-          const logoElement = shadowRoot.querySelector("#logo");
-          if (logoElement) {
-            logoElement.remove();
-          }
+    const badgeSelectors = [
+      "#logo",
+      "a#logo",
+      "a[href*='spline.design']",
+      "[aria-label*='Spline' i]",
+      "[title*='Spline' i]",
+    ].join(",");
+    const observedShadowRoots = new WeakSet<ShadowRoot>();
+    let observer: MutationObserver | null = null;
+
+    // Remove Spline's runtime badge after its shadow DOM finishes rendering.
+    const removeSplineBadge = () => {
+      document.querySelectorAll<HTMLElement>("spline-viewer").forEach((viewer) => {
+        const shadowRoot = viewer.shadowRoot;
+
+        if (!shadowRoot) {
+          return;
         }
-      }
+
+        if (observer && !observedShadowRoots.has(shadowRoot)) {
+          observer.observe(shadowRoot, { childList: true, subtree: true });
+          observedShadowRoots.add(shadowRoot);
+        }
+
+        shadowRoot.querySelectorAll<HTMLElement>(badgeSelectors).forEach((badge) => {
+          badge.remove();
+        });
+      });
     };
 
     document.body.appendChild(script);
 
+    observer = new MutationObserver(removeSplineBadge);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const badgeCleanupInterval = window.setInterval(removeSplineBadge, 250);
+    const stopBadgeCleanupTimeout = window.setTimeout(() => {
+      window.clearInterval(badgeCleanupInterval);
+    }, 8000);
+
+    script.addEventListener("load", removeSplineBadge);
+    removeSplineBadge();
+
     return () => {
+      observer?.disconnect();
+      window.clearInterval(badgeCleanupInterval);
+      window.clearTimeout(stopBadgeCleanupTimeout);
+      script.removeEventListener("load", removeSplineBadge);
       document.body.removeChild(script);
     };
   }, []);
@@ -44,24 +77,51 @@ export default function Home() {
     <section className="flex flex-col items-center justify-center gap-4 w-full">
       {/* Hero section */}
       {/* Hero section */}
-      <div className="relative w-full h-[calc(100vh-64px)] flex flex-col items-center justify-center overflow-hidden">
-        <Marquee />
-        <spline-viewer
-          style={{
-            backgroundColor: "transparent",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 1,
-            pointerEvents: "none",
-          }}
-          url="https://prod.spline.design/pS-PjKUUhIiCodIC/scene.splinecode"
-          events-target="global"
-        ></spline-viewer>
+      <div className="relative w-full overflow-hidden bg-black">
+        <div className="relative flex h-[calc(100vh-64px)] w-full flex-col items-center justify-center overflow-hidden">
+          <Marquee />
+          <spline-viewer
+            style={{
+              backgroundColor: "transparent",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              zIndex: 1,
+              pointerEvents: "none",
+            }}
+            url="https://prod.spline.design/pS-PjKUUhIiCodIC/scene.splinecode"
+            events-target="global"
+          ></spline-viewer>
 
-        {heroSection}
+          {heroSection}
+        </div>
+
+        <div className="relative isolate h-[220px] w-full overflow-hidden bg-black sm:h-[240px] md:h-[280px]">
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[54%] bg-black" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[58%] bg-[radial-gradient(circle_at_50%_8%,rgba(90,10,5,0.65),transparent_58%),linear-gradient(180deg,#120302_0%,#050000_100%)]" />
+          <div className="pointer-events-none absolute inset-x-0 top-[40%] z-0 h-[30%] bg-gradient-to-b from-black via-[#120302]/80 to-[#120302]" />
+          <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_100%,transparent_0%,rgba(0,0,0,0.55)_78%)]" />
+
+          <spline-viewer
+            style={{
+              backgroundColor: "transparent",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              zIndex: 1,
+              opacity: 0.9,
+              pointerEvents: "none",
+            }}
+            url="https://prod.spline.design/pS-PjKUUhIiCodIC/scene.splinecode"
+            events-target="global"
+          ></spline-viewer>
+
+          <SinePathMarquee />
+        </div>
       </div>
 
       <HeroSequenceSection />
@@ -114,7 +174,7 @@ const heroSection = (
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5, duration: 0.8 }}
-      className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mt-8 font-light tracking-wide mix-blend-difference"
+      className="text-lg md:text-2xl text-gray-300 max-w-[19rem] sm:max-w-2xl mx-auto mt-8 font-light tracking-wide mix-blend-difference"
     >
       Full Stack Engineer crafting digital experiences that matter.
     </motion.p>
@@ -123,14 +183,14 @@ const heroSection = (
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.8, duration: 0.8 }}
-      className="flex gap-6 mt-12"
+      className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-10 sm:mt-12"
     >
       <Magnetic>
         <a
           href="https://www.linkedin.com/in/cbonz/"
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-black text-lg font-bold rounded-full overflow-hidden transition-all hover:bg-gray-200"
+          className="group relative inline-flex items-center justify-center px-6 py-4 bg-white text-black text-base sm:px-8 sm:text-lg font-bold rounded-full overflow-hidden transition-all hover:bg-gray-200"
         >
           <span className="relative z-10 group-hover:text-black transition-colors">
             Let&apos;s Connect
@@ -141,7 +201,7 @@ const heroSection = (
 
       <Magnetic>
         <button
-          className="group relative inline-flex items-center justify-center px-8 py-4 border border-white/30 text-white text-lg font-bold rounded-full overflow-hidden transition-all hover:border-white"
+          className="group relative inline-flex items-center justify-center px-6 py-4 border border-white/30 text-white text-base sm:px-8 sm:text-lg font-bold rounded-full overflow-hidden transition-all hover:border-white"
           onClick={() => {
             const section = document.getElementById("showcase");
             if (section) {
