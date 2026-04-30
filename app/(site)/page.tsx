@@ -74,7 +74,7 @@ export default function Home() {
   }, []);
 
   return (
-    <section className="flex flex-col items-center justify-center gap-4 w-full">
+    <section className="flex w-full flex-col items-center justify-center gap-4 overflow-x-clip">
       {/* Hero section */}
       {/* Hero section */}
       <div className="relative w-full overflow-hidden bg-black">

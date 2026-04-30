@@ -11,7 +11,11 @@ import {
   useTransform,
 } from "framer-motion";
 
-const TOTAL_FRAMES = 80;
+const LAST_SOURCE_FRAME = 80;
+const SELECTED_FRAME_NUMBERS = [
+  1,
+  ...Array.from({ length: LAST_SOURCE_FRAME / 5 }, (_, index) => (index + 1) * 5),
+];
 const TOTAL_SCENES = 5;
 
 export default function HeroSequenceSection() {
@@ -81,10 +85,13 @@ export default function HeroSequenceSection() {
 
   const frames = useMemo(
     () =>
-      Array.from({ length: TOTAL_FRAMES }, (_, index) => {
-        const frameNumber = String(index + 1).padStart(3, "0");
+      SELECTED_FRAME_NUMBERS.map((sourceFrame) => {
+        const frameNumber = String(sourceFrame).padStart(3, "0");
 
-        return `/images/hero/ezgif-frame-${frameNumber}.png`;
+        return {
+          sourceFrame,
+          src: `/images/hero/ezgif-frame-${frameNumber}.png`,
+        };
       }),
     []
   );
@@ -101,7 +108,7 @@ export default function HeroSequenceSection() {
   });
 
   const frameIndex = useTransform(smoothProgress, (value) =>
-    Math.min(TOTAL_FRAMES - 1, Math.floor(value * (TOTAL_FRAMES - 1)))
+    Math.min(frames.length - 1, Math.floor(value * (frames.length - 1)))
   );
 
   const sceneIndex = useTransform(smoothProgress, (value) =>
@@ -122,7 +129,7 @@ export default function HeroSequenceSection() {
 
   useEffect(() => {
     const preloadFrames = () => {
-      frames.forEach((src) => {
+      frames.forEach(({ src }) => {
         const image = new window.Image();
         image.src = src;
       });
@@ -136,6 +143,7 @@ export default function HeroSequenceSection() {
   }, [frames]);
 
   const activeScene = scenes[currentScene];
+  const activeFrame = frames[currentFrame];
 
   return (
     <section
@@ -145,7 +153,7 @@ export default function HeroSequenceSection() {
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
         <Image
-          src={frames[currentFrame]}
+          src={activeFrame.src}
           alt=""
           fill
           priority
@@ -158,7 +166,10 @@ export default function HeroSequenceSection() {
 
         <div className="absolute left-0 top-0 flex w-full items-start justify-between px-5 py-5 text-[10px] uppercase tracking-[0.35em] text-white/70 md:px-8 md:py-8">
           <span>Private Archive</span>
-          <span>{String(currentFrame + 1).padStart(3, "0")} / 080</span>
+          <span>
+            {String(activeFrame.sourceFrame).padStart(3, "0")} /{" "}
+            {String(LAST_SOURCE_FRAME).padStart(3, "0")}
+          </span>
         </div>
 
         <div className="absolute bottom-0 left-0 w-full px-5 pb-10 md:px-8 md:pb-14">

@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 interface Experience {
@@ -50,21 +50,65 @@ const experiences: Experience[] = [
     },
 ];
 
+const ambientPalettes = [
+    {
+        primary: "rgba(45, 212, 191, 0.62)",
+        secondary: "rgba(59, 130, 246, 0.56)",
+        tertiary: "rgba(244, 114, 182, 0.44)",
+    },
+    {
+        primary: "rgba(244, 114, 182, 0.62)",
+        secondary: "rgba(168, 85, 247, 0.56)",
+        tertiary: "rgba(34, 197, 94, 0.42)",
+    },
+    {
+        primary: "rgba(250, 204, 21, 0.48)",
+        secondary: "rgba(20, 184, 166, 0.62)",
+        tertiary: "rgba(96, 165, 250, 0.52)",
+    },
+    {
+        primary: "rgba(251, 146, 60, 0.52)",
+        secondary: "rgba(14, 165, 233, 0.58)",
+        tertiary: "rgba(217, 70, 239, 0.46)",
+    },
+];
+
 export default function ExperienceTimeline() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [ambientPalette, setAmbientPalette] = useState(ambientPalettes[0]);
+
+    useEffect(() => {
+        setAmbientPalette(
+            ambientPalettes[Math.floor(Math.random() * ambientPalettes.length)]
+        );
+    }, []);
 
     return (
         <div
             ref={containerRef}
             id="experience"
-            className="w-full mt-24 px-4 sm:px-8 md:px-16 flex flex-col items-center"
+            className="relative mt-24 flex w-full flex-col items-center px-4 sm:px-8 md:px-16"
         >
-            <h2 className="text-4xl font-bold dark:text-white mb-2">Experience</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl text-center mb-16">
+            <div className="pointer-events-none absolute inset-0 bg-black" />
+            <div
+                className="pointer-events-none absolute inset-x-0 -inset-y-[18%] opacity-100 blur-3xl saturate-150 [animation:experienceAmbient_28s_ease-in-out_infinite_alternate] motion-reduce:animate-none"
+                style={{
+                    background: `radial-gradient(circle at 24% 28%, ${ambientPalette.primary}, transparent 26%), radial-gradient(circle at 76% 30%, ${ambientPalette.secondary}, transparent 28%), radial-gradient(circle at 50% 76%, ${ambientPalette.tertiary}, transparent 32%)`,
+                }}
+                aria-hidden="true"
+            />
+            <div
+                className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:72px_72px]"
+                aria-hidden="true"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.12)_52%,rgba(0,0,0,0.58)_100%)]" />
+
+            <h2 className="relative z-10 mb-2 text-4xl font-bold dark:text-white">Experience</h2>
+            <p className="relative z-10 mb-16 max-w-2xl text-center text-lg text-gray-600 dark:text-gray-300">
                 A detailed log of my professional journey.
             </p>
 
-            <div className="w-full max-w-4xl flex flex-col pb-24">
+            <div className="relative z-10 flex w-full max-w-4xl flex-col pb-24">
                 {experiences.map((exp, index) => {
                     // Create a "path" for the terminal header based on company name
                     const path = `~/experience/${exp.company
@@ -78,14 +122,21 @@ export default function ExperienceTimeline() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-50px" }}
                             transition={{ duration: 0.5, delay: index * 0.1 }}
-                            className="sticky"
+                            className="sticky group/terminal relative"
                             style={{
                                 // Staggered sticky top position
                                 top: `${100 + index * 40}px`,
                                 zIndex: index + 1,
                             }}
                         >
-                            <div className="bg-[#1e1e1e] rounded-xl shadow-2xl overflow-hidden border border-gray-800 font-mono text-sm md:text-base mb-8 transform origin-top hover:scale-[1.01] transition-transform duration-300">
+                            <div
+                                className="pointer-events-none absolute -inset-x-10 -inset-y-12 z-0 rounded-[2rem] opacity-100 blur-3xl saturate-150 transition-opacity duration-500 group-hover/terminal:opacity-100"
+                                style={{
+                                    background: `radial-gradient(circle at 18% 22%, ${ambientPalette.primary}, transparent 26%), radial-gradient(circle at 84% 50%, ${ambientPalette.secondary}, transparent 30%), radial-gradient(circle at 50% 94%, ${ambientPalette.tertiary}, transparent 36%)`,
+                                }}
+                                aria-hidden="true"
+                            />
+                            <div className="relative z-10 mb-8 origin-top overflow-hidden rounded-xl border border-white/10 bg-[#1e1e1e] font-mono text-sm shadow-2xl shadow-black/70 transition-transform duration-300 hover:scale-[1.01] md:text-base">
                                 {/* Terminal Header */}
                                 <div className="bg-[#2d2d2d] px-4 py-3 flex items-center justify-between border-b border-gray-800">
                                     <div className="flex gap-2">
@@ -156,6 +207,26 @@ export default function ExperienceTimeline() {
                     );
                 })}
             </div>
+
+            <style
+                dangerouslySetInnerHTML={{
+                    __html: `
+                        @keyframes experienceAmbient {
+                            0% {
+                                transform: translate3d(0, -1.5%, 0) scale(1);
+                            }
+
+                            45% {
+                                transform: translate3d(0, 2%, 0) scale(1.04);
+                            }
+
+                            100% {
+                                transform: translate3d(0, 4%, 0) scale(1.02);
+                            }
+                        }
+                    `,
+                }}
+            />
         </div>
     );
 }
