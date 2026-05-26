@@ -6,7 +6,6 @@ import StatsSection from "@/components/portoSection/StatsSection";
 import ExperienceTimeline from "@/components/portoSection/ExperienceTimeline";
 import ProjectsShowcase from "@/components/portoSection/ProjectsShowcase";
 import ContactFooter from "@/components/portoSection/ContactFooter";
-import SinePathMarquee from "@/components/portoSection/SinePathMarquee";
 import Marquee from "@/components/ui/Marquee";
 import Magnetic from "@/components/ui/Magnetic";
 import { motion } from "framer-motion";
@@ -20,15 +19,6 @@ export default function Home() {
           <Marquee />
 
           {heroSection}
-        </div>
-
-        <div className="relative isolate h-[220px] w-full overflow-hidden bg-black sm:h-[240px] md:h-[280px]">
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[54%] bg-black" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[58%] bg-[radial-gradient(circle_at_50%_8%,rgba(90,10,5,0.65),transparent_58%),linear-gradient(180deg,#120302_0%,#050000_100%)]" />
-          <div className="pointer-events-none absolute inset-x-0 top-[40%] z-0 h-[30%] bg-gradient-to-b from-black via-[#120302]/80 to-[#120302]" />
-          <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_100%,transparent_0%,rgba(0,0,0,0.55)_78%)]" />
-
-          <SinePathMarquee />
         </div>
       </div>
 
