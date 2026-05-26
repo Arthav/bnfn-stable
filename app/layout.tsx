@@ -48,7 +48,13 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning lang="en">
-      <head />
+      <head>
+        <script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="5d250dde-2543-4934-b2c7-0255f00f8720"
+        ></script>
+      </head>
       <body
         suppressHydrationWarning
         className={clsx(

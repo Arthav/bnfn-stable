@@ -20,6 +20,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import {
     BarChart3,
+    BookOpen,
     Bot,
     Bug,
     Building2,
@@ -149,6 +150,16 @@ const initialProjects: Project[] = [
         className: "md:col-span-2",
     },
     {
+        id: "vifive",
+        title: "ViFive",
+        description:
+            "A cinematic landing page built to introduce and frame a novel story.",
+        tags: ["Next.js", "Storytelling", "Cinematic", "Landing Page"],
+        liveUrl: "https://vifive.vercel.app/",
+        theme: "indigo",
+        className: "md:col-span-2",
+    },
+    {
         id: "maxima",
         title: "Maxima Property",
         description: "Modern real estate listing and property management interface.",
@@ -245,6 +256,8 @@ const TagIcon = ({ tag }: { tag: string }) => {
         Automation: Bot,
         Joke: Wand2,
         AI: Sparkles,
+        Storytelling: BookOpen,
+        Cinematic: Film,
         Design: Grid2X2,
         Streaming: Film,
         "UI/UX": Sparkles,
@@ -263,6 +276,8 @@ function ProjectPreview({ project }: { project: Project }) {
     const preview =
         project.id === "credentid" ? (
             <IdentityPreview />
+        ) : project.id === "vifive" ? (
+            <NovelPreview />
         ) : project.id === "maxima" ? (
             <PropertyPreview />
         ) : project.id === "spinwin" ? (
@@ -312,6 +327,45 @@ function IdentityPreview() {
                         <div className="mt-3 h-2 w-16 rounded-full bg-white/35" />
                         <div className="mt-2 h-2 w-20 rounded-full bg-white/15" />
                     </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function NovelPreview() {
+    return (
+        <div className="relative h-full min-h-0 w-full overflow-hidden rounded-2xl border border-sky-300/15 bg-indigo-950/20 p-4">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(56,189,248,0.22),transparent_32%),linear-gradient(135deg,rgba(15,23,42,0.1),rgba(2,6,23,0.82))]" />
+            <div className="absolute inset-x-0 top-8 h-px bg-sky-200/25" />
+            <div className="absolute bottom-6 left-0 h-px w-full bg-sky-200/20" />
+            <Film className="absolute right-7 top-7 h-12 w-12 text-sky-100/70" />
+
+            <div className="relative grid h-full grid-cols-[88px_1fr] items-center gap-4">
+                <div className="grid h-28 place-items-center rounded-2xl border border-sky-200/20 bg-black/45 shadow-2xl">
+                    <div className="relative h-20 w-14 rounded-sm border border-sky-100/35 bg-gradient-to-br from-slate-800 via-indigo-950 to-black p-2">
+                        <BookOpen className="mx-auto mt-1 h-9 w-9 text-sky-100/75" />
+                        <span className="absolute bottom-3 left-2 h-1.5 w-10 rounded-full bg-sky-100/45" />
+                        <span className="absolute bottom-6 left-2 h-1.5 w-7 rounded-full bg-white/20" />
+                    </div>
+                </div>
+                <div className="rounded-2xl border border-sky-200/15 bg-black/45 p-4 backdrop-blur">
+                    <div className="mb-4 flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-100">
+                            Story Trailer
+                        </span>
+                        <Sparkles className="h-5 w-5 text-sky-200" />
+                    </div>
+                    <div className="grid h-16 grid-cols-3 gap-2">
+                        {[0, 1, 2].map((frame) => (
+                            <span
+                                key={frame}
+                                className="rounded-lg border border-sky-200/15 bg-gradient-to-br from-sky-300/20 via-indigo-500/15 to-black"
+                            />
+                        ))}
+                    </div>
+                    <div className="mt-4 h-2 w-28 rounded-full bg-sky-100/55" />
+                    <div className="mt-2 h-2 w-40 rounded-full bg-white/18" />
                 </div>
             </div>
         </div>
