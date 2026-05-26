@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import React, { useState, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import { Staff } from "@/components/types/massage";
 
@@ -14,14 +14,6 @@ export default function StaffListPage({
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentStaff, setCurrentStaff] = useState<Staff | null>(null);
   const [nameFormData, setNameFormData] = useState<string>("");
-
-
-  // Save to localStorage whenever the staff list changes.
-  useEffect(() => {
-    if (staffList.length > 0) {
-      localStorage.setItem("staffList", JSON.stringify(staffList));
-    }
-  }, [staffList]);
 
   // Open modal to add a new staff member.
   const openAddModal = () => {

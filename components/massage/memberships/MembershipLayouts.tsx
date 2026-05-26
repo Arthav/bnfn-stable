@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Membership,
   MembershipTypesStruct,
@@ -14,27 +14,20 @@ import MemberShip from "@/components/massage/memberships/MemberShip";
 import MemberShipTypes from "@/components/massage/memberships/MembershipTypePage";
 import RedeemHistoryPage from "@/components/massage/memberships/RedeemHistoryPage";
 import CustomerEntryPage from "@/components/massage/memberships/CustomerEntryPage";
+import type { MassageWorkspaceActions } from "@/lib/massage/use-massage-workspace";
 
 export default function MassageShiftPage({
   memberships,
-  setMemberships,
   membershipTypes,
-  setMembershipTypes,
   redeemHistory,
-  setRedeemHistory,
-  customerEntry
+  customerEntry,
+  actions,
 }: {
   memberships: Membership[];
-  setMemberships: React.Dispatch<React.SetStateAction<Membership[]>>;
   membershipTypes: MembershipTypesStruct[];
-  setMembershipTypes: React.Dispatch<
-    React.SetStateAction<MembershipTypesStruct[]>
-  >;
   redeemHistory: RedeemPointHistoryStruct[];
-  setRedeemHistory: React.Dispatch<
-    React.SetStateAction<RedeemPointHistoryStruct[]>
-  >;
   customerEntry: CustomerEntryStruct[];
+  actions: MassageWorkspaceActions;
 }) {
   const [activeTab, setActiveTab] = useState("membership");
 
@@ -45,10 +38,9 @@ export default function MassageShiftPage({
       component: (
         <MemberShip
           memberships={memberships}
-          setMemberships={setMemberships}
           membershipTypes={membershipTypes}
           redeemHistory={redeemHistory}
-          setRedeemHistory={setRedeemHistory}
+          actions={actions}
         />
       ),
     },
@@ -58,7 +50,7 @@ export default function MassageShiftPage({
       component: (
         <MemberShipTypes
           membershipTypes={membershipTypes}
-          setMembershipTypes={setMembershipTypes}
+          actions={actions}
         />
       ),
     },

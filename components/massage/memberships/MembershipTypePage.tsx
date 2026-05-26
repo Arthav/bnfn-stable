@@ -1,15 +1,19 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent, useMemo } from "react";
+import React, { useState, FormEvent, ChangeEvent, useMemo } from "react";
 import { MembershipTypesStruct } from "@/components/types/massage";
 import { toast } from "react-toastify";
+import type { MassageWorkspaceActions } from "@/lib/massage/use-massage-workspace";
 
 type ModalType = "add" | "edit" | null;
 
 export default function MembershipTypePage({
   membershipTypes,
-  setMembershipTypes,
+  actions,
 }: {
   membershipTypes: MembershipTypesStruct[];
-  setMembershipTypes: React.Dispatch<React.SetStateAction<MembershipTypesStruct[]>>;
+  actions: Pick<
+    MassageWorkspaceActions,
+    "saveMembershipType" | "deleteMembershipType"
+  >;
 }) {
   // Modal management state
   const [modalType, setModalType] = useState<ModalType>(null);
@@ -18,20 +22,6 @@ export default function MembershipTypePage({
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
-
-  // Load membership types from localStorage on mount
-  useEffect(() => {
-    const storedMembershipTypes = localStorage.getItem("membershipTypes");
-    if (storedMembershipTypes) {
-      setMembershipTypes(JSON.parse(storedMembershipTypes));
-    }
-  }, []);
-
-  // Save membership types to localStorage whenever they change (skip if empty)
-  useEffect(() => {
-    if (membershipTypes.length === 0) return;
-    localStorage.setItem("membershipTypes", JSON.stringify(membershipTypes));
-  }, [membershipTypes]);
 
   // Filter membership types based on search query
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -78,7 +68,7 @@ export default function MembershipTypePage({
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    setMembershipTypes((prev) => [...prev, newMembershipType]);
+    actions.saveMembershipType(newMembershipType);
     toast.success("Membership Type added", { position: "top-center", autoClose: 5000 });
     setModalType(null);
   };
@@ -87,20 +77,14 @@ export default function MembershipTypePage({
   const handleEditSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!currentMembershipType) return;
-    setMembershipTypes((prev) =>
-      prev.map((membershipType) =>
-        membershipType.id === currentMembershipType.id
-          ? {
-              ...membershipType,
-              name,
-              description,
-              price,
-              duration,
-              updatedAt: new Date().toISOString(),
-            }
-          : membershipType
-      )
-    );
+    actions.saveMembershipType({
+      ...currentMembershipType,
+      name,
+      description,
+      price,
+      duration,
+      updatedAt: new Date().toISOString(),
+    });
     toast.success("Membership Type updated", { position: "top-center", autoClose: 5000 });
     setModalType(null);
   };
@@ -108,7 +92,7 @@ export default function MembershipTypePage({
   // Handles membership type deletion
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this membership type?")) {
-      setMembershipTypes((prev) => prev.filter((membershipType) => membershipType.id !== id));
+      actions.deleteMembershipType(id);
       toast.success("Membership Type deleted", { position: "top-center", autoClose: 5000 });
     }
   };

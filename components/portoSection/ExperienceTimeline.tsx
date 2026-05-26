@@ -91,7 +91,7 @@ export default function ExperienceTimeline() {
         >
             <div className="pointer-events-none absolute inset-0 bg-black" />
             <div
-                className="pointer-events-none absolute inset-x-0 -inset-y-[18%] opacity-100 blur-3xl saturate-150 [animation:experienceAmbient_28s_ease-in-out_infinite_alternate] motion-reduce:animate-none"
+                className="pointer-events-none absolute inset-x-0 -inset-y-[12%] opacity-45 blur-2xl saturate-125"
                 style={{
                     background: `radial-gradient(circle at 24% 28%, ${ambientPalette.primary}, transparent 26%), radial-gradient(circle at 76% 30%, ${ambientPalette.secondary}, transparent 28%), radial-gradient(circle at 50% 76%, ${ambientPalette.tertiary}, transparent 32%)`,
                 }}
@@ -130,7 +130,7 @@ export default function ExperienceTimeline() {
                             }}
                         >
                             <div
-                                className="pointer-events-none absolute -inset-x-10 -inset-y-12 z-0 rounded-[2rem] opacity-100 blur-3xl saturate-150 transition-opacity duration-500 group-hover/terminal:opacity-100"
+                                className="pointer-events-none absolute -inset-x-8 -inset-y-8 z-0 hidden rounded-[2rem] opacity-30 blur-2xl saturate-125 transition-opacity duration-500 group-hover/terminal:opacity-45 md:block"
                                 style={{
                                     background: `radial-gradient(circle at 18% 22%, ${ambientPalette.primary}, transparent 26%), radial-gradient(circle at 84% 50%, ${ambientPalette.secondary}, transparent 30%), radial-gradient(circle at 50% 94%, ${ambientPalette.tertiary}, transparent 36%)`,
                                 }}
@@ -207,26 +207,6 @@ export default function ExperienceTimeline() {
                     );
                 })}
             </div>
-
-            <style
-                dangerouslySetInnerHTML={{
-                    __html: `
-                        @keyframes experienceAmbient {
-                            0% {
-                                transform: translate3d(0, -1.5%, 0) scale(1);
-                            }
-
-                            45% {
-                                transform: translate3d(0, 2%, 0) scale(1.04);
-                            }
-
-                            100% {
-                                transform: translate3d(0, 4%, 0) scale(1.02);
-                            }
-                        }
-                    `,
-                }}
-            />
         </div>
     );
 }

@@ -152,14 +152,16 @@ export default function HeroSequenceSection() {
       className="relative h-[420vh] w-full bg-black"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
-        <Image
-          src={activeFrame.src}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="pointer-events-none select-none object-cover"
-        />
+        <div className="absolute inset-0">
+          <Image
+            src={activeFrame.src}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="pointer-events-none select-none object-cover"
+          />
+        </div>
 
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.28)_72%,rgba(0,0,0,0.8)_100%)]" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />

@@ -24,10 +24,6 @@ export const siteConfig = {
       label: "Mini Games",
       href: "/mini-games",
     },
-    {
-      label: "Analytics",
-      href: "/analytics",
-    },
 
   ],
   navMenuItems: [
@@ -50,10 +46,6 @@ export const siteConfig = {
     {
       label: "Mini Games",
       href: "/mini-games",
-    },
-    {
-      label: "Analytics",
-      href: "/analytics",
     },
   ],
   links: {

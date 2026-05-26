@@ -3,13 +3,10 @@ import { toast } from "react-toastify";
 import {
   Services,
   Worker,
-  Transaction,
   AddOns,
-  Staff,
   Membership,
-  BookingListStruct,
-  CustomerEntryStruct,
 } from "@/components/types/massage";
+import type { StartWorkerInput } from "@/lib/massage/workspace";
 import MultiSelectDropdown from "./MultiSelectDropDown";
 
 const statusOrder: Record<Worker["status"], number> = {
@@ -35,30 +32,20 @@ type ModalType = "workTime" | "editWorker" | "addWorker" | null;
 
 export default function MassageShift({
   services,
-  transactions,
   workers,
   setWorkers,
-  setTransactions,
   addOns,
-  activeStaff,
-  bookingList,
-  setBookingList,
   memberships,
-  customerEntry,
-  setCustomerEntry,
+  startWorker,
+  finishWorker: finishWorkerAction,
 }: {
   services: Services[];
-  transactions: Transaction[];
   workers: Worker[];
   setWorkers: React.Dispatch<React.SetStateAction<Worker[]>>;
-  setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
   addOns: AddOns[];
-  activeStaff: Staff | null;
-  bookingList: BookingListStruct[];
-  setBookingList: React.Dispatch<React.SetStateAction<BookingListStruct[]>>;
   memberships: Membership[];
-  customerEntry: CustomerEntryStruct[];
-  setCustomerEntry: React.Dispatch<React.SetStateAction<CustomerEntryStruct[]>>;
+  startWorker: (input: StartWorkerInput) => string | undefined;
+  finishWorker?: (workerId: number) => string | undefined;
 }) {
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentWorker, setCurrentWorker] = useState<Worker | null>(null);
@@ -90,68 +77,11 @@ export default function MassageShift({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (workers.length === 0) return;
-    localStorage.setItem("workers", JSON.stringify(workers));
-  }, [workers]);
-
-  useEffect(() => {
-    if (bookingList.length === 0) return;
-    localStorage.setItem("bookingList", JSON.stringify(bookingList));
-  }, [bookingList]);
-
   const finishWorker = (workerId: number) => {
-    setWorkers((prev) => {
-      const index = prev.findIndex((w) => w.id === workerId);
-      if (index === -1) return prev;
+    const workerName = finishWorkerAction?.(workerId);
+    if (!workerName) return;
 
-      // Create an updated worker with cleared work details
-      const updatedWorker: Worker = {
-        ...prev[index],
-        status: "Available",
-        startTime: "",
-        serviceTime: 0,
-        endTime: "",
-        availableSince: undefined,
-        serviceId: undefined,
-        serviceName: undefined,
-        addOns: [],
-      };
-
-      // If the worker was Busy, remove them from their current position and append them at the end.
-      if (prev[index].status === "Busy") {
-        const newWorkers = [...prev];
-        newWorkers.splice(index, 1);
-        return [...newWorkers, updatedWorker];
-      }
-      // If the worker was Booked, update them in place so their index remains the same.
-      else if (prev[index].status === "Booked") {
-        return prev.map((worker, idx) =>
-          idx === index ? updatedWorker : worker
-        );
-      }
-      // For any other status, update in place.
-      else {
-        return prev.map((worker, idx) =>
-          idx === index ? updatedWorker : worker
-        );
-      }
-    });
-
-    setBookingList((prev) =>
-      prev.map((booking) => {
-        if (booking.workerId === workerId && booking.status === "ACTIVE") {
-          return {
-            ...booking,
-            status: "DONE",
-          };
-        }
-        return booking;
-      })
-    );
-
-    const currentW = workers.find((w) => w.id === workerId);
-    toast.success(`${currentW?.name} has done working`, {
+    toast.success(`${workerName} has done working`, {
       position: "top-center",
       autoClose: 5000,
     });
@@ -190,145 +120,20 @@ export default function MassageShift({
     )
       return;
 
-    const now = new Date();
-    const [hours, minutes] = workTimeFormData.startTime.split(":").map(Number);
-    const start = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      hours,
-      minutes
-    );
-    const serviceMins = workTimeFormData.serviceTime;
-    const end = new Date(start.getTime() + Number(serviceMins) * 60000);
-    const padZero = (num: number) => num.toString().padStart(2, "0");
-    const formattedEnd = `${padZero(end.getHours())}:${padZero(
-      end.getMinutes()
-    )}:${padZero(end.getSeconds())}`;
-
-    const selectedServiceObj = services.find(
-      (service) => service.id === selectedService
-    );
-    if (!selectedServiceObj) return;
-
-    const newStatus = isBooked ? "Booked" : "Busy";
-
-    // Get the selected add‑On objects
-    const selectedAddOns = addOns.filter((addon) =>
-      selectedAddOnIds.includes(addon.id)
-    );
-
-    // Update the worker with work details including add‑Ons.
-    setWorkers((prev) =>
-      prev.map((worker) =>
-        worker.id === currentWorker.id
-          ? {
-              ...worker,
-              startTime: start.toLocaleTimeString("en-GB"),
-              serviceTime: parseFloat(serviceMins) || 0,
-              endTime: formattedEnd,
-              status: newStatus,
-              serviceId: selectedServiceObj.id,
-              serviceName: selectedServiceObj.name,
-              addOns: selectedAddOns,
-            }
-          : worker
-      )
-    );
-
-    if (newStatus === "Booked") {
-      const newBooking: BookingListStruct = {
-        id: Date.now(),
-        workerId: currentWorker.id,
-        serviceId: selectedServiceObj.id,
-        startTime: start.toLocaleTimeString("en-GB"),
-        serviceTime: parseFloat(serviceMins) || 0,
-        sales: selectedServiceObj.price,
-        commission:
-          (selectedServiceObj.commission || 0) +
-          selectedAddOns.reduce(
-            (acc, addon) => acc + (addon.workerCommission || 0),
-            0
-          ),
-        staffCommission:
-          (selectedServiceObj.staffCommission || 0) +
-          selectedAddOns.reduce(
-            (acc, addon) => acc + (addon.staffCommission || 0),
-            0
-          ),
-        workerName: currentWorker.name,
-        serviceName: selectedServiceObj.name,
-        footTime: selectedServiceObj.footTimeMin,
-        bodyTime: selectedServiceObj.bodyTimeMin,
-        customerName: customerNameFormData,
-        customerPhone: customerPhoneFormData,
-        transactionDate: new Date().toISOString(),
-        addOns: selectedAddOns,
-        createdBy: activeStaff,
-        status: "ACTIVE",
-      };
-      setBookingList((prev) => [...prev, newBooking]);
-      localStorage.setItem(
-        "bookingList",
-        JSON.stringify([...bookingList, newBooking])
-      );
-    }
-
-    const newTransaction: Transaction = {
-      id: Date.now(),
+    const workerName = startWorker({
       workerId: currentWorker.id,
-      serviceId: selectedServiceObj.id,
-      startTime: start.toLocaleTimeString("en-GB"),
-      serviceTime: Number(serviceMins),
-      endTime: formattedEnd,
-      sales: selectedServiceObj.price,
-      commission:
-        (selectedServiceObj.commission || 0) +
-        selectedAddOns.reduce(
-          (acc, addon) => acc + (addon.workerCommission || 0),
-          0
-        ),
-      workerName: currentWorker.name,
-      serviceName: selectedServiceObj.name,
-      footTime: selectedServiceObj.footTimeMin,
-      bodyTime: selectedServiceObj.bodyTimeMin,
+      serviceId: selectedService,
+      startTime: workTimeFormData.startTime,
+      serviceTimeMinutes: Number(workTimeFormData.serviceTime),
+      isBooked,
+      selectedAddOnIds,
       customerName: customerNameFormData,
       customerPhone: customerPhoneFormData,
-      transactionDate: new Date().toISOString(),
-      addOns: selectedAddOns,
-      createdBy: activeStaff,
-      staffCommission:
-        (selectedServiceObj.staffCommission || 0) +
-        selectedAddOns.reduce(
-          (acc, addon) => acc + (addon.staffCommission || 0),
-          0
-        ),
-    };
-
-    setTransactions([...transactions, newTransaction]);
-    localStorage.setItem(
-      "transactions",
-      JSON.stringify([...transactions, newTransaction])
-    );
-
-    // Add new customer to customerEntry
-    const newCustomer: CustomerEntryStruct = {
-      id: Date.now(),
-      name: customerNameFormData,
       nationality: customerNationalityFormData,
       identityNumber: customerIdFormData,
-      timeIn: start.toLocaleTimeString("en-GB"),
-      timeOut: formattedEnd,
-      phone: customerPhoneFormData,
-      createdAt: new Date().toISOString(),
-    };
-    setCustomerEntry([...customerEntry, newCustomer]);
-    localStorage.setItem(
-      "customerEntry",
-      JSON.stringify([...customerEntry, newCustomer])
-    );
+    });
 
-    toast.success(`${currentWorker.name} is set to work`, {
+    toast.success(`${workerName || currentWorker.name} is set to work`, {
       position: "top-center",
       autoClose: 5000,
     });
@@ -984,3 +789,4 @@ export default function MassageShift({
     </div>
   );
 }
+

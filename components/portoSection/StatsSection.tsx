@@ -13,10 +13,6 @@ import {
   TerminalSquare,
   UserRound,
 } from "lucide-react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface AnimatedCounterProps {
   target: number;
@@ -208,34 +204,31 @@ export default function StatsSection() {
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    const counterTrigger = ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: "top 78%",
-      once: true,
-      onEnter: () => setAnimateCounters(true),
-    });
-
-    const revealTween = gsap.fromTo(
-      sectionRef.current.querySelectorAll(".stat-item"),
-      { opacity: 0, y: 34 },
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setAnimateCounters(true);
+        observer.disconnect();
+      },
       {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.12,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 82%",
-        },
+        rootMargin: "0px 0px -18% 0px",
+        threshold: 0.12,
       }
     );
 
+    observer.observe(sectionRef.current);
+
     return () => {
-      counterTrigger.kill();
-      revealTween.kill();
+      observer.disconnect();
     };
   }, []);
+
+  const revealClass = animateCounters
+    ? "translate-y-0 opacity-100"
+    : "translate-y-8 opacity-0";
+  const revealStyle = (delay: number) => ({
+    transitionDelay: animateCounters ? `${delay}ms` : "0ms",
+  });
 
   return (
     <section
@@ -254,7 +247,10 @@ export default function StatsSection() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:h-[calc(100dvh-170px)] lg:min-h-[390px] lg:max-h-[470px] lg:grid-cols-[0.92fr_1.08fr]">
-          <article className="stat-item group/experience relative min-h-[480px] overflow-hidden rounded-[1.6rem] border border-[#7b8cff]/55 bg-[radial-gradient(circle_at_0%_0%,rgba(255,75,193,0.22),transparent_34%),radial-gradient(circle_at_100%_0%,rgba(78,114,255,0.2),transparent_32%),linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02)_42%,rgba(5,8,18,0.98))] p-7 shadow-[0_0_34px_rgba(255,75,193,0.18)] sm:p-9 lg:h-full lg:min-h-0 lg:p-6">
+          <article
+            className={`stat-item group/experience relative min-h-[480px] overflow-hidden rounded-[1.6rem] border border-[#7b8cff]/55 bg-[radial-gradient(circle_at_0%_0%,rgba(255,75,193,0.22),transparent_34%),radial-gradient(circle_at_100%_0%,rgba(78,114,255,0.2),transparent_32%),linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02)_42%,rgba(5,8,18,0.98))] p-7 shadow-[0_0_34px_rgba(255,75,193,0.18)] transition-[opacity,transform] duration-700 ease-out sm:p-9 lg:h-full lg:min-h-0 lg:p-6 ${revealClass}`}
+            style={revealStyle(0)}
+          >
             <div className="absolute inset-0 opacity-[0.22] [background-image:linear-gradient(rgba(255,255,255,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.16)_1px,transparent_1px)] [background-size:56px_56px]" />
             <div className="absolute inset-x-6 bottom-0 h-px bg-gradient-to-r from-[#ff4bc1] via-transparent to-[#527dff]" />
             <GalaxyVisual />
@@ -285,7 +281,10 @@ export default function StatsSection() {
           </article>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:h-full lg:grid-rows-2">
-            <article className="stat-item group/projects relative min-h-[260px] overflow-hidden rounded-[1.5rem] border border-[#ff4bc1]/45 bg-[radial-gradient(circle_at_95%_0%,rgba(255,75,193,0.34),transparent_24%),linear-gradient(135deg,rgba(255,75,193,0.12),rgba(5,7,17,0.97)_48%)] p-6 shadow-[0_0_28px_rgba(255,75,193,0.14)] lg:h-full lg:min-h-0 lg:p-5">
+            <article
+              className={`stat-item group/projects relative min-h-[260px] overflow-hidden rounded-[1.5rem] border border-[#ff4bc1]/45 bg-[radial-gradient(circle_at_95%_0%,rgba(255,75,193,0.34),transparent_24%),linear-gradient(135deg,rgba(255,75,193,0.12),rgba(5,7,17,0.97)_48%)] p-6 shadow-[0_0_28px_rgba(255,75,193,0.14)] transition-[opacity,transform] duration-700 ease-out lg:h-full lg:min-h-0 lg:p-5 ${revealClass}`}
+              style={revealStyle(90)}
+            >
               <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:46px_46px]" />
               <ProjectsVisual />
               <div className="relative z-10 max-w-[250px]">
@@ -312,7 +311,10 @@ export default function StatsSection() {
               </div>
             </article>
 
-            <article className="stat-item group/stack relative min-h-[260px] overflow-hidden rounded-[1.5rem] border border-[#6279ff]/45 bg-[radial-gradient(circle_at_95%_0%,rgba(82,125,255,0.32),transparent_25%),linear-gradient(135deg,rgba(93,95,255,0.12),rgba(5,8,18,0.98)_50%)] p-6 shadow-[0_0_28px_rgba(82,125,255,0.14)] lg:h-full lg:min-h-0 lg:p-5">
+            <article
+              className={`stat-item group/stack relative min-h-[260px] overflow-hidden rounded-[1.5rem] border border-[#6279ff]/45 bg-[radial-gradient(circle_at_95%_0%,rgba(82,125,255,0.32),transparent_25%),linear-gradient(135deg,rgba(93,95,255,0.12),rgba(5,8,18,0.98)_50%)] p-6 shadow-[0_0_28px_rgba(82,125,255,0.14)] transition-[opacity,transform] duration-700 ease-out lg:h-full lg:min-h-0 lg:p-5 ${revealClass}`}
+              style={revealStyle(180)}
+            >
               <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:46px_46px]" />
               <StackVisual />
               <div className="relative z-10 max-w-[245px]">
@@ -339,7 +341,10 @@ export default function StatsSection() {
               </div>
             </article>
 
-            <article className="stat-item relative min-h-[240px] overflow-hidden rounded-[1.5rem] border border-[#9d55ff]/45 bg-[radial-gradient(circle_at_0%_0%,rgba(255,75,193,0.22),transparent_26%),radial-gradient(circle_at_100%_0%,rgba(79,125,255,0.22),transparent_28%),linear-gradient(135deg,rgba(255,75,193,0.08),rgba(5,7,18,0.98)_45%)] p-6 shadow-[0_0_30px_rgba(255,75,193,0.12)] md:col-span-2 lg:h-full lg:min-h-0 lg:p-5">
+            <article
+              className={`stat-item relative min-h-[240px] overflow-hidden rounded-[1.5rem] border border-[#9d55ff]/45 bg-[radial-gradient(circle_at_0%_0%,rgba(255,75,193,0.22),transparent_26%),radial-gradient(circle_at_100%_0%,rgba(79,125,255,0.22),transparent_28%),linear-gradient(135deg,rgba(255,75,193,0.08),rgba(5,7,18,0.98)_45%)] p-6 shadow-[0_0_30px_rgba(255,75,193,0.12)] transition-[opacity,transform] duration-700 ease-out md:col-span-2 lg:h-full lg:min-h-0 lg:p-5 ${revealClass}`}
+              style={revealStyle(270)}
+            >
               <div className="absolute inset-0 opacity-[0.16] [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:56px_56px]" />
               <HeartbeatVisual />
               <div className="relative z-10 max-w-[360px]">

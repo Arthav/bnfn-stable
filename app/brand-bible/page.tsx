@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { BrandForm } from "@/components/brand-bible/brand-form";
 import { BrandResult } from "@/components/brand-bible/brand-result";
-// import { generateBrand } from "@/actions/generate-brand";
 import { BrandInput, BrandResult as BrandResultType } from "@/types/brand";
+import { parseBrandResult } from "@/lib/brand/result-parser";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -41,14 +41,7 @@ export default function BrandBiblePage() {
                 resultText += decoder.decode(value, { stream: true });
             }
 
-            // Clean up any markdown code blocks if present (safeguard)
-            if (resultText.includes("```json")) {
-                resultText = resultText.split("```json")[1].split("```")[0].trim();
-            } else if (resultText.includes("```")) {
-                resultText = resultText.split("```")[1].split("```")[0].trim();
-            }
-
-            const generatedBrand = JSON.parse(resultText) as BrandResultType;
+            const generatedBrand = parseBrandResult(resultText) as BrandResultType;
             setResult({
                 ...generatedBrand,
                 businessName: data.businessName,

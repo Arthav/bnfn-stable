@@ -1,19 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  Worker,
-  Services,
-  Transaction,
-  AddOns,
-  Staff,
-  StaffChangeLog,
-  BookingListStruct,
-  Membership,
-  MembershipTypesStruct,
-  RedeemPointHistoryStruct,
-  CustomerEntryStruct,
-} from "@/components/types/massage";
+import { useEffect, useState } from "react";
 import MassageShift from "@/components/massage/MassageShift";
 import ManageService from "@/components/massage/ManageService";
 import { ToastContainer, toast } from "react-toastify";
@@ -24,6 +11,7 @@ import BookingListPage from "@/components/massage/BookingList";
 import ManageAddOnsPage from "@/components/massage/AddOns";
 import StaffList from "@/components/massage/Staff";
 import MembershipLayout from "@/components/massage/memberships/MembershipLayouts";
+import { useMassageWorkspace } from "@/lib/massage/use-massage-workspace";
 import {
   FaSpa,
   FaCalendarAlt,
@@ -36,23 +24,26 @@ import {
 
 export default function MassageShiftPage() {
   const [activeTab, setActiveTab] = useState("massage-shift");
-  const [services, setServices] = useState<Services[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [workers, setWorkers] = useState<Worker[]>([]);
-  const [addOns, setAddOns] = useState<AddOns[]>([]);
-  const [staffList, setStaffList] = useState<Staff[]>([]);
-  const [activeStaff, setActiveStaff] = useState<Staff | null>(null);
-  const [staffChangeLog, setStaffChangeLog] = useState<StaffChangeLog[]>([]);
   const [showStaffChangeLog, setShowStaffChangeLog] = useState(false);
-  const [bookingList, setBookingList] = useState<BookingListStruct[]>([]);
-  const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [membershipTypes, setMembershipTypes] = useState<
-    MembershipTypesStruct[]
-  >([]);
-  const [redeemHistory, setRedeemHistory] = useState<
-    RedeemPointHistoryStruct[]
-  >([]);
-  const [customerEntry, setCustomerEntry] = useState<CustomerEntryStruct[]>([]);
+  const {
+    services,
+    transactions,
+    setTransactions,
+    workers,
+    setWorkers,
+    addOns,
+    staffList,
+    setStaffList,
+    activeStaff,
+    staffChangeLog,
+    bookingList,
+    setBookingList,
+    memberships,
+    membershipTypes,
+    redeemHistory,
+    customerEntry,
+    actions,
+  } = useMassageWorkspace();
 
   const tabs = [
     {
@@ -62,17 +53,12 @@ export default function MassageShiftPage() {
       component: (
         <MassageShift
           services={services}
-          transactions={transactions}
           workers={workers}
           setWorkers={setWorkers}
-          setTransactions={setTransactions}
           addOns={addOns}
-          activeStaff={activeStaff}
-          bookingList={bookingList}
-          setBookingList={setBookingList}
           memberships={memberships}
-          customerEntry={customerEntry}
-          setCustomerEntry={setCustomerEntry}
+          startWorker={actions.startWorker}
+          finishWorker={actions.finishWorker}
         />
       ),
     },
@@ -86,6 +72,8 @@ export default function MassageShiftPage() {
           setBookingList={setBookingList}
           workers={workers}
           activeStaff={activeStaff}
+          addBooking={actions.addBooking}
+          finishAppointment={actions.finishAppointment}
         />
       ),
     },
@@ -97,12 +85,12 @@ export default function MassageShiftPage() {
         <div className="flex flex-col gap-0">
           <ManageService
             services={services}
-            setServices={setServices}
+            saveService={actions.saveService}
             activeStaff={activeStaff}
           />
           <ManageAddOnsPage
             addOns={addOns}
-            setAddOns={setAddOns}
+            saveAddOn={actions.saveAddOn}
             activeStaff={activeStaff}
           />
         </div>
@@ -123,12 +111,10 @@ export default function MassageShiftPage() {
       component: (
         <MembershipLayout
           memberships={memberships}
-          setMemberships={setMemberships}
           membershipTypes={membershipTypes}
-          setMembershipTypes={setMembershipTypes}
           redeemHistory={redeemHistory}
-          setRedeemHistory={setRedeemHistory}
           customerEntry={customerEntry}
+          actions={actions}
         />
       ),
     },
@@ -141,6 +127,7 @@ export default function MassageShiftPage() {
           transactions={transactions}
           setTransactions={setTransactions}
           activeStaff={activeStaff}
+          refundTransaction={actions.refundTransaction}
         />
       ),
     },
@@ -160,207 +147,22 @@ export default function MassageShiftPage() {
     },
   ];
 
-  const parseEndTime = (endTime: string): Date => {
-    const [hours, minutes, seconds] = endTime.split(":").map(Number);
-    const now = new Date();
-    return new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      hours,
-      minutes,
-      seconds || 0
-    );
-  };
-
-  const updateWorkersStatus = () => {
-    let finishedWorkerNames: string[] = [];
-    let finishedWorkerIds: number[] = [];
-    setWorkers((prev) => {
-      const updatedWorkers = prev.map((worker) => {
-        if (
-          (worker.status === "Busy" || worker.status === "Booked") &&
-          worker.endTime
-        ) {
-          const endDate = parseEndTime(worker.endTime);
-          // Check if the current time is past the end time
-          if (new Date() > endDate) {
-            finishedWorkerNames.push(worker.name);
-            finishedWorkerIds.push(worker.id);
-            const updatedWorker: Worker = {
-              ...worker,
-              status: "Available",
-              startTime: "",
-              serviceTime: 0,
-              endTime: "",
-              availableSince: undefined,
-              serviceId: undefined,
-              serviceName: undefined,
-              addOns: [],
-            };
-
-            // If the status was "Busy", move the worker to the end of the array
-            if (worker.status === "Busy") {
-              return { updatedWorker, isMovedToEnd: true };
-            }
-
-            // If the status was "Booked", update the worker in place
-            return { updatedWorker, isMovedToEnd: false };
-          }
-        }
-        return { updatedWorker: worker, isMovedToEnd: false }; // No change
-      });
-
-      // Separate the workers that need to be moved to the end
-      const movedWorkers = updatedWorkers
-        .filter((w) => w.isMovedToEnd)
-        .map((w) => w.updatedWorker);
-      const updatedWorkersInPlace = updatedWorkers
-        .filter((w) => !w.isMovedToEnd)
-        .map((w) => w.updatedWorker);
-
-      // Combine the updated workers, placing the moved ones at the end
-      return [...updatedWorkersInPlace, ...movedWorkers];
-    });
-
-    // Update the bookingList state
-    setBookingList((prev) =>
-      prev.map((booking) => {
-        if (
-          finishedWorkerIds.includes(booking.workerId ?? 0) &&
-          booking.status === "ACTIVE"
-        ) {
-          return {
-            ...booking,
-            status: "DONE",
-          };
-        }
-        return booking;
-      })
-    );
-
-    // Show toast notifications for finished workers
-    finishedWorkerNames.forEach((name) => {
-      toast.success(`${name} has done working`, {
-        position: "top-center",
-        autoClose: 5000,
-      });
-    });
-  };
-
   useEffect(() => {
     const interval = setInterval(() => {
-      updateWorkersStatus();
-    }, 20000); // Runs every 20 seconds
+      actions.refreshExpiredWorkers().forEach((name) => {
+        toast.success(`${name} has done working`, {
+          position: "top-center",
+          autoClose: 5000,
+        });
+      });
+    }, 20000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [actions]);
 
-  // Load from localStorage on component mount
-  useEffect(() => {
-    console.log(`
-========================================
-Dear Developer, my name is Christian Bonafena
-
-Welcome to the hidden gateway of our code. Your unexpected discovery is not only a testament to your keen curiosity but also a nod to the finer nuances of our craft. In this realm, every semicolon shines with precision, and every curly brace holds a story of excellence.
-
-★ Embrace the Mystery ★
-
-May your commits be legendary, your debugging swift, and your journey through code forever inspiring.
-
-========================================
-`);
-
-    const storedServices = localStorage.getItem("services");
-    if (storedServices) {
-      setServices(JSON.parse(storedServices));
-    }
-
-    const storedWorkers = localStorage.getItem("workers");
-    if (storedWorkers) {
-      setWorkers(JSON.parse(storedWorkers));
-    }
-
-    const storedCustomerEntry = localStorage.getItem("customerEntry");
-    if (storedCustomerEntry) {
-      setCustomerEntry(JSON.parse(storedCustomerEntry));
-    }
-
-    const storedBookingList = localStorage.getItem("bookingList");
-    if (storedBookingList) {
-      setBookingList(JSON.parse(storedBookingList));
-    }
-
-    const storedTransactions = localStorage.getItem("transactions");
-    if (storedTransactions) {
-      setTransactions(JSON.parse(storedTransactions));
-    }
-
-    const storedAddOns = localStorage.getItem("addOns");
-    if (storedAddOns) {
-      setAddOns(JSON.parse(storedAddOns));
-    }
-
-    const storedMemberships = localStorage.getItem("memberships");
-    if (storedMemberships) {
-      setMemberships(JSON.parse(storedMemberships));
-    }
-
-    const storedMembershipTypes = localStorage.getItem("membershipTypes");
-    if (storedMembershipTypes) {
-      setMembershipTypes(JSON.parse(storedMembershipTypes));
-    }
-
-    const storedRedeemHistory = localStorage.getItem("redeemHistory");
-    if (storedRedeemHistory) {
-      setRedeemHistory(JSON.parse(storedRedeemHistory));
-    }
-
-    const storedStaff = localStorage.getItem("staffList");
-    if (storedStaff) {
-      setStaffList(JSON.parse(storedStaff));
-    }
-
-    const storedActiveStaff = localStorage.getItem("activeStaff");
-    if (storedActiveStaff) {
-      setActiveStaff(JSON.parse(storedActiveStaff));
-    }
-
-    const storedStaffChangeLog = localStorage.getItem("staffChangeLog");
-    if (storedStaffChangeLog) {
-      const parsedLog = JSON.parse(storedStaffChangeLog);
-      // Ensure the parsed value is an array; otherwise default to an empty array
-      setStaffChangeLog(Array.isArray(parsedLog) ? parsedLog : []);
-    }
-  }, []);
-
-  // Synchronize staffChangeLog state with localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("staffChangeLog", JSON.stringify(staffChangeLog));
-  }, [staffChangeLog]);
-
-  // Handle active staff change
   const handleActiveStaffChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedStaffId = parseInt(e.target.value);
-    const selectedStaff =
-      staffList.find((staff) => staff.id === selectedStaffId) || null;
-
-    const newStaffChangeLog: StaffChangeLog = {
-      id: Date.now(),
-      staffId: selectedStaffId,
-      changeFromId: activeStaff?.id || null,
-      changeToId: selectedStaffId,
-      changeDate: new Date().toISOString(),
-    };
-
-    // Append the new log entry and update the state
-    setStaffChangeLog([...staffChangeLog, newStaffChangeLog]);
-    setActiveStaff(selectedStaff);
-
-    // Update activeStaff in localStorage (can also be synchronized via a useEffect)
-    localStorage.setItem("activeStaff", JSON.stringify(selectedStaff));
+    actions.changeActiveStaff(parseInt(e.target.value, 10));
   };
-
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="pb-5 mb-4">
@@ -538,3 +340,5 @@ May your commits be legendary, your debugging swift, and your journey through co
     </div>
   );
 }
+
+

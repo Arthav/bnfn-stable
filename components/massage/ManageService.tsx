@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import React, { useState, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import { Services, Staff } from "@/components/types/massage";
 
@@ -17,11 +17,11 @@ const statusClasses: Record<Services["status"], string> = {
 
 export default function ManageServicePage({
   services,
-  setServices,
+  saveService,
   activeStaff,
 }: {
   services: Services[];
-  setServices: (services: Services[]) => void;
+  saveService: (service: Services) => void;
   activeStaff: Staff | null;
 }) {
   // Modal and current service state.
@@ -54,19 +54,6 @@ export default function ManageServicePage({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  // Load services from localStorage on mount.
-  useEffect(() => {
-    const storedServices = localStorage.getItem("services");
-    if (storedServices) {
-      setServices(JSON.parse(storedServices));
-    }
-  }, []);
-
-  // Save services to localStorage whenever they change.
-  useEffect(() => {
-    localStorage.setItem("services", JSON.stringify(services));
-  }, [services]);
 
   // Opens modal to add a new service.
   const openAddModal = () => {
@@ -113,7 +100,7 @@ export default function ManageServicePage({
       staffCommission: parseFloat(staffCommissionFormData) || 0,
       createdBy: activeStaff,
     };
-    setServices([...services, newService]);
+    saveService(newService);
     toast.success("Service added", { position: "top-center", autoClose: 5000 });
     setModalType(null);
   };
@@ -122,23 +109,17 @@ export default function ManageServicePage({
   const handleEditSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!currentService) return;
-    setServices(
-      services.map((service) =>
-        service.id === currentService.id
-          ? {
-              ...service,
-              name: nameFormData,
-              description: descriptionFormData,
-              price: parseFloat(priceFormData) || 0,
-              serviceTimeMin: parseFloat(serviceTimeFormData) || 0,
-              footTimeMin: parseFloat(footTimeFormData) || 0,
-              bodyTimeMin: parseFloat(bodyTimeFormData) || 0,
-              commission: parseFloat(commissionFormData) || 0,
-              staffCommission: parseFloat(staffCommissionFormData) || 0,
-            }
-          : service
-      )
-    );
+    saveService({
+      ...currentService,
+      name: nameFormData,
+      description: descriptionFormData,
+      price: parseFloat(priceFormData) || 0,
+      serviceTimeMin: parseFloat(serviceTimeFormData) || 0,
+      footTimeMin: parseFloat(footTimeFormData) || 0,
+      bodyTimeMin: parseFloat(bodyTimeFormData) || 0,
+      commission: parseFloat(commissionFormData) || 0,
+      staffCommission: parseFloat(staffCommissionFormData) || 0,
+    });
     toast.success("Service updated", {
       position: "top-center",
       autoClose: 5000,
@@ -149,11 +130,8 @@ export default function ManageServicePage({
   // Handles service deletion.
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
-      setServices(
-        services.map((service) =>
-          service.id === id ? { ...service, status: "Discontinued" } : service
-        )
-      );
+      const service = services.find((item) => item.id === id);
+      if (service) saveService({ ...service, status: "Discontinued" });
       toast.success("Service discontinued", {
         position: "top-center",
         autoClose: 5000,
@@ -163,11 +141,8 @@ export default function ManageServicePage({
 
   const handleActivate = (id: number) => {
     if (window.confirm("Are you sure you want to activate this service?")) {
-      setServices(
-        services.map((service) =>
-          service.id === id ? { ...service, status: "Active" } : service
-        )
-      );
+      const service = services.find((item) => item.id === id);
+      if (service) saveService({ ...service, status: "Active" });
       toast.success("Service activated", {
         position: "top-center",
         autoClose: 5000,

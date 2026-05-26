@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import React, { useState, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import { Item } from "@/components/types/massage";
 
@@ -15,20 +15,6 @@ export default function TemplatePage({
   const [modalType, setModalType] = useState<ModalType>(null);
   const [currentItem, setCurrentItem] = useState<Item | null>(null);
   const [nameFormData, setNameFormData] = useState<string>("");
-
-  // Load items from localStorage on mount.
-  useEffect(() => {
-    const storedItems = localStorage.getItem("items");
-    if (storedItems) {
-      setItems(JSON.parse(storedItems));
-    }
-  }, []);
-
-  // Save items to localStorage whenever they change (skip if empty).
-  useEffect(() => {
-    if (items.length === 0) return;
-    localStorage.setItem("items", JSON.stringify(items));
-  }, [items]);
 
   // Opens modal to add a new item.
   const openAddModal = () => {

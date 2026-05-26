@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Globe2, Mail, Sparkles, Users, Zap } from "lucide-react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FaArrowUp, FaEnvelope, FaGithub, FaLinkedin } from "react-icons/fa";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const socials = [
   {
@@ -38,29 +34,27 @@ const availability = [
 
 export default function ContactFooter() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    const revealTween = gsap.fromTo(
-      sectionRef.current.querySelector(".contact-content"),
-      { opacity: 0, y: 42, rotateX: -4 },
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setIsVisible(true);
+        observer.disconnect();
+      },
       {
-        opacity: 1,
-        y: 0,
-        rotateX: 0,
-        duration: 0.9,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 82%",
-          toggleActions: "play none none none",
-        },
+        rootMargin: "0px 0px -18% 0px",
+        threshold: 0.12,
       }
     );
 
+    observer.observe(sectionRef.current);
+
     return () => {
-      revealTween.kill();
+      observer.disconnect();
     };
   }, []);
 
@@ -72,7 +66,9 @@ export default function ContactFooter() {
     <div ref={sectionRef} className="w-full mt-24">
       <section className="relative mx-4 sm:mx-8 md:mx-16">
         <div
-          className="contact-content group relative overflow-hidden rounded-[2rem] border border-[#d97aff]/45 bg-[#05050b] px-5 py-14 text-center shadow-[0_0_50px_rgba(255,76,190,0.18),inset_0_0_70px_rgba(83,110,255,0.08)] sm:px-8 md:rounded-[2.25rem] md:px-12 md:py-20"
+          className={`contact-content group relative overflow-hidden rounded-[2rem] border border-[#d97aff]/45 bg-[#05050b] px-5 py-14 text-center shadow-[0_0_50px_rgba(255,76,190,0.18),inset_0_0_70px_rgba(83,110,255,0.08)] transition-[opacity,transform] duration-700 ease-out sm:px-8 md:rounded-[2.25rem] md:px-12 md:py-20 ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
           style={{ transformStyle: "preserve-3d" }}
         >
           <div className="pointer-events-none absolute -inset-6 -z-10 rotate-[-2deg] rounded-[2.35rem] border border-[#9d48ff]/25 bg-[#15091e]/45 shadow-[0_0_48px_rgba(134,74,255,0.12)]" />

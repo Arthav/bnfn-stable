@@ -5,12 +5,14 @@ interface TransactionListProps {
   transactions: Transaction[];
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
   activeStaff: Staff | null;
+  refundTransaction?: (transaction: Transaction, reason: string) => void;
 }
 
 const TransactionList: React.FC<TransactionListProps> = ({
   transactions,
   setTransactions,
   activeStaff,
+  refundTransaction: refundTransactionAction,
 }) => {
   // Filter states
   const [timeFilter, setTimeFilter] = useState<"custom" | "week" | "month">("custom");
@@ -117,6 +119,13 @@ const TransactionList: React.FC<TransactionListProps> = ({
     e.preventDefault();
     if (!selectedTransaction) return;
 
+    if (refundTransactionAction) {
+      refundTransactionAction(selectedTransaction, refundReason);
+      setSelectedTransaction(null);
+      setRefundReason("");
+      return;
+    }
+
     // Generate a new id (e.g., max current id + 1)
     const newId =
       transactions.length > 0
@@ -151,7 +160,6 @@ const TransactionList: React.FC<TransactionListProps> = ({
     updatedTransactions.push(refundTransaction);
 
     setTransactions(updatedTransactions);
-    localStorage.setItem("transactions", JSON.stringify(updatedTransactions));
 
     // Reset modal state.
     setSelectedTransaction(null);

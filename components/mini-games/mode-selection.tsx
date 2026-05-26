@@ -1,8 +1,9 @@
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { motion } from "framer-motion";
+import { PlayMode } from "@/components/mini-games/types";
 
-export type PlayMode = "vs_computer" | "vs_player" | "competition";
+export type { PlayMode };
 
 interface ModeSelectionProps {
     selectedMode: PlayMode | null;

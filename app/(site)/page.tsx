@@ -1,9 +1,7 @@
 "use client";
-import React, { useEffect } from "react";
 import Skills from "@/components/portoSection/Skills";
 import HeroSequenceSection from "@/components/portoSection/HeroSequenceSection";
 
-import BioSection from "@/components/portoSection/bio";
 import StatsSection from "@/components/portoSection/StatsSection";
 import ExperienceTimeline from "@/components/portoSection/ExperienceTimeline";
 import ProjectsShowcase from "@/components/portoSection/ProjectsShowcase";
@@ -13,87 +11,13 @@ import Marquee from "@/components/ui/Marquee";
 import Magnetic from "@/components/ui/Magnetic";
 import { motion } from "framer-motion";
 
-
 export default function Home() {
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.type = "module";
-    script.src = "https://unpkg.com/@splinetool/viewer/build/spline-viewer.js";
-    script.async = true;
-
-    const badgeSelectors = [
-      "#logo",
-      "a#logo",
-      "a[href*='spline.design']",
-      "[aria-label*='Spline' i]",
-      "[title*='Spline' i]",
-    ].join(",");
-    const observedShadowRoots = new WeakSet<ShadowRoot>();
-    let observer: MutationObserver | null = null;
-
-    // Remove Spline's runtime badge after its shadow DOM finishes rendering.
-    const removeSplineBadge = () => {
-      document.querySelectorAll<HTMLElement>("spline-viewer").forEach((viewer) => {
-        const shadowRoot = viewer.shadowRoot;
-
-        if (!shadowRoot) {
-          return;
-        }
-
-        if (observer && !observedShadowRoots.has(shadowRoot)) {
-          observer.observe(shadowRoot, { childList: true, subtree: true });
-          observedShadowRoots.add(shadowRoot);
-        }
-
-        shadowRoot.querySelectorAll<HTMLElement>(badgeSelectors).forEach((badge) => {
-          badge.remove();
-        });
-      });
-    };
-
-    document.body.appendChild(script);
-
-    observer = new MutationObserver(removeSplineBadge);
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    const badgeCleanupInterval = window.setInterval(removeSplineBadge, 250);
-    const stopBadgeCleanupTimeout = window.setTimeout(() => {
-      window.clearInterval(badgeCleanupInterval);
-    }, 8000);
-
-    script.addEventListener("load", removeSplineBadge);
-    removeSplineBadge();
-
-    return () => {
-      observer?.disconnect();
-      window.clearInterval(badgeCleanupInterval);
-      window.clearTimeout(stopBadgeCleanupTimeout);
-      script.removeEventListener("load", removeSplineBadge);
-      document.body.removeChild(script);
-    };
-  }, []);
-
   return (
     <section className="flex w-full flex-col items-center justify-center gap-4 overflow-x-clip">
-      {/* Hero section */}
       {/* Hero section */}
       <div className="relative w-full overflow-hidden bg-black">
         <div className="relative flex h-[calc(100vh-64px)] w-full flex-col items-center justify-center overflow-hidden">
           <Marquee />
-          <spline-viewer
-            style={{
-              backgroundColor: "transparent",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              zIndex: 1,
-              pointerEvents: "none",
-            }}
-            url="https://prod.spline.design/pS-PjKUUhIiCodIC/scene.splinecode"
-            events-target="global"
-          ></spline-viewer>
 
           {heroSection}
         </div>
@@ -103,22 +27,6 @@ export default function Home() {
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[58%] bg-[radial-gradient(circle_at_50%_8%,rgba(90,10,5,0.65),transparent_58%),linear-gradient(180deg,#120302_0%,#050000_100%)]" />
           <div className="pointer-events-none absolute inset-x-0 top-[40%] z-0 h-[30%] bg-gradient-to-b from-black via-[#120302]/80 to-[#120302]" />
           <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_100%,transparent_0%,rgba(0,0,0,0.55)_78%)]" />
-
-          <spline-viewer
-            style={{
-              backgroundColor: "transparent",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              zIndex: 1,
-              opacity: 0.9,
-              pointerEvents: "none",
-            }}
-            url="https://prod.spline.design/pS-PjKUUhIiCodIC/scene.splinecode"
-            events-target="global"
-          ></spline-viewer>
 
           <SinePathMarquee />
         </div>

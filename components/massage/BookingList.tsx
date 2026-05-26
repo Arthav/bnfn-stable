@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { BookingListStruct, Worker, Staff } from "@/components/types/massage";
 
 type BookingListPageProps = {
@@ -6,6 +6,8 @@ type BookingListPageProps = {
   activeStaff: Staff | null;
   bookingList: BookingListStruct[];
   setBookingList: React.Dispatch<React.SetStateAction<BookingListStruct[]>>;
+  addBooking?: (booking: BookingListStruct) => void;
+  finishAppointment?: (bookingId: number) => void;
 };
 
 export default function BookingListPage({
@@ -13,6 +15,8 @@ export default function BookingListPage({
   activeStaff,
   bookingList,
   setBookingList,
+  addBooking,
+  finishAppointment: finishAppointmentAction,
 }: BookingListPageProps) {
   const [status, setStatus] = useState("ACTIVE");
   const [modalOpen, setModalOpen] = useState(false); // To manage modal visibility
@@ -38,11 +42,6 @@ export default function BookingListPage({
   };
   const [bookingFormData, setBookingFormData] =
     useState<BookingListStruct>(emptyFormState);
-
-  useEffect(() => {
-    if (bookingList.length === 0) return;
-    localStorage.setItem("bookingList", JSON.stringify(bookingList));
-  }, [bookingList]);
 
   // Filter workers to only include those with a "Booked" status.
   const bookedWorkers = bookingList
@@ -71,7 +70,11 @@ export default function BookingListPage({
       createdBy: activeStaff,
       status: "APPOINTMENT",
     };
-    setBookingList((prev) => [...prev, newAppointMentData]);
+    if (addBooking) {
+      addBooking(newAppointMentData);
+    } else {
+      setBookingList((prev) => [...prev, newAppointMentData]);
+    }
     setModalOpen(false);
     setBookingFormData(emptyFormState);
   };
@@ -103,16 +106,20 @@ export default function BookingListPage({
   };
 
   const finishAppointment = (bookingId: number) => {
+    if (finishAppointmentAction) {
+      finishAppointmentAction(bookingId);
+      return;
+    }
+
     setBookingList((prev) =>
-      prev.map((booking) => {
-        if (booking.id === bookingId) {
-          return {
-            ...booking,
-            status: "APPOINTMENT DONE",
-          };
-        }
-        return booking;
-      })
+      prev.map((booking) =>
+        booking.id === bookingId
+          ? {
+              ...booking,
+              status: "APPOINTMENT DONE",
+            }
+          : booking
+      )
     );
   };
 

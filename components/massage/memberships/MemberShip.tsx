@@ -1,6 +1,5 @@
 import React, {
   useState,
-  useEffect,
   FormEvent,
   ChangeEvent,
   useMemo,
@@ -10,6 +9,7 @@ import {
   MembershipTypesStruct,
   RedeemPointHistoryStruct,
 } from "@/components/types/massage";
+import type { MassageWorkspaceActions } from "@/lib/massage/use-massage-workspace";
 import { toast } from "react-toastify";
 import {
   FaWhatsapp,
@@ -19,17 +19,16 @@ type ModalType = "add" | "edit" | "redeem" | null;
 
 export default function MembershipMasterPage({
   memberships,
-  setMemberships,
   membershipTypes,
   redeemHistory,
-  setRedeemHistory,
+  actions,
 }: {
   memberships: Membership[];
-  setMemberships: React.Dispatch<React.SetStateAction<Membership[]>>;
   membershipTypes: MembershipTypesStruct[];
   redeemHistory: RedeemPointHistoryStruct[];
-  setRedeemHistory: React.Dispatch<
-    React.SetStateAction<RedeemPointHistoryStruct[]>
+  actions: Pick<
+    MassageWorkspaceActions,
+    "saveMembership" | "deleteMembership" | "redeemMembershipPoints"
   >;
 }) {
   // Modal management state.
@@ -56,25 +55,6 @@ export default function MembershipMasterPage({
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  // Load memberships from localStorage on mount.
-  useEffect(() => {
-    const storedMemberships = localStorage.getItem("memberships");
-    if (storedMemberships) {
-      setMemberships(JSON.parse(storedMemberships));
-    }
-  }, []);
-
-  // Save memberships to localStorage whenever they change (skip if empty).
-  useEffect(() => {
-    if (memberships.length === 0) return;
-    localStorage.setItem("memberships", JSON.stringify(memberships));
-  }, [memberships]);
-
-  useEffect(() => {
-    if (redeemHistory.length === 0) return;
-    localStorage.setItem("redeemHistory", JSON.stringify(redeemHistory));
-  }, [redeemHistory]);
-
   // Filter memberships based on search query
   const [searchQuery, setSearchQuery] = useState<string>("");
   const filterMemberships = useMemo(
@@ -101,25 +81,6 @@ export default function MembershipMasterPage({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  // Load memberships from localStorage on mount.
-  useEffect(() => {
-    const storedMemberships = localStorage.getItem("memberships");
-    if (storedMemberships) {
-      setMemberships(JSON.parse(storedMemberships));
-    }
-  }, []);
-
-  // Save memberships to localStorage whenever they change (skip if empty).
-  useEffect(() => {
-    if (memberships.length === 0) return;
-    localStorage.setItem("memberships", JSON.stringify(memberships));
-  }, [memberships]);
-
-  useEffect(() => {
-    if (redeemHistory.length === 0) return;
-    localStorage.setItem("redeemHistory", JSON.stringify(redeemHistory));
-  }, [redeemHistory]);
 
   // Opens modal to add a new membership.
   const openAddModal = () => {
@@ -199,7 +160,7 @@ export default function MembershipMasterPage({
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    setMemberships((prev) => [...prev, newMembership]);
+    actions.saveMembership(newMembership);
     toast.success("Membership added", {
       position: "top-center",
       autoClose: 5000,
@@ -211,27 +172,21 @@ export default function MembershipMasterPage({
   const handleEditSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!currentMembership) return;
-    setMemberships((prev) =>
-      prev.map((membership) =>
-        membership.id === currentMembership.id
-          ? {
-              ...membership,
-              firstName,
-              lastName,
-              email,
-              phoneNumber,
-              nationality,
-              identityNumber,
-              membershipTypeId,
-              membershipStartDate,
-              membershipEndDate,
-              isActive,
-              points,
-              updatedAt: new Date().toISOString(),
-            }
-          : membership
-      )
-    );
+    actions.saveMembership({
+      ...currentMembership,
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      nationality,
+      identityNumber,
+      membershipTypeId,
+      membershipStartDate,
+      membershipEndDate,
+      isActive,
+      points,
+      updatedAt: new Date().toISOString(),
+    });
     toast.success("Membership updated", {
       position: "top-center",
       autoClose: 5000,
@@ -242,9 +197,7 @@ export default function MembershipMasterPage({
   // Handles membership deletion.
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this membership?")) {
-      setMemberships((prev) =>
-        prev.filter((membership) => membership.id !== id)
-      );
+      actions.deleteMembership(id);
       toast.success("Membership deleted", {
         position: "top-center",
         autoClose: 5000,
@@ -266,30 +219,14 @@ export default function MembershipMasterPage({
       return;
     }
 
-    // Update the membership points
-    const updatedMembership = {
-      ...currentMembership,
-      points: currentMembership.points - redeemPoints,
-      updatedAt: new Date().toISOString(),
-    };
-
-    // Update memberships state
-    setMemberships((prev) =>
-      prev.map((membership) =>
-        membership.id === currentMembership.id ? updatedMembership : membership
-      )
-    );
-
-    // Add to redeem history
-    const newRedeemHistory: RedeemPointHistoryStruct = {
-      id: Date.now(),
-      membershipId: currentMembership.id,
-      points: redeemPoints,
-      redeemDate: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-    };
-
-    setRedeemHistory((prev) => [...prev, newRedeemHistory]);
+    const error = actions.redeemMembershipPoints(currentMembership, redeemPoints);
+    if (error) {
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 5000,
+      });
+      return;
+    }
 
     toast.success("Points redeemed successfully", {
       position: "top-center",
@@ -1021,3 +958,4 @@ export default function MembershipMasterPage({
     </div>
   );
 }
+

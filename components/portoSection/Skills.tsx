@@ -47,7 +47,7 @@ const skills = [
 const marqueeRepeatCount = 4;
 
 const SkillBadge = ({ icon: Icon, name }: { icon: any; name: string }) => (
-    <div className="flex items-center gap-2 px-4 py-2 mx-4 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm hover:bg-white/10 transition-colors">
+    <div className="flex items-center gap-2 px-4 py-2 mx-4 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors">
         <Icon className="w-6 h-6 text-white" />
         <span className="text-sm font-medium text-white/80">{name}</span>
     </div>
@@ -77,7 +77,7 @@ export default function Skills() {
             <div className="relative flex flex-col gap-8">
                 {/* First Row */}
                 <div className="flex w-full overflow-hidden mask-linear-gradient">
-                    <div className="flex w-max animate-marquee shrink-0 items-center">
+                    <div className="flex w-max animate-marquee shrink-0 items-center will-change-transform">
                         {repeatedFirstRow.map((skill, index) => (
                             <SkillBadge key={`row1-${index}`} {...skill} />
                         ))}
@@ -86,7 +86,7 @@ export default function Skills() {
 
                 {/* Second Row */}
                 <div className="flex w-full overflow-hidden mask-linear-gradient">
-                    <div className="flex w-max animate-marquee-reverse shrink-0 items-center">
+                    <div className="flex w-max animate-marquee-reverse shrink-0 items-center will-change-transform">
                         {repeatedSecondRow.map((skill, index) => (
                             <SkillBadge key={`row2-${index}`} {...skill} />
                         ))}

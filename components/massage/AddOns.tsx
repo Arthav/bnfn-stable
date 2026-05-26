@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import React, { useState, FormEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import { AddOns, Staff } from "@/components/types/massage";
 
@@ -6,11 +6,11 @@ type ModalType = "add" | "edit" | null;
 
 export default function ManageAddOnsPage({
   addOns,
-  setAddOns,
+  saveAddOn,
   activeStaff,
 }: {
   addOns: AddOns[];
-  setAddOns: React.Dispatch<React.SetStateAction<AddOns[]>>;
+  saveAddOn: (addOn: AddOns) => void;
   activeStaff: Staff | null;
 }) {
   const [modalType, setModalType] = useState<ModalType>(null);
@@ -35,11 +35,6 @@ export default function ManageAddOnsPage({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  // Save add-ons to localStorage whenever they change.
-  useEffect(() => {
-    localStorage.setItem("addOns", JSON.stringify(addOns));
-  }, [addOns]);
 
   const openAddModal = () => {
     setCurrentAddon(null);
@@ -87,7 +82,7 @@ export default function ManageAddOnsPage({
     e.preventDefault();
     const newId = addOns.length ? Math.max(...addOns.map((a) => a.id)) + 1 : 1;
     const newAddon: AddOns = { id: newId, ...formData, createdBy: activeStaff };
-    setAddOns((prev) => [...prev, newAddon]);
+    saveAddOn(newAddon);
     setTimeout(() => {
       toast.success("Addon added", { position: "top-center", autoClose: 5000 });
     }, 0);
@@ -98,9 +93,7 @@ export default function ManageAddOnsPage({
   const handleEditSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!currentAddon) return;
-    setAddOns((prev) =>
-      prev.map((a) => (a.id === currentAddon.id ? { ...a, ...formData } : a))
-    );
+    saveAddOn({ ...currentAddon, ...formData });
     toast.success("Addon updated", { position: "top-center", autoClose: 5000 });
     setModalType(null);
   };
@@ -112,11 +105,7 @@ export default function ManageAddOnsPage({
     const newStatus =
       addonToToggle.status === "Active" ? "Discontinued" : "Active";
 
-    setAddOns((prev) =>
-      prev.map((addon) =>
-        addon.id === id ? { ...addon, status: newStatus } : addon
-      )
-    );
+    saveAddOn({ ...addonToToggle, status: newStatus });
 
     // Defer toast outside the updater function.
     setTimeout(() => {

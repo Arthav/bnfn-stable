@@ -16,13 +16,10 @@ import {
   ModalContent,
 } from "@nextui-org/modal";
 import confetti from "canvas-confetti";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import "@/styles/driver-js.css";
-
-import { instruction } from "@/components/constant/instruction";
 
 interface Todo {
   id: number;
@@ -46,33 +43,21 @@ const TodoList: React.FC = () => {
   const generateTasksWithAI = async (prompt: string) => {
     setLoading(true);
     try {
-      const geminiKey = process.env.NEXT_PUBLIC_GEMINI_KEY;
-      if (!geminiKey) {
-        throw new Error("Missing API Key");
-      }
-
-      const genAI = new GoogleGenerativeAI(geminiKey);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
-        systemInstruction: {
-          role: "system",
-          parts: [
-            {
-              text: instruction.todoList,
-            },
-          ],
-        },
-        generationConfig: {
-          temperature: 0.5,
-          maxOutputTokens: 150,
-          topP: 0.9,
-          topK: 50,
-        },
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: prompt,
+          instructionKey: "todoList",
+        }),
       });
 
-      const result = await model.generateContent(prompt);
-      const aiTasks = result.response
-        .text()
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      const result = (await response.json()) as { text: string };
+      const aiTasks = result.text
         .split("\n")
         .map((task, index) => ({
           id: Date.now() + index,

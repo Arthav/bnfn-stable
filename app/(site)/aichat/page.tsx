@@ -1,98 +1,65 @@
 "use client";
 
 import React, { useState } from "react";
-import { GoogleGenerativeAI, ChatSession } from "@google/generative-ai";
 import clsx from "clsx";
-
 import { instruction } from "@/components/constant/instruction";
+import { ChatHistoryMessage, ChatResponse, InstructionKey } from "@/lib/ai/chat-types";
+
+const instructionsOptions: Record<InstructionKey, string> = {
+  todoList: "Todo List",
+  customerService: "Customer Service",
+  datingSims: "Dating Sims",
+  therapist: "Therapist Consultant",
+  socialMedia: "Social Media Influencer",
+  storyTeller: "Story Teller",
+  writer: "Writer",
+  songWritter: "Song Writter",
+  careerCoach: "Career Coach",
+  relationshipCouncelor: "Relationship Counsellor",
+  triviaHost: "Trivia Host",
+  techSupport: "Tech Support",
+  bhaktaSupport: "Bhakta Support",
+};
 
 const AIChatPage = () => {
-  const [messages, setMessages] = useState<{ user: string; text: string }[]>(
-    []
-  );
-  const [inputValue, setInputValue] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [messages, setMessages] = useState<ChatHistoryMessage[]>([]);
+  const [inputValue, setInputValue] = useState("");
+  const [loading, setLoading] = useState(false);
   const [selectedInstruction, setSelectedInstruction] =
-    useState<keyof typeof instruction>("customerService");
-  const [chatSession, setChatSession] = useState<ChatSession | null>(null);
-
-  const instructionsOptions = {
-    customerService: "Customer Service",
-    therapist: "Therapist Consultant",
-    socialMedia: "Social Media Influencer",
-    storyTeller: "Story Teller",
-    writer: "Writer",
-    songWritter: "Song Writter",
-    careerCoach: "Career Coach",
-    relationshipCouncelor: "Relationship Counsellor",
-    triviaHost: "Trivia Host",
-    techSupport: "Tech Support",
-    bhaktaSupport: "Bhakta Support",
-  };
-
-  const generationConfig = {
-    temperature: 0.9,
-    maxOutputTokens: 250,
-    topP: 0.9,
-    topK: 50,
-  };
-
-  const initializeChatSession = (apiKey: string) => {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      systemInstruction: {
-        role: "system",
-        parts: [
-          {
-            text: instruction[selectedInstruction],
-          },
-        ],
-      },
-      generationConfig,
-    });
-
-    return model.startChat();
-  };
+    useState<InstructionKey>("customerService");
 
   const handleSendMessage = async () => {
-    if (inputValue.trim() === "") return;
+    const message = inputValue.trim();
+    if (!message) return;
 
-    const userMessage = { user: "User", text: inputValue };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    const previousMessages = messages;
+    setMessages((prevMessages) => [...prevMessages, { user: "User", text: message }]);
     setInputValue("");
     setLoading(true);
 
     try {
-      const geminiKey = process.env.NEXT_PUBLIC_GEMINI_KEY;
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message,
+          instructionKey: selectedInstruction,
+          history: previousMessages,
+        }),
+      });
 
-      if (!geminiKey) {
-        throw new Error("Missing API Key");
+      if (!response.ok) {
+        throw new Error(await response.text());
       }
 
-      // Initialize ChatSession if not already initialized
-      let session = chatSession;
-      if (!session) {
-        session = initializeChatSession(geminiKey);
-        setChatSession(session);
-      }
-
-      // Send the user's message to the model
-      const result = await session.sendMessage(inputValue);
-
-      const aiMessage = {
-        user: "AI",
-        text: result.response.text() || "No response received from AI.",
-      };
-
-      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+      const data = (await response.json()) as ChatResponse;
+      setMessages((prevMessages) => [...prevMessages, { user: "AI", text: data.text }]);
     } catch (error) {
       console.error("Error fetching AI response:", error);
-      const errorMessage = {
-        user: "AI",
-        text: "Error loading AI response. Please try again later.",
-      };
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { user: "AI", text: "Error loading AI response. Please try again later." },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -104,7 +71,6 @@ const AIChatPage = () => {
       handleSendMessage();
     }
   };
-  // add test comment
 
   return (
     <div>
@@ -113,14 +79,13 @@ const AIChatPage = () => {
           className="bg-gray-200 dark:bg-gray-700 border border-gray-300 rounded-md p-2"
           value={selectedInstruction}
           onChange={(e) => {
-            setSelectedInstruction(e.target.value as keyof typeof instruction);
+            setSelectedInstruction(e.target.value as InstructionKey);
             setMessages([]);
-            setChatSession(null);
           }}
         >
-          {Object.entries(instructionsOptions).map(([instruction, label]) => (
-            <option value={instruction} key={instruction}>
-              {label}
+          {Object.keys(instruction).map((key) => (
+            <option value={key} key={key}>
+              {instructionsOptions[key as InstructionKey] || key}
             </option>
           ))}
         </select>
@@ -131,25 +96,18 @@ const AIChatPage = () => {
       >
         {messages.map((message, index) => (
           <div
-            key={index}
+            key={`${message.user}-${index}`}
             className={clsx(
               "chat-message",
               "rounded-lg",
               "border",
+              "whitespace-pre-wrap",
               message.user === "User"
                 ? "bg-gray-500 text-white flex justify-end text-right"
                 : "flex justify-start text-left"
             )}
           >
-            <div
-              dangerouslySetInnerHTML={{
-                __html: message.text
-                  .replace(/(?:\r\n|\r|\n)/g, "<br />")
-                  .replace(/`([^`]+)`/g, "<code>$1</code>")
-                  .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-                  .replace(/\*([^*]+)\*/g, "<em>$1</em>"),
-              }}
-            />
+            {message.text}
           </div>
         ))}
       </div>
