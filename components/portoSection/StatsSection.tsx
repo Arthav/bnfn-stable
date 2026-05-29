@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Box,
   BriefcaseBusiness,
@@ -13,6 +14,10 @@ import {
   TerminalSquare,
   UserRound,
 } from "lucide-react";
+
+const PlasmaWave = dynamic(() => import("@/components/PlasmaWave"), {
+  ssr: false,
+});
 
 interface AnimatedCounterProps {
   target: number;
@@ -233,9 +238,25 @@ export default function StatsSection() {
   return (
     <section
       ref={sectionRef}
-      className="w-full px-4 py-12 sm:px-8 md:px-16 lg:min-h-screen lg:py-8"
+      className="relative w-full overflow-hidden bg-black px-4 py-12 sm:px-8 md:px-16 lg:min-h-screen lg:py-8"
     >
-      <div className="mx-auto w-full max-w-[1500px]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-65"
+      >
+        <PlasmaWave
+          colors={["#A855F7", "#06B6D4"]}
+          speed1={0.11}
+          speed2={0.005}
+          dir2={1}
+          focalLength={1.25}
+          bend1={1.4}
+          bend2={0.5}
+        />
+      </div>
+      <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.28)_42%,rgba(0,0,0,0.86)_100%)]" />
+
+      <div className="relative z-10 mx-auto w-full max-w-[1500px]">
         <div className="mb-4 lg:mb-3">
           <h2 className="text-4xl font-black tracking-normal text-white sm:text-5xl lg:text-[3.25rem] lg:leading-none">
             Life Stat

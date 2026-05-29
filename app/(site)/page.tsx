@@ -6,17 +6,28 @@ import StatsSection from "@/components/portoSection/StatsSection";
 import ExperienceTimeline from "@/components/portoSection/ExperienceTimeline";
 import ProjectsShowcase from "@/components/portoSection/ProjectsShowcase";
 import ContactFooter from "@/components/portoSection/ContactFooter";
-import Marquee from "@/components/ui/Marquee";
 import Magnetic from "@/components/ui/Magnetic";
+import { hyperspeedPresets } from "@/components/HyperSpeedPresets";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+
+const Hyperspeed = dynamic(() => import("@/components/Hyperspeed"), {
+  ssr: false,
+});
 
 export default function Home() {
   return (
     <section className="flex w-full flex-col items-center justify-center gap-4 overflow-x-clip">
       {/* Hero section */}
       <div className="relative w-full overflow-hidden bg-black">
-        <div className="relative flex h-[calc(100vh-64px)] w-full flex-col items-center justify-center overflow-hidden">
-          <Marquee />
+        <div className="relative isolate flex h-[calc(100vh-64px)] w-full flex-col items-center justify-center overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-0 opacity-90"
+          >
+            <Hyperspeed effectOptions={hyperspeedPresets.three} />
+          </div>
+          <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/10 to-black/70" />
 
           {heroSection}
         </div>
@@ -46,7 +57,7 @@ export default function Home() {
 }
 
 const heroSection = (
-  <div className="flex flex-col items-center justify-center text-center z-10 w-full px-4 relative mix-blend-difference">
+  <div className="relative z-20 flex w-full flex-col items-center justify-center px-4 text-center">
     <div className="overflow-hidden">
       <motion.h1
         initial={{ y: 200 }}
@@ -72,7 +83,7 @@ const heroSection = (
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5, duration: 0.8 }}
-      className="text-lg md:text-2xl text-gray-300 max-w-[19rem] sm:max-w-2xl mx-auto mt-8 font-light tracking-wide mix-blend-difference"
+      className="mx-auto mt-8 max-w-[19rem] text-lg font-light tracking-wide text-gray-300 sm:max-w-2xl md:text-2xl"
     >
       Full Stack Engineer crafting digital experiences that matter.
     </motion.p>

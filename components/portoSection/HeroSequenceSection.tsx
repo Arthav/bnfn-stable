@@ -151,7 +151,7 @@ export default function HeroSequenceSection() {
       id="hero-sequence"
       className="relative h-[420vh] w-full bg-black"
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
+      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-black">
         <div className="absolute inset-0">
           <Image
             src={activeFrame.src}
@@ -174,8 +174,8 @@ export default function HeroSequenceSection() {
           </span>
         </div>
 
-        <div className="absolute bottom-0 left-0 w-full px-5 pb-10 md:px-8 md:pb-14">
-          <div className="max-w-3xl">
+        <div className="absolute bottom-0 left-0 w-full px-5 pb-12 md:px-8 md:pb-14">
+          <div className="max-w-[min(48rem,calc(100vw-2.5rem))]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeScene.eyebrow}
@@ -188,7 +188,7 @@ export default function HeroSequenceSection() {
                   {activeScene.eyebrow}
                 </p>
 
-                <h2 className="max-w-3xl text-3xl font-black uppercase leading-[0.88] tracking-[-0.04em] text-white sm:text-5xl md:text-7xl">
+                <h2 className="max-w-3xl text-[clamp(2.75rem,7.5vmin,4.75rem)] font-black uppercase leading-[0.86] tracking-[-0.04em] text-white">
                   {activeScene.headline.map((line) => (
                     <span key={line} className="block">
                       {line}

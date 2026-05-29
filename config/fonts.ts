@@ -1,17 +1,19 @@
-import { Fira_Code as FontMono, Inter as FontSans, Kanit as FontHeading } from "next/font/google";
+import { Urbanist } from "next/font/google";
 
-export const fontSans = FontSans({
+export const fontSans = Urbanist({
   subsets: ["latin"],
   variable: "--font-sans",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-export const fontMono = FontMono({
+export const fontMono = Urbanist({
   subsets: ["latin"],
   variable: "--font-mono",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-export const fontHeading = FontHeading({
+export const fontHeading = Urbanist({
   subsets: ["latin"],
   variable: "--font-heading",
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
