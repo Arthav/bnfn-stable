@@ -18,6 +18,9 @@ import NextLink from "next/link";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 
+import { usePathname } from "next/navigation";
+import { PortfolioNavigation } from "@/components/portfolio/navigation";
+
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -29,7 +32,13 @@ import {
   BNFNLogo,
 } from "@/components/icons";
 
+// Keep the existing app navigation on every route outside the portfolio.
 export const Navbar = () => {
+  const pathname = usePathname();
+  return pathname === "/" ? <PortfolioNavigation /> : <AppNavbar />;
+};
+
+const AppNavbar = () => {
   const [isHidden, setIsHidden] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const lastScrollYRef = useRef(0);

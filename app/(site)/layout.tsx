@@ -7,15 +7,12 @@ export default function SiteLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="relative flex min-h-screen flex-col">
+        <div id="top" className="relative flex min-h-screen flex-col">
             <CustomCursor />
             <Navbar />
-            <main className="w-full flex-grow overflow-x-clip">
+            <main id="main-content" tabIndex={-1} className="w-full flex-grow overflow-x-clip">
                 {children}
             </main>
-            <footer className="w-full flex items-center justify-center py-3">
-                {/* Footer content can go here if needed later */}
-            </footer>
         </div>
     );
 }

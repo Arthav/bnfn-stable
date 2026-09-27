@@ -17,9 +17,12 @@ vi.mock("@/components/mini-games/orbito", () => ({
   Orbito: () => createElement("div"),
 }));
 
-const { getGamesForMode, getRegisteredGame, registeredGames } = await import(
-  "@/components/mini-games/registry"
-);
+// Vitest hoists the mocks; a static import also supports the project's ES5 target.
+import {
+  getGamesForMode,
+  getRegisteredGame,
+  registeredGames,
+} from "@/components/mini-games/registry";
 
 describe("mini-games registry Module", () => {
   it("exposes registered game metadata from one list", () => {
@@ -35,10 +38,10 @@ describe("mini-games registry Module", () => {
 
   it("filters games by play mode", () => {
     expect(getGamesForMode("vs_computer").map((game) => game.id)).not.toContain(
-      "memory-match"
+      "memory-match",
     );
     expect(getGamesForMode("competition").map((game) => game.id)).toContain(
-      "memory-match"
+      "memory-match",
     );
   });
 });

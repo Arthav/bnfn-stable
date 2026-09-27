@@ -1,8 +1,11 @@
 "use client";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CustomCursor() {
+    const pathname = usePathname();
+    const isPortfolio = pathname === "/";
     const [isHovered, setIsHovered] = useState(false);
     const cursorSize = isHovered ? 60 : 20;
 
@@ -14,6 +17,7 @@ export default function CustomCursor() {
     const cursorY = useSpring(mouseY, springConfig);
 
     useEffect(() => {
+        if (isPortfolio) return;
         const moveCursor = (e: MouseEvent) => {
             mouseX.set(e.clientX - cursorSize / 2);
             mouseY.set(e.clientY - cursorSize / 2);
@@ -40,7 +44,10 @@ export default function CustomCursor() {
             window.removeEventListener("mousemove", moveCursor);
             window.removeEventListener("mouseover", handleMouseOver);
         };
-    }, [cursorSize, mouseX, mouseY]);
+    }, [cursorSize, mouseX, mouseY, isPortfolio]);
+
+    // The portfolio uses the native pointer and dedicated magnetic interactions.
+    if (isPortfolio) return null;
 
     return (
         <motion.div

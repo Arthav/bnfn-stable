@@ -108,3 +108,13 @@ button:disabled {
 .card-spotlight:hover::before {
   opacity: 1;
 }
+
+/* Smooth anchors are scoped to the portfolio and respect its motion control. */
+html:has([data-portfolio-motion]) {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+}
+html:has([data-portfolio-motion="paused"]) { scroll-behavior: auto; }
+@media (prefers-reduced-motion: reduce) {
+  html:has([data-portfolio-motion]) { scroll-behavior: auto; }
+}
